@@ -1,0 +1,61 @@
+body.less
+    .more-link
+        background-image: url(../images/sprites.png)
+        background-position: -18px -320px
+        display: inline-block
+        width: 44px
+        height: 16px
+        +hide-text
+    
+    .nav-1
+        ul
+            margin: 0
+            padding: 0
+            list-style: none
+            li
+                display: inline
+
+    .hide-text
+        +hide-text
+
+    .center
+        text-align: center !important
+
+    .clearfix
+        overflow: visible
+        zoom: 1
+        &:before, &:after
+            content: "\0020"
+            display: block
+            height: 0
+            overflow: hidden
+        &:after
+            clear: both
+
+    .button
+        border: none
+        cursor: pointer
+        text-align: center
+        display: inline-block
+        text-decoration: none
+
+    .button-1
+        padding: .3em
+        background: #EEE
+
+
+    .right
+        float: right
+
+    .left
+        float: left
+
+    .left
+        img
+            margin: 0 10px 10px 0
+
+    .right
+        img
+            margin: 0 0 10px 10px
+    .hide
+        display: none

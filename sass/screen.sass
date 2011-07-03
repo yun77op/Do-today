@@ -1,0 +1,114 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import blueprint/reset
+
+// To configure blueprint, edit the partials/base.sass file.
+@import partials/base
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import blueprint
+
+// Combine the partials into a single screen stylesheet.
+@import partials/page
+@import partials/form
+@import partials/two_col
+
+@import "compass/css3"
+@import "compass/typography"
+
+@import less/index
+
+@import app/index
+
+
+html
+    background: #FFF url(../images/html_bg.png) 50% 100% repeat-x
+body
+    background: url(../images/body_bg.png) repeat-x
+
+#header
+    padding-top: 20px
+    height: 220px
+    position: relative
+    h1
+        background: url(../images/logo.png)
+        float: left
+        a
+            display: block
+            width: 271px
+            height: 114px
+            +hide-text
+
+    #nav
+        position: absolute
+        top: 20px
+        right: 20px
+        li
+            display: inline
+            a
+                display: inline-block
+                padding: 0 7px
+                width: 80px
+                height: 34px
+                +hide-text
+                background-image: url(../images/sprites.png)
+        .wb-recommend
+            a
+                background-position: -465px -8px
+        .wb-followUs
+            a
+                background-position: -564px -8px
+        .wb-login
+            a
+                background-position: -664px -8px
+
+#content
+    width: 610px
+    margin: 0 auto
+    #primary
+        height: 157px
+        background: url(../images/sprites.png) -70px -184px no-repeat
+        .question
+            font-weight: bold
+            padding-top: 15px
+            h3
+                color: red
+                margin:  20px 0 10px
+            ul
+                list-style: inside upper-latin
+                li
+                    margin-bottom: 10px
+                    cursor: pointer
+                    -webkit-transition: padding .2s ease-out .1s
+                    -moz-transition: padding .2s ease-out .1s
+                    &:hover
+                        padding-left: 10px
+                        &:after
+                            content: "->"
+            .question-hd, .question-bd
+                margin-left: 200px
+        .question-done
+            h3
+                margin-top: 0
+            .question-bd
+                margin: 0 30px 0 70px
+            
+    #connect
+        background: url(../images/sprites.png) -70px -341px no-repeat
+        .connect-hd
+            margin-left: 70px
+            height: 30px
+            +replace-text("sprites.png", -470px, -75px)
+            background-image: url(../images/sprites.png)
+        textarea
+            margin: 10px 0 10px 70px
+            height: 50px
+            display: block
+            width: 450px
+            border: none
+        #connect-btn
+            margin: 40px 200px 20px
+
+#footer
+    padding: 10px 0
+    width: 100%
+    background: url(../images/footer_bg.png) repeat-x
