@@ -20,95 +20,64 @@
 @import app/index
 
 
-html
-    background: #FFF url(../images/html_bg.png) 50% 100% repeat-x
-body
-    background: url(../images/body_bg.png) repeat-x
-
 #header
-    padding-top: 20px
-    height: 220px
+    height: 180px
     position: relative
     h1
         background: url(../images/logo.png)
+        margin: 50px 0 0 200px
         float: left
         a
             display: block
-            width: 271px
-            height: 114px
+            height: 88px
+            width: 224px
             +hide-text
 
-    #nav
-        position: absolute
-        top: 20px
-        right: 20px
-        li
-            display: inline
-            a
-                display: inline-block
-                padding: 0 7px
-                width: 80px
-                height: 34px
-                +hide-text
-                background-image: url(../images/sprites.png)
-        .wb-recommend
-            a
-                background-position: -465px -8px
-        .wb-followUs
-            a
-                background-position: -564px -8px
-        .wb-login
-            a
-                background-position: -664px -8px
-
 #content
-    width: 610px
+    width: 500px
     margin: 0 auto
-    #primary
-        height: 157px
-        background: url(../images/sprites.png) -70px -184px no-repeat
-        .question
-            font-weight: bold
-            padding-top: 15px
-            h3
-                color: red
-                margin:  20px 0 10px
-            ul
-                list-style: inside upper-latin
-                li
-                    margin-bottom: 10px
-                    cursor: pointer
-                    -webkit-transition: padding .2s ease-out .1s
-                    -moz-transition: padding .2s ease-out .1s
-                    &:hover
-                        padding-left: 10px
-                        &:after
-                            content: "->"
-            .question-hd, .question-bd
-                margin-left: 200px
-        .question-done
-            h3
-                margin-top: 0
-            .question-bd
-                margin: 0 30px 0 70px
-            
-    #connect
-        background: url(../images/sprites.png) -70px -341px no-repeat
-        .connect-hd
-            margin-left: 70px
-            height: 30px
-            +replace-text("sprites.png", -470px, -75px)
-            background-image: url(../images/sprites.png)
-        textarea
-            margin: 10px 0 10px 70px
-            height: 50px
-            display: block
-            width: 450px
-            border: none
-        #connect-btn
-            margin: 40px 200px 20px
+    font-size: 1.2em
+    color: #FFF
+    > .container
+        margin: 10px
+    #timer
+        height: 60px
+        background: #999
+        position: relative
+        .timer-time, .timer-start
+            height: 40px
+            margin-top: 10px
+            float: left
+        .timer-time
+            width: 3em
+            font-size: 2em
+            font-weight: bold 
+            line-height: 40px
+        .timer-start
+            width: 20px
+            background: orange
 
-#footer
-    padding: 10px 0
-    width: 100%
-    background: url(../images/footer_bg.png) repeat-x
+    #task
+        > div
+            margin-bottom: 10px
+        .nav
+            border-bottom: 1px solid #000
+            .selected
+                a
+                    font-weight: bold
+                    border-bottom: 2px solid #000
+        .task-add
+            input
+                padding: 4px
+                width: 450px
+                +border-radius(4px, 4px)
+                border: 2px inset threedface
+                &:focus
+                    border-color: yellow
+        .task-today-list
+            ul
+                list-style: upper-roman inside
+                li
+                    border-bottom: 1px dotted #000
+                    padding: .5em
+
