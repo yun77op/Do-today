@@ -1,14 +1,10 @@
 define(function(require, exports, module) {
-    var app = {};
 
-    app.init = function() {
-        $(document).trigger('init');
-        $(function() {
-            require.async('./mvc.js', function() {});
-            $(document).trigger('init:domReady');
-        });
-        $(document).trigger('init:complete');
-    };
 
+    var app = require('./base');
+    var initPlugins = require('./init_plugin');
+    app.addInitPlugins(initPlugins);
+
+    window.app = app;
     return app;
 });

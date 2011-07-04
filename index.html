@@ -19,6 +19,22 @@ t" type="text/css" />
     <![endif] -->
     <link rel="shortcut icon" href="/favicon.ico">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <script src="scripts/lib/LAB.min.js"></script>
+    <script>
+        $LAB.setOptions({BasePath: '/Do-today/scripts/'})
+            .script('lib/sea.js')
+            .script('lib/jquery-1.6.1.js')
+            .script('lib/underscore-min.js').wait()
+            .script('lib/backbone.js')
+            .wait(function() {
+                seajs.config({
+                    base: '/Do-today/scripts/'
+                });
+                seajs.use('app', function(app) {
+                    app.init();
+                });
+            });
+    </script>
 </head>
 <body class="two-col bp less app">
     <div id="container">
@@ -57,11 +73,5 @@ t" type="text/css" />
 
         </div>
     </div>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script><!--Load jQuery-->
-<script>!window.jQuery && document.write(unescape('%3Cscript src="js/lib/jquery-1.5.2.min.js"%3E%3C/script%3E'))</script>
-<script src="scripts/lib/underscore-min.js"></script>
-<script src="scripts/lib/sea.js"></script>
-<script src="scripts/app.js"></script>
 </body>
 </html>
