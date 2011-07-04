@@ -21,41 +21,68 @@
 
 
 #header
-    height: 180px
+    height: 80px
     position: relative
+    background: #FFF url(../images/header.png) repeat-x
     h1
         background: url(../images/logo.png)
-        margin: 50px 0 0 200px
+        margin: 16px 0 0 230px
         float: left
         a
             display: block
             height: 88px
             width: 224px
             +hide-text
+    .sub-title
+        position: absolute
+        width: 150px
+        height: 60px
+        background: url(../images/sprites.png) 0 -93px no-repeat
+        left: 68px
+        top: -10px
 
 #content
-    width: 500px
+    padding-top: 50px
+    width: 570px
     margin: 0 auto
     font-size: 1.2em
     color: #FFF
     > .container
         margin: 10px
     #timer
-        height: 60px
-        background: #999
+        height: 66px
+        background: url(../images/sprites.png) -4px -6px
         position: relative
         .timer-time, .timer-start
-            height: 40px
-            margin-top: 10px
+            height: 36px
+            margin-top: 20px
             float: left
         .timer-time
-            width: 3em
-            font-size: 2em
+            width: 50px
+            margin-left: 18px
+            font-size: 18px
             font-weight: bold 
-            line-height: 40px
+            line-height: 36px
         .timer-start
             width: 20px
-            background: orange
+            margin-left: 6px
+            +linear-gradient(color-stops(#B1AD3F, #A4A148), left)
+            +border-radius(5px)
+            .button
+                width: 0
+                height: 0
+                border-style: solid
+                border-width: 10px
+                border-color: transparent #FFF
+                border-right-width: 0
+                margin: 9px 0 0 6px
+        .start
+            .button
+                width: 8px
+                height: 14px
+                border: none
+                background: #FFF
+                margin-left: 6px
 
     #task
         > div
@@ -69,7 +96,7 @@
         .task-add
             input
                 padding: 4px
-                width: 450px
+                width: 540px
                 +border-radius(4px, 4px)
                 border: 2px inset threedface
                 &:focus
