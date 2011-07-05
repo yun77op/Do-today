@@ -643,6 +643,7 @@ body.app #container {
 /* line 4, ../sass/app/_typography.sass */
 body.app #container a {
   color: white;
+  text-decoration: none;
 }
 
 /* line 2, ../sass/app/_page.sass */
@@ -740,28 +741,28 @@ body.app #container a {
   border-right-width: 0;
   margin: 9px 0 0 6px;
 }
-/* line 80, ../sass/screen.sass */
-#content #timer .start .button {
+/* line 79, ../sass/screen.sass */
+#content #timer .timer-start .button.started {
   width: 8px;
   height: 14px;
   border: none;
   background: white;
   margin-left: 6px;
 }
-/* line 88, ../sass/screen.sass */
+/* line 87, ../sass/screen.sass */
 #content #task > div {
   margin-bottom: 10px;
 }
-/* line 90, ../sass/screen.sass */
+/* line 89, ../sass/screen.sass */
 #content #task .nav {
   border-bottom: 1px solid black;
 }
-/* line 93, ../sass/screen.sass */
+/* line 92, ../sass/screen.sass */
 #content #task .nav .selected a {
   font-weight: bold;
   border-bottom: 2px solid black;
 }
-/* line 97, ../sass/screen.sass */
+/* line 96, ../sass/screen.sass */
 #content #task .task-add input {
   padding: 4px;
   width: 540px;
@@ -773,16 +774,51 @@ body.app #container a {
   border-radius: 4px / 4px;
   border: 2px inset threedface;
 }
-/* line 102, ../sass/screen.sass */
+/* line 101, ../sass/screen.sass */
 #content #task .task-add input:focus {
   border-color: yellow;
 }
-/* line 105, ../sass/screen.sass */
-#content #task .task-today-list ul {
+/* line 104, ../sass/screen.sass */
+#content #task .task-list ul {
   list-style: upper-roman inside;
 }
-/* line 107, ../sass/screen.sass */
-#content #task .task-today-list ul li {
+/* line 106, ../sass/screen.sass */
+#content #task .task-list ul li {
   border-bottom: 1px dotted black;
   padding: 0.5em;
+  position: relative;
+}
+/* line 110, ../sass/screen.sass */
+#content #task .task-list ul li .reorder-icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  margin-top: -8px;
+  visibility: hidden;
+}
+/* line 116, ../sass/screen.sass */
+#content #task .sortable {
+  cursor: move;
+}
+/* line 118, ../sass/screen.sass */
+#content #task .sortable .reorder-icon {
+  visibility: visible !important;
+}
+/* line 120, ../sass/screen.sass */
+#content #task .sortable .task-actions {
+  visibility: hidden;
+}
+/* line 122, ../sass/screen.sass */
+#content #task .actions {
+  font-size: 0.9em;
+}
+/* line 124, ../sass/screen.sass */
+#content #task .actions .active {
+  background: orange;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -o-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -khtml-border-radius: 4px;
+  border-radius: 4px;
 }

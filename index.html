@@ -6,12 +6,13 @@
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="zh-CN" class="no-js"> <!--<![endif]-->
 <head>
     <meta charset="utf-8">
-    <title>日积月累</title>
+    <title>Do today</title>
     <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="robots" content="index,follow"> 
     <meta name="robots" content="noodp">
     <link href="stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="stylesheets/ui-lightness/jquery-ui-1.8.14.custom.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <link href="stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
      <!--[if lt IE 8]>
     <link href="stylesheets/ie.css" media="screen, projection" rel="styleshee
@@ -53,24 +54,48 @@ t" type="text/css" />
                 <span class="message-text">你知道吗？</span>
                 <button class="message-dismiss button">dismiss</button>
             </div>
-            <div id="task" class="container">
-                <div class="nav nav-1">
-                    <ul>
-                        <li class="selected"><a href="#today" class="button">今日任务</a></li>
-                        <li><a href="#past" class="button">往日记录</a></li> 
-                    </ul>
+            <div id="task" class="tabs">
+                <ul>
+                    <li class="selected"><a href="#task-today" class="button">今日任务</a></li>
+                    <li><a href="#task-past" class="button">往日记录</a></li> 
+                </ul>
+                <div id="task-today">
+                    <div class="task-add">
+                        <input placeholder="Add a task>>">
+                    </div>
+                    <div class="task-today-list task-list">
+                        <div id="task-template" class="hide"><span class="task">{{ name }}</span><a href="#"class="task-actions right">✿</a></div>
+                        <ul>
+                            <li class="task"><span class="task-content">开早会</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions right">✿</a></li>
+                            <li class="task"><span class="task-content">开你妹啊</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#" class="task-actions right">✿</a></li>
+                        </ul>
+                    </div>
+                    <div class="control actions">
+                        <a id="viewall-btn" class="button" href="">查看全部</a>
+                        <a id="reorder-btn" class="button" href="">重排</a>
+                    </div>
                 </div>
-                <div class="task-add">
-                    <input placeholder="Add a task>>">
+                <div id="task-past">
+                    coming soon
                 </div>
-                <div class="task-today-list">
-                    <ul>
-                        <li>开早会</li>
-                        <li>开你妹啊</li>
-                    </ul>
-                </div>
+                
             </div>
 
+        </div>
+    </div>
+    <div id="ui-overlay-task" class="ui-overlay hide">
+        <div class="ui-overlay-bd">
+            <ul>
+                <li class="task-del"><a href="#">删除</a></li>
+                <li class="task-hide"><a href="#">隐藏</a></li>
+                <li class="task-priority">隐藏
+                    <ul>
+                        <li class="task-priority-1"></li>
+                        <li class="task-priority-2"></li>
+                        <li class="task-priority-3"></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </div>
 </body>

@@ -1,6 +1,8 @@
 define(function(require, exports, module) {
 
 
+    require('./lib/jquery-ui-1.8.14.custom.min.js');
+
     var config = {
         timer: {
             workTime: 25 * 60,
@@ -35,6 +37,8 @@ define(function(require, exports, module) {
                             count += unit;
                             process.width(count);
                             plugin.updateTime.call(plugin, --time);
+                            if (time == 0)
+                                plugin.instance.stop();
                         });
                     } else {
                         plugin.instance.stop();
@@ -63,23 +67,93 @@ define(function(require, exports, module) {
                     s = Math.floor(time % 60);
                 
                 function zeroFill(s) {
+                    s += '';
                     return s.length == 1 ? '0' + s : s;
                 }
-
                 this.timeEl.text(zeroFill(m) + ':' + zeroFill(s));
 
-                if (m + s == 0) {
-                    return false;
-                }
             },
             started: false,
             
             instance: null
         }, task: {
             func: function(app, plugin) {
-                var el = plugin.el = $('#task');
+                var el = plugin.el = $('#task');             
 
-                el.delegate('');
+                _.templateSettings = {
+                    interpolate : /\{\{(.+?)\}\}/g
+                };
+
+
+                el.tabs();
+
+                var sortable = true;
+                el.delegate('.actions #reorder-btn', 'click', function(e) {
+                    e.preventDefault();
+                    $(this).toggleClass('active');
+                    $(this).text((sortable ? '完成': '') + '重排');
+                    sortable = !sortable;
+                    $( ".task-list ul" ).sortable({ disabled: sortable });
+                    $('.task-today-list', el).toggleClass('sortable');
+
+                });             
+
+                var TaskView = Backbone.View.extend({
+                    tagName: 'li',
+                    className: 'task',
+                    template: _.template($('#task-template').html()),
+                    initialize: function() {
+                        _.bindAll(this, 'render');
+                    },
+
+                    render: function() {
+                        var data = this.model.attributes;
+                        var content = this.template(data);
+                        $(this.el).empty().append(content);
+                        return this;
+                    },
+                    events: {
+                        'keyup input': 'addTask',
+                        'click .task-actions-trigger': 'showActions',
+                        'click .del-btn': 'del',
+                        'click .hide-btn': 'hide'
+                    },
+
+                    addTask: function(e) {
+                        
+                    },
+
+                    showActions: function(e) {
+                        e.preventDefault();
+
+                    },
+
+                    del: function(e) {
+                        e.preventDefault();
+                        this.remove();
+                    },
+
+                    hide: function(e) {
+                        e.preventDefault();
+                        this.remove();
+                    }
+                };
+
+
+                el.delegate('input', 'keyup', function(e) {
+                    var o = $(this);
+                    if (e.which == 13) {
+                        var task = $.trim(o.val());
+                        o.val('');
+                        if (task === '')
+                            return;
+                        var taskView = new TaskView();
+                        $('.task-today-list ul', el).append(taskView.el);
+                    }
+                });
+
+
+
             }
         }
 	}
