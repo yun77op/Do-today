@@ -360,7 +360,7 @@ body.bp .info a {
   color: #205791;
 }
 /* line 10, D:/Program Files/Ruby192/lib/ruby/gems/1.9.1/gems/compass-0.11.3/frameworks/blueprint/stylesheets/blueprint/_interaction.scss */
-body.bp .hide, body.bp .ui-overlay {
+body.bp .hide {
   display: none;
 }
 /* line 11, D:/Program Files/Ruby192/lib/ruby/gems/1.9.1/gems/compass-0.11.3/frameworks/blueprint/stylesheets/blueprint/_interaction.scss */
@@ -579,8 +579,12 @@ body.less .right img {
   margin: 0 0 10px 10px;
 }
 /* line 60, ../sass/less/_util.sass */
-body.less .hide, body.less .ui-overlay {
+body.less .hide {
   display: none;
+}
+/* line 64, ../sass/less/_util.sass */
+body.less .horizontal li {
+  display: inline;
 }
 
 /* line 4, ../sass/less/_ui.sass */
@@ -600,24 +604,19 @@ body.less .hide, body.less .ui-overlay {
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* line 16, ../sass/less/_ui.sass */
-.ui-overlay li:hover {
-  background: #bebebe;
-}
-
-/* line 19, ../sass/less/_ui.sass */
+/* line 15, ../sass/less/_ui.sass */
 .ui-trigger {
   cursor: pointer;
 }
 
-/* line 22, ../sass/less/_ui.sass */
+/* line 18, ../sass/less/_ui.sass */
 .ui-overlay-trigger {
   position: absolute;
   top: 0;
   right: 0;
 }
 
-/* line 27, ../sass/less/_ui.sass */
+/* line 23, ../sass/less/_ui.sass */
 .ui-trigger-1 {
   padding: 1px 3px;
   border: 1px #dddddd solid;
@@ -629,7 +628,7 @@ body.less .hide, body.less .ui-overlay {
   border-radius: 3px;
 }
 
-/* line 32, ../sass/less/_ui.sass */
+/* line 28, ../sass/less/_ui.sass */
 .ui-close {
   position: absolute;
   top: 5px;
@@ -805,7 +804,7 @@ body.app #container a {
   visibility: visible !important;
 }
 /* line 120, ../sass/screen.sass */
-#content #task .sortable .task-actions {
+#content #task .sortable .task-actions-trigger {
   visibility: hidden;
 }
 /* line 122, ../sass/screen.sass */
@@ -821,4 +820,10 @@ body.app #container a {
   -ms-border-radius: 4px;
   -khtml-border-radius: 4px;
   border-radius: 4px;
+}
+
+/* line 130, ../sass/screen.sass */
+.task-priority li {
+  cursor: pointer;
+  border: 1px solid #222222;
 }

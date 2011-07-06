@@ -7,14 +7,10 @@ $ui-overlay-border-color        : rgba(0, 0, 0, 0.8)
 .ui-overlay
     position: absolute
     z-index: 20
-    @extend .hide
     background: #FFF
     border: 1px solid $ui-overlay-border-color
     +box-shadow(rgba(0, 0, 0, .3), 1px, 1px, 3px)
-.ui-overlay
-    li
-        &:hover
-            background: $blueprint-background-deep-color
+
 
 .ui-trigger
     cursor: pointer

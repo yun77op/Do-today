@@ -25,6 +25,7 @@ t" type="text/css" />
         $LAB.setOptions({BasePath: '/Do-today/scripts/'})
             .script('lib/sea.js')
             .script('lib/jquery-1.6.1.js')
+            .script('ui.js')
             .script('lib/underscore-min.js').wait()
             .script('lib/backbone.js')
             .wait(function() {
@@ -64,10 +65,8 @@ t" type="text/css" />
                         <input placeholder="Add a task>>">
                     </div>
                     <div class="task-today-list task-list">
-                        <div id="task-template" class="hide"><span class="task">{{ name }}</span><a href="#"class="task-actions right">✿</a></div>
+                        <div id="task-template" class="hide"><span class="task-content">{{ name }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
                         <ul>
-                            <li class="task"><span class="task-content">开早会</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions right">✿</a></li>
-                            <li class="task"><span class="task-content">开你妹啊</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#" class="task-actions right">✿</a></li>
                         </ul>
                     </div>
                     <div class="control actions">
@@ -83,16 +82,17 @@ t" type="text/css" />
 
         </div>
     </div>
-    <div id="ui-overlay-task" class="ui-overlay hide">
+    <div id="ui-overlay-task" class="ui-overlay ui-helper-hidden">
         <div class="ui-overlay-bd">
             <ul>
-                <li class="task-del"><a href="#">删除</a></li>
-                <li class="task-hide"><a href="#">隐藏</a></li>
-                <li class="task-priority">隐藏
-                    <ul>
-                        <li class="task-priority-1"></li>
-                        <li class="task-priority-2"></li>
-                        <li class="task-priority-3"></li>
+                <li><a class="del-btn" href="#">删除</a></li>
+                <li><a class="hide-btn" href="#">隐藏</a></li>
+                <li class="task-priority">优先级
+                    <ul class="horizontal">
+                        <li class="task-priority-1">1</li>
+                        <li class="task-priority-2">2</li>
+                        <li class="task-priority-3">3</li>
+                        <li class="task-priority-none">无</li>
                     </ul>
                 </li>
             </ul>

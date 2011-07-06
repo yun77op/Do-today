@@ -78,7 +78,7 @@ define(function(require, exports, module) {
             instance: null
         }, task: {
             func: function(app, plugin) {
-                var el = plugin.el = $('#task');             
+                var el = plugin.el = $('#task');
 
                 _.templateSettings = {
                     interpolate : /\{\{(.+?)\}\}/g
@@ -95,7 +95,6 @@ define(function(require, exports, module) {
                     sortable = !sortable;
                     $( ".task-list ul" ).sortable({ disabled: sortable });
                     $('.task-today-list', el).toggleClass('sortable');
-
                 });             
 
                 var TaskView = Backbone.View.extend({
@@ -103,42 +102,71 @@ define(function(require, exports, module) {
                     className: 'task',
                     template: _.template($('#task-template').html()),
                     initialize: function() {
-                        _.bindAll(this, 'render');
+                        _.bindAll(this, 'render', 'overlay');              
                     },
 
                     render: function() {
-                        var data = this.model.attributes;
+                        var data = this.model;
                         var content = this.template(data);
                         $(this.el).empty().append(content);
                         return this;
                     },
-                    events: {
-                        'keyup input': 'addTask',
-                        'click .task-actions-trigger': 'showActions',
-                        'click .del-btn': 'del',
-                        'click .hide-btn': 'hide'
-                    },
 
-                    addTask: function(e) {
-                        
+                    events: {
+                        'click .task-actions-trigger': 'showActions'
                     },
 
                     showActions: function(e) {
                         e.preventDefault();
+                        overlayView.host = this;
+                        this.taskActions.overlay('toggle', e);
+                    },
 
+                    overlay: function() {
+                        this.taskActions = $('.task-actions-trigger', this.el).overlay({
+                            srcNode: '#ui-overlay-task',
+                            width: '10em',
+                            visible: false,
+                            show: function(e, ui) {
+                                $(this).overlay('option', {
+                                    align: {
+                                        node: e.target,
+                                        points: ['RB', 'LT']
+                                    }
+                                });
+                            }
+                        });
+                        return this;
+                    }
+                });
+
+                _.extend(TaskView.prototype, {
+                    plug: function(plugin, opts) {
+                        plugin.host = this;    
+                    }
+                });
+
+
+                var OverlayView = Backbone.View.extend({
+                    el: $('#ui-overlay-task'),
+                    events: {
+                        'click .del-btn': 'del',
+                        'click .hide-btn': 'hide',
+                        'click'
                     },
 
                     del: function(e) {
                         e.preventDefault();
-                        this.remove();
+                        this.host.taskActions.overlay('hide');
+                        this.host.remove();
                     },
 
                     hide: function(e) {
-                        e.preventDefault();
-                        this.remove();
+                        this.del(e);
                     }
-                };
+                });
 
+                var overlayView = new OverlayView();
 
                 el.delegate('input', 'keyup', function(e) {
                     var o = $(this);
@@ -147,11 +175,20 @@ define(function(require, exports, module) {
                         o.val('');
                         if (task === '')
                             return;
-                        var taskView = new TaskView();
-                        $('.task-today-list ul', el).append(taskView.el);
+                        var taskView = new TaskView({
+                            model: {
+                                name: task
+                            }
+                        });
+
+                        taskView.plug(overlayView);
+
+                        $('.task-today-list ul', el).append(taskView.render().overlay().el);
                     }
                 });
 
+
+              
 
 
             }
