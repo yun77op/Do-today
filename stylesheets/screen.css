@@ -683,29 +683,30 @@ body.app #container a {
 
 /* line 44, ../sass/screen.sass */
 #content {
+  position: relative;
   padding-top: 50px;
   width: 570px;
   margin: 0 auto;
   font-size: 1.2em;
   color: white;
 }
-/* line 50, ../sass/screen.sass */
+/* line 51, ../sass/screen.sass */
 #content > .container {
   margin: 10px;
 }
-/* line 52, ../sass/screen.sass */
+/* line 53, ../sass/screen.sass */
 #content #timer {
   height: 66px;
   background: url(../images/sprites.png) -4px -6px;
   position: relative;
 }
-/* line 56, ../sass/screen.sass */
+/* line 57, ../sass/screen.sass */
 #content #timer .timer-time, #content #timer .timer-start {
   height: 36px;
   margin-top: 20px;
   float: left;
 }
-/* line 60, ../sass/screen.sass */
+/* line 61, ../sass/screen.sass */
 #content #timer .timer-time {
   width: 50px;
   margin-left: 18px;
@@ -713,7 +714,7 @@ body.app #container a {
   font-weight: bold;
   line-height: 36px;
 }
-/* line 66, ../sass/screen.sass */
+/* line 67, ../sass/screen.sass */
 #content #timer .timer-start {
   width: 20px;
   margin-left: 6px;
@@ -730,7 +731,7 @@ body.app #container a {
   -khtml-border-radius: 5px;
   border-radius: 5px;
 }
-/* line 71, ../sass/screen.sass */
+/* line 72, ../sass/screen.sass */
 #content #timer .timer-start .button {
   width: 0;
   height: 0;
@@ -740,7 +741,7 @@ body.app #container a {
   border-right-width: 0;
   margin: 9px 0 0 6px;
 }
-/* line 79, ../sass/screen.sass */
+/* line 80, ../sass/screen.sass */
 #content #timer .timer-start .button.started {
   width: 8px;
   height: 14px;
@@ -748,20 +749,20 @@ body.app #container a {
   background: white;
   margin-left: 6px;
 }
-/* line 87, ../sass/screen.sass */
+/* line 88, ../sass/screen.sass */
 #content #task > div {
   margin-bottom: 10px;
 }
-/* line 89, ../sass/screen.sass */
+/* line 90, ../sass/screen.sass */
 #content #task .nav {
   border-bottom: 1px solid black;
 }
-/* line 92, ../sass/screen.sass */
+/* line 93, ../sass/screen.sass */
 #content #task .nav .selected a {
   font-weight: bold;
   border-bottom: 2px solid black;
 }
-/* line 96, ../sass/screen.sass */
+/* line 97, ../sass/screen.sass */
 #content #task .task-add input {
   padding: 4px;
   width: 540px;
@@ -773,21 +774,21 @@ body.app #container a {
   border-radius: 4px / 4px;
   border: 2px inset threedface;
 }
-/* line 101, ../sass/screen.sass */
+/* line 102, ../sass/screen.sass */
 #content #task .task-add input:focus {
   border-color: yellow;
 }
-/* line 104, ../sass/screen.sass */
+/* line 105, ../sass/screen.sass */
 #content #task .task-list ul {
   list-style: upper-roman inside;
 }
-/* line 106, ../sass/screen.sass */
+/* line 107, ../sass/screen.sass */
 #content #task .task-list ul li {
   border-bottom: 1px dotted black;
   padding: 0.5em;
   position: relative;
 }
-/* line 110, ../sass/screen.sass */
+/* line 111, ../sass/screen.sass */
 #content #task .task-list ul li .reorder-icon {
   position: absolute;
   right: 0;
@@ -795,23 +796,23 @@ body.app #container a {
   margin-top: -8px;
   visibility: hidden;
 }
-/* line 116, ../sass/screen.sass */
+/* line 117, ../sass/screen.sass */
 #content #task .sortable {
   cursor: move;
 }
-/* line 118, ../sass/screen.sass */
+/* line 119, ../sass/screen.sass */
 #content #task .sortable .reorder-icon {
   visibility: visible !important;
 }
-/* line 120, ../sass/screen.sass */
+/* line 121, ../sass/screen.sass */
 #content #task .sortable .task-actions-trigger {
   visibility: hidden;
 }
-/* line 122, ../sass/screen.sass */
+/* line 123, ../sass/screen.sass */
 #content #task .actions {
   font-size: 0.9em;
 }
-/* line 124, ../sass/screen.sass */
+/* line 125, ../sass/screen.sass */
 #content #task .actions .active {
   background: orange;
   -moz-border-radius: 4px;
@@ -822,8 +823,15 @@ body.app #container a {
   border-radius: 4px;
 }
 
-/* line 130, ../sass/screen.sass */
+/* line 131, ../sass/screen.sass */
 .task-priority li {
   cursor: pointer;
   border: 1px solid #222222;
+}
+
+/* line 135, ../sass/screen.sass */
+#message {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
