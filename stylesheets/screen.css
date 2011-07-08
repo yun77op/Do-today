@@ -651,19 +651,19 @@ body.app #container a {
 }
 
 /* line 23, ../sass/screen.sass */
-#header {
+body.app #header {
   height: 80px;
   position: relative;
   background: white url(../images/header.png) repeat-x;
 }
 /* line 27, ../sass/screen.sass */
-#header h1 {
+body.app #header h1 {
   background: url(../images/logo.png);
   margin: 16px 0 0 230px;
   float: left;
 }
 /* line 31, ../sass/screen.sass */
-#header h1 a {
+body.app #header h1 a {
   display: block;
   height: 88px;
   width: 224px;
@@ -672,7 +672,7 @@ body.app #container a {
   text-align: left;
 }
 /* line 36, ../sass/screen.sass */
-#header .sub-title {
+body.app #header .sub-title {
   position: absolute;
   width: 150px;
   height: 60px;
@@ -680,9 +680,8 @@ body.app #container a {
   left: 68px;
   top: -10px;
 }
-
 /* line 44, ../sass/screen.sass */
-#content {
+body.app #content {
   position: relative;
   padding-top: 50px;
   width: 570px;
@@ -691,23 +690,23 @@ body.app #container a {
   color: white;
 }
 /* line 51, ../sass/screen.sass */
-#content > .container {
+body.app #content > .container {
   margin: 10px;
 }
 /* line 53, ../sass/screen.sass */
-#content #timer {
+body.app #timer {
   height: 66px;
   background: url(../images/sprites.png) -4px -6px;
   position: relative;
 }
 /* line 57, ../sass/screen.sass */
-#content #timer .timer-time, #content #timer .timer-start {
+body.app #timer .timer-time, body.app #timer .timer-start {
   height: 36px;
   margin-top: 20px;
   float: left;
 }
 /* line 61, ../sass/screen.sass */
-#content #timer .timer-time {
+body.app #timer .timer-time {
   width: 50px;
   margin-left: 18px;
   font-size: 18px;
@@ -715,7 +714,7 @@ body.app #container a {
   line-height: 36px;
 }
 /* line 67, ../sass/screen.sass */
-#content #timer .timer-start {
+body.app #timer .timer-start {
   width: 20px;
   margin-left: 6px;
   background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #b1ad3f), color-stop(100%, #a4a148));
@@ -732,40 +731,34 @@ body.app #container a {
   border-radius: 5px;
 }
 /* line 72, ../sass/screen.sass */
-#content #timer .timer-start .button {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 10px;
-  border-color: transparent white;
-  border-right-width: 0;
+body.app #timer .timer-start .button {
   margin: 9px 0 0 6px;
 }
-/* line 80, ../sass/screen.sass */
-#content #timer .timer-start .button.started {
+/* line 74, ../sass/screen.sass */
+body.app #timer .timer-start .button.started {
   width: 8px;
   height: 14px;
   border: none;
   background: white;
   margin-left: 6px;
 }
-/* line 88, ../sass/screen.sass */
-#content #task > div {
+/* line 82, ../sass/screen.sass */
+body.app #task > div {
   margin-bottom: 10px;
 }
-/* line 90, ../sass/screen.sass */
-#content #task .nav {
+/* line 84, ../sass/screen.sass */
+body.app #task .nav {
   border-bottom: 1px solid black;
 }
-/* line 93, ../sass/screen.sass */
-#content #task .nav .selected a {
+/* line 87, ../sass/screen.sass */
+body.app #task .nav .selected a {
   font-weight: bold;
   border-bottom: 2px solid black;
 }
-/* line 97, ../sass/screen.sass */
-#content #task .task-add input {
+/* line 91, ../sass/screen.sass */
+body.app #task .task-add input {
   padding: 4px;
-  width: 540px;
+  width: 510px;
   -webkit-border-radius: 4px 4px;
   -moz-border-radius: 4px / 4px;
   -o-border-radius: 4px / 4px;
@@ -774,46 +767,99 @@ body.app #container a {
   border-radius: 4px / 4px;
   border: 2px inset threedface;
 }
-/* line 102, ../sass/screen.sass */
-#content #task .task-add input:focus {
+/* line 96, ../sass/screen.sass */
+body.app #task .task-add input:focus {
   border-color: yellow;
 }
-/* line 105, ../sass/screen.sass */
-#content #task .task-list ul {
-  list-style: upper-roman inside;
+/* line 99, ../sass/screen.sass */
+body.app #task .task-list ul {
+  list-style: none;
 }
-/* line 107, ../sass/screen.sass */
-#content #task .task-list ul li {
+/* line 101, ../sass/screen.sass */
+body.app #task .task-list .task {
   border-bottom: 1px dotted black;
   padding: 0.5em;
   position: relative;
 }
-/* line 111, ../sass/screen.sass */
-#content #task .task-list ul li .reorder-icon {
+/* line 106, ../sass/screen.sass */
+body.app #task .task-list .task:hover .task-actions-trigger {
+  display: block;
+}
+/* line 108, ../sass/screen.sass */
+body.app #task .task-list .task .task-actions-trigger {
+  display: none;
+}
+/* line 110, ../sass/screen.sass */
+body.app #task .task-list .task .reorder-icon {
   position: absolute;
   right: 0;
   top: 50%;
   margin-top: -8px;
   visibility: hidden;
 }
-/* line 117, ../sass/screen.sass */
-#content #task .sortable {
+/* line 116, ../sass/screen.sass */
+body.app #task .task-list .task .task-progress-container {
+  display: none;
+  height: 30px;
+  line-height: 30px;
+  padding: 10px 10px;
+  position: absolute;
+  top: -50px;
+  left: -45px;
+  background: green;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+}
+/* line 126, ../sass/screen.sass */
+body.app #task .task-list .task .task-progress-container .task-progress {
+  width: 60px;
+  margin: 8px 0 0 10px;
+}
+/* line 129, ../sass/screen.sass */
+body.app #task .task-list .task .task-progress-container .point {
+  position: absolute;
+  bottom: -14px;
+  left: 55px;
+  border-color: transparent green;
+  -moz-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+/* line 135, ../sass/screen.sass */
+body.app #task .task-list .task .task-check {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #222222;
+  margin: 0 1em 0 0;
+}
+/* line 141, ../sass/screen.sass */
+body.app #task .task-list .task .task-check:hover .task-progress-container {
+  display: block;
+}
+/* line 144, ../sass/screen.sass */
+body.app #task .sortable {
   cursor: move;
 }
-/* line 119, ../sass/screen.sass */
-#content #task .sortable .reorder-icon {
+/* line 146, ../sass/screen.sass */
+body.app #task .sortable .reorder-icon {
   visibility: visible !important;
 }
-/* line 121, ../sass/screen.sass */
-#content #task .sortable .task-actions-trigger {
+/* line 148, ../sass/screen.sass */
+body.app #task .sortable .task-actions-trigger {
   visibility: hidden;
 }
-/* line 123, ../sass/screen.sass */
-#content #task .actions {
+/* line 150, ../sass/screen.sass */
+body.app #task .actions {
   font-size: 0.9em;
 }
-/* line 125, ../sass/screen.sass */
-#content #task .actions .active {
+/* line 152, ../sass/screen.sass */
+body.app #task .actions .active {
   background: orange;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -822,16 +868,39 @@ body.app #container a {
   -khtml-border-radius: 4px;
   border-radius: 4px;
 }
-
-/* line 131, ../sass/screen.sass */
-.task-priority li {
+/* line 158, ../sass/screen.sass */
+body.app .task-priority li {
   cursor: pointer;
   border: 1px solid #222222;
 }
-
-/* line 135, ../sass/screen.sass */
-#message {
+/* line 162, ../sass/screen.sass */
+body.app .task-priority-1 {
+  color: red;
+}
+/* line 164, ../sass/screen.sass */
+body.app .task-priority-2 {
+  color: #007700;
+}
+/* line 166, ../sass/screen.sass */
+body.app .task-priority-3 {
+  color: #006699;
+}
+/* line 168, ../sass/screen.sass */
+body.app .task-priority-0 {
+  color: #202020;
+}
+/* line 171, ../sass/screen.sass */
+body.app #message {
   position: absolute;
   top: 0;
   right: 0;
+}
+/* line 176, ../sass/screen.sass */
+body.app .point {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px;
+  border-color: transparent white;
+  border-right-width: 0;
 }

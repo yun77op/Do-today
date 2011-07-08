@@ -118,27 +118,14 @@ define(function(require, exports, module) {
                     className: 'task',
                     template: _.template($('#task-template').html()),
                     initialize: function() {
-                        _.bindAll(this, 'render', 'overlay');              
+                        _.bindAll(this, 'render');
                     },
 
                     render: function() {
-                        var data = this.model;
+                        var data = this.model.attributes;
                         var content = this.template(data);
                         $(this.el).empty().append(content);
-                        return this;
-                    },
-
-                    events: {
-                        'click .task-actions-trigger': 'showActions'
-                    },
-
-                    showActions: function(e) {
-                        e.preventDefault();
-                        overlayView.host = this;
-                        this.taskActions.overlay('toggle', e);
-                    },
-
-                    overlay: function() {
+                        
                         this.taskActions = $('.task-actions-trigger', this.el).overlay({
                             srcNode: '#ui-overlay-task',
                             width: '10em',
@@ -152,7 +139,30 @@ define(function(require, exports, module) {
                                 });
                             }
                         });
+
+                        $('.task-progress', this.el).slider();
+
                         return this;
+                    },
+
+                    events: {
+                        'click .task-actions-trigger': 'showActions',
+                        'click .task-content': 'edit'
+                    },
+
+                    showActions: function(e) {
+                        e.preventDefault();
+                        overlayView.host = this;
+                        this.taskActions.overlay('toggle', e);
+                    },
+
+                    edit: function(e) {
+                        var o = this;
+                        var contentEl = $('.task-content', this.el);
+                        contentEl.hotedit('edit', function(text) {
+                            contentEl.text(text);
+                            $(document).trigger('task:change', [o.model.get('id'), 'content', text]);
+                        });
                     }
                 });
 
@@ -175,6 +185,7 @@ define(function(require, exports, module) {
                         e.preventDefault();
                         this.host.taskActions.overlay('hide');
                         this.host.remove();
+                        $(document).trigger('task:del', this.host.model.get('id'));
                     },
 
                     hide: function(e) {
@@ -184,9 +195,8 @@ define(function(require, exports, module) {
                     priority: function(e) {
                         var el = $(e.target),
                             priority = el.data('priority');
-                        
-                        $('.task-content', this.host.el).css('color', el.css('background-color'));
-
+                        $(document).trigger('task:change', [this.host.model.get('id'), 'priority', priority]);
+                        this.host.render();
                     }
                 });
 
@@ -196,35 +206,44 @@ define(function(require, exports, module) {
                 el.delegate('input', 'keyup', function(e) {
                     var o = $(this);
                     if (e.which == 13) {
-                        var name = $.trim(o.val());
+                        var content = $.trim(o.val());
                         o.val('');
-                        if (name === '')
+                        if (content === '')
                             return;
                         var task = {
-                            name: name
+                            content: content
                         };
 
-                        plugin.add(task);
-                        $(document).trigger('task:add', task);
+                        var taskModel = plugin.addToCurrent(task);
+                        $(document).trigger('task:add', taskModel);
+                    }
+                });
+
+                var TaskModel = Backbone.Model.extend({
+                    defaults: {
+                        priority: 0
+                    },
+
+                    initialize: function(attrs) {
+                        attrs['id'] || (this.attributes['id'] = new ObjectID().toHexString());
+                        attrs['created_at'] || (this.attributes['created_at'] = new Date());
                     }
                 });
 
 
-                function add(task) {
+                function addToCurrent(task) {
+                    var taskModel = task instanceof Backbone.Model ? task : new TaskModel(task);
+                    
                     var taskView = new TaskView({
-                        model: {
-                            name: task.name
-                        }
+                        model: taskModel
                     });
-
-                    task.id || (task.id = new ObjectID().toHexString());
-                    task['created_at'] || (task['created_at'] = new Date());
-                    task.priority || (task.priority = 0);
-
-                    $('.task-today-list ul', el).append(taskView.render().overlay().el);
+                    
+                    $('.task-today-list ul', el).append(taskView.render().el);
+                    $(document).trigger('task:current:add', taskModel);
+                    return taskModel;
                 }
 
-                plugin.add = add;
+                plugin.addToCurrent = addToCurrent;
             }
         },
 
@@ -257,9 +276,14 @@ define(function(require, exports, module) {
                     set(key, val);
                 }
 
+                function remove(key) {
+                    localStorage.removeItem(key);
+                }
+
                 plugin.set = set;
                 plugin.append = append;
                 plugin.get = get;
+                plugin.remove = remove;
             }
         },
 
@@ -291,15 +315,16 @@ define(function(require, exports, module) {
 
                 function initialize() {
                     timer.initialize('work');
-                    var currentArr = storage.get('current', true);
-                    if (currentArr) {
-                        _.each(currentArr, function(id) {
-                            task.add(storage.get(id, true));
+                    var arr = storage.get('current', true);
+                    if (arr) {
+                        _.each(arr, function(id) {
+                            var taskModel = storage.get(id, true);
+                            taskModel.id = id;
+                            task.addToCurrent(taskModel);
                         });
                     }
                 }
 
-                initialize();
                 
                 $(document).bind('timer:start', function(e) {
                     if (!initial && !storage.get('current')) {
@@ -324,7 +349,8 @@ define(function(require, exports, module) {
                 });
 
 
-                $(document).bind('task:add', function(e, task) {
+                $(document).bind('task:add', function(e, taskModel) {
+                    var task = _.clone(taskModel.attributes);
                     var id = task.id;
                     delete task.id;
                     storage.set(id, task);
@@ -332,8 +358,25 @@ define(function(require, exports, module) {
                     plugin.started = false;
                 });
 
+                var currentObj = {};
+                $(document).bind('task:current:add', function(e, taskModel) {
+                    currentObj[taskModel.get('id')] = taskModel;
+                });
+
+                $(document).bind('task:change', function(e, id, key, val) {
+                    var taskModel = currentObj[id],
+                        attr = {};
+                    attr[key] = val;
+                    taskModel.set(attr);
+                    storage.set(id, taskModel.attributes);
+                });
+
+                $(document).bind('task:del', function(e, id) {
+                     storage.remove(id);
+                });
+
+                initialize();
             }
         }
     }
 });
-

@@ -48,7 +48,7 @@ t" type="text/css" />
             <div id="timer" class="container">
                 <div class="timer-time">25:00</div>
                 <div class="timer-start">
-                    <span class="button"></span>
+                    <span class="button point"></span>
                 </div>
             </div>
             <div id="message" class="notice hide">
@@ -65,7 +65,7 @@ t" type="text/css" />
                         <input placeholder="Add a task>>">
                     </div>
                     <div class="task-today-list task-list">
-                        <div id="task-template" class="hide"><span class="task-content">{{ name }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
+                        <div id="task-template" class="hide"><div class="task-check left"><div class="task-progress-container"><span>90%</span><div class="point"></div><div class="task-progress right"></div></div></div><span class="task-content task-priority-{{ priority }}">{{ content }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
                         <ul>
                         </ul>
                     </div>
@@ -77,7 +77,6 @@ t" type="text/css" />
                 <div id="task-past">
                     coming soon
                 </div>
-                
             </div>
 
         </div>

@@ -120,3 +120,91 @@ $.fn.overlay = function() {
     }
 
 };
+
+
+
+
+
+(function() {
+
+
+    var el = $('<input id="hotedit" style="position: absolute">');
+        
+    el.hide();
+    
+    $('body').append(el);
+
+
+    function initialize(opts) {
+        var DEFAULTS = {
+            cb: $.noop
+        };
+
+        opts = $.extend(DEFAULTS, opts);
+        $(this).data('hotedit', opts);
+    }
+
+    function hide() {
+        el.hide();
+    }
+
+    function edit(cb) {
+        el.unbind('blur').bind('blur', function() {
+            complete();
+        }).unbind('keyup').bind('keyup', function(e) {
+            if (e.which == 13) {
+                complete();
+            }
+        });
+
+        function complete() {
+            var text = el.val();
+            hide(el);
+            cb(text);
+        }
+
+        el.width($(this).parent().width());
+    }
+
+    $.fn.hotedit = function() {
+
+        var o = $(this);
+        
+        if (typeof arguments[0] == 'object') {
+            initialize.call(this, arguments[0]);
+            return;
+        }
+        
+        var opts = o.data('hotedit');
+            
+
+        var methodHandle = {};
+
+        var actionHandle = {
+            'edit': function(cb) {
+                !cb || (opts && (cb = opts.cb));
+                var offset = o.offset();
+                el.css({
+                    left: offset.left,
+                    top: offset.top,
+                    width: o.width()
+                });
+                el.show().val(o.text());
+                el[0].select();
+                edit.call(o, cb);
+            },
+
+            'option': function(opt) {
+                _.each(opt, function(val, key) {
+                    methodHandle[key].call(o, val);
+                });
+            }
+        };
+        
+        var action = arguments[0];
+        actionHandle[action].apply(this, Array.prototype.slice.call(arguments, 1));
+        
+    };
+
+    
+})();
