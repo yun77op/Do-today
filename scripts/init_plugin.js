@@ -33,32 +33,41 @@ define(function(require, exports, module) {
                     width = initialWidth;
                     plugin.updateTime.call(plugin, time);
                     progress.width(width);
-                    progress.find('.button').removeClass('started');
+                }
+
+                el.delegate('.button', 'click', timing);
+
+                function timing() {
+                    var o = $(this);
+
+                    switch (plugin.status) {
+                        case 'normal':
+                            plugin.status = 'started';
+                            o.addClass('started');
+                            plugin.instance = plugin.interval(function(step) {
+                                width += step;
+                                progress.width(width);
+                                plugin.updateTime.call(plugin, --time);
+                                if (time == 0)
+                                    $(document).trigger('timer:complete');
+                            }, step);
+                            break;
+                        case 'started':
+                            plugin.status = 'stopped';
+                            o.removeClass('started').addClass('stopped');
+                            plugin.instance && plugin.instance.stop(plugin);
+                            break;
+                        case 'stopped':
+                            plugin.status = 'normal';
+                            o.removeClass('stopped');
+                            break;
+                    }
+                
+                    $(document).trigger('timer:status:' + plugin.status , plugin);
                 }
 
                 plugin.initialize = initialize;
-
-                el.delegate('.button', 'click', function(e) {
-
-                    var o = $(this);
-
-                    plugin.started = !plugin.started;
-                    $(document).trigger('timer:' + (plugin.started ? 'start' : 'stop'), plugin);
-                    if (plugin.started) {
-                        o.addClass('started');
-                        plugin.instance = plugin.interval(function(step) {
-                            width += step;
-                            progress.width(width);
-                            plugin.updateTime.call(plugin, --time);
-                            if (time == 0)
-                                plugin.instance.complete(plugin);
-                        }, step);
-                    } else {
-                        o.removeClass('started');
-                        plugin.instance && plugin.instance.complete(plugin);
-                    }
-                    
-                });
+                plugin.timing = timing;
 
             }, interval: function(cb, step) {
                 var t;
@@ -69,10 +78,8 @@ define(function(require, exports, module) {
 
                 t = setTimeout(_interval, 1000);
                 return {
-                    complete: function(plugin) {
-                        plugin.started = false;
+                    stop: function(plugin) {
                         clearTimeout(t);
-                        $(document).trigger('timer:complete');
                     }
                 }
             },
@@ -89,7 +96,7 @@ define(function(require, exports, module) {
                 this.timeEl.text(zeroFill(m) + ':' + zeroFill(s));
 
             },
-            started: false,
+            status: 'normal',
             
             instance: null
         }, task: {
@@ -110,8 +117,22 @@ define(function(require, exports, module) {
                     $(this).text((sortable ? '完成': '') + '重排');
                     sortable = !sortable;
                     $( ".task-list ul" ).sortable({ disabled: sortable });
-                    $('.task-today-list', el).toggleClass('sortable');
-                });             
+                    $('#task-today-current .task-list', el).toggleClass('sortable');
+                }).delegate('.actions #viewall-btn, .actions #return-btn', 'click', function(e) {
+                    e.preventDefault();
+                    var o = $(this);
+                    var target = $(o.attr('href'));
+                    target.siblings().fadeOut(function() {
+                         target.fadeIn();
+                    });
+                });
+
+
+                $('.task-hidden', el).click(function(e) {
+                    e.preventDefault();
+                    var o = $(this);
+                    o.siblings('.task-hidden-content').slideToggle();
+                });
 
                 var TaskView = Backbone.View.extend({
                     tagName: 'li',
@@ -122,6 +143,7 @@ define(function(require, exports, module) {
                     },
 
                     render: function() {
+                        var o = this;
                         var data = this.model.attributes;
                         var content = this.template(data);
                         $(this.el).empty().append(content);
@@ -140,14 +162,26 @@ define(function(require, exports, module) {
                             }
                         });
 
-                        $('.task-progress', this.el).slider();
+                        $('.task-progress', this.el).slider({
+                            change: function(e, ui) {
+                                var valEl = $(this).siblings('.task-process-val');
+                                valEl.text(ui.value + '%');
+                                if (ui.value == 100) {
+                                    o.check();
+                                }
+                                $(document).trigger('task:change', [o.model.get('id'), 'progress', ui.value]);
+                            },
+
+                            value: o.model.get('progress')
+                        });
 
                         return this;
                     },
 
                     events: {
                         'click .task-actions-trigger': 'showActions',
-                        'click .task-content': 'edit'
+                        'click .task-content': 'edit',
+                        'click .task-check': 'check'
                     },
 
                     showActions: function(e) {
@@ -163,12 +197,20 @@ define(function(require, exports, module) {
                             contentEl.text(text);
                             $(document).trigger('task:change', [o.model.get('id'), 'content', text]);
                         });
+                    },
+
+                    check: function(e) {
+                        var id = this.model.get('id');
+                        this.remove();
+                        //$('#task-today-all ul', el).
+                        $(document).trigger('task:check', id);
+                        $(document).trigger('task:change', [id, 'progress', 100]);
                     }
                 });
 
                 _.extend(TaskView.prototype, {
                     plug: function(plugin, opts) {
-                        plugin.host = this;    
+                        plugin.host = this;
                     }
                 });
 
@@ -221,7 +263,8 @@ define(function(require, exports, module) {
 
                 var TaskModel = Backbone.Model.extend({
                     defaults: {
-                        priority: 0
+                        priority: 0,
+                        progress: 0
                     },
 
                     initialize: function(attrs) {
@@ -237,8 +280,8 @@ define(function(require, exports, module) {
                     var taskView = new TaskView({
                         model: taskModel
                     });
-                    
-                    $('.task-today-list ul', el).append(taskView.render().el);
+
+                    $('#task-today-current ul', el).append(taskView.render().el);
                     $(document).trigger('task:current:add', taskModel);
                     return taskModel;
                 }
@@ -300,83 +343,6 @@ define(function(require, exports, module) {
                     el.slideUp('slow');
                 })
             }  
-        },
-
-        connect: { //connect timer with task with storage
-            
-            func: function(app, plugin) {
-                var plugins = app.initPlugins;
-
-                var initial = false;
-                var storage = plugins.storage,
-                    timer = plugins.timer,
-                    message = plugins.message,
-                    task = plugins.task;
-
-                function initialize() {
-                    timer.initialize('work');
-                    var arr = storage.get('current', true);
-                    if (arr) {
-                        _.each(arr, function(id) {
-                            var taskModel = storage.get(id, true);
-                            taskModel.id = id;
-                            task.addToCurrent(taskModel);
-                        });
-                    }
-                }
-
-                
-                $(document).bind('timer:start', function(e) {
-                    if (!initial && !storage.get('current')) {
-                        if(confirm('你不添加个任务先？')) {
-                            $('input', plugins.task.el)[0].focus();
-                            plugin.started = false;
-                        }
-                        initial = true;
-                    }
-                });
-
-
-                var working = true;
-                $(document).bind('timer:complete', function(e, task) {
-                    working = !working;
-                    if (!working) {
-                        message.show('休息，休息一下！');
-                    } else {
-                        message.show('开始工作了！'); 
-                    }
-                    plugins.timer.initialize(working ? 'work' : 'relax');
-                });
-
-
-                $(document).bind('task:add', function(e, taskModel) {
-                    var task = _.clone(taskModel.attributes);
-                    var id = task.id;
-                    delete task.id;
-                    storage.set(id, task);
-                    storage.append('current', id);
-                    plugin.started = false;
-                });
-
-                var currentObj = {};
-                $(document).bind('task:current:add', function(e, taskModel) {
-                    currentObj[taskModel.get('id')] = taskModel;
-                });
-
-                $(document).bind('task:change', function(e, id, key, val) {
-                    var taskModel = currentObj[id],
-                        attr = {};
-                    attr[key] = val;
-                    taskModel.set(attr);
-                    storage.set(id, taskModel.attributes);
-                });
-
-                $(document).bind('task:del', function(e, id) {
-                     storage.remove(id);
-                });
-
-                initialize();
-            }
         }
     }
 });
