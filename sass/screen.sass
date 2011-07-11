@@ -121,6 +121,8 @@ body.app
                 &:hover
                     .task-actions-trigger
                         display: block
+                span
+                    margin: 0 .5em 0 0
                 .task-actions-trigger
                     display: none
                 .reorder-icon
@@ -169,6 +171,14 @@ body.app
                 background: orange
                 +border-radius(4px)
 
+    #task-mask
+        position: absolute
+        display: none
+        z-index: 2
+        top: 140px
+        left: 0
+        right: 0
+        bottom: 0
 
     .task-priority
         li

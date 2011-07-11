@@ -72,7 +72,7 @@ t" type="text/css" />
                             </div>
                         </div>
                         <div class="task-list">
-                            <div id="task-template" class="hide"><div class="task-check left"><div class="task-progress-container"><span class="task-process-val">{{ progress }}%</span><div class="point"></div><div class="task-progress right"></div></div></div><span class="task-content task-priority-{{ priority }}">{{ content }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
+                            <div id="task-current-template" class="hide"><div class="task-check left"><div class="task-progress-container"><span class="task-process-val">{{ progress }}%</span><div class="point"></div><div class="task-progress right"></div></div></div><span class="task-content task-priority-{{ priority }}">{{ content }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
                             <ul>
                             </ul>
                         </div>
@@ -83,6 +83,9 @@ t" type="text/css" />
                     </div>
                     <div id="task-today-all" class="hide">
                         <div class="task-list">
+                            <script id="task-all-template" type="text/x-jquery-tmpl">
+                                <li class="task"><div><span class="task-period"><span class="task-time">${$item.data.period[0]}</span>到<span class="task-time">${$item.data.period[1]}</span></span><span class="task-content">${content}</span>{{if $item.progress()}}<span class="task-progress"><span>${$item.data.progress[0]}%</span>到<span>${$item.data.progress[1]}%</span></span>{{/if}}</div></li>
+                            </script>
                             <ul>
                             </ul>
                         </div>
@@ -95,7 +98,7 @@ t" type="text/css" />
                     coming soon
                 </div>
             </div>
-
+            <div id="task-mask"></div>
         </div>
     </div>
     <div id="ui-overlay-task" class="ui-overlay ui-helper-hidden">

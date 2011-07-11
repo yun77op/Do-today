@@ -2,6 +2,7 @@ define(function(require, exports, module) {
 
 
     require('./lib/jquery-ui-1.8.14.custom.min.js');
+    require('./lib/jquery.tmpl.min.js');
     var ObjectID = require('./lib/objectid').ObjectID;
 
     var config = {
@@ -38,24 +39,33 @@ define(function(require, exports, module) {
                 el.delegate('.button', 'click', timing);
 
                 function timing() {
-                    var o = $(this);
+                    var o = el.find('.button');
 
                     switch (plugin.status) {
                         case 'normal':
+                            $(document).trigger('timer:status:beforeStart');
+                            if ($(document)[0].eventReturnValue === false)
+                                return;
+
                             plugin.status = 'started';
-                            o.addClass('started');
+                            o.addClass('started');                            
+
                             plugin.instance = plugin.interval(function(step) {
                                 width += step;
                                 progress.width(width);
                                 plugin.updateTime.call(plugin, --time);
-                                if (time == 0)
+                                if (time == 0) {
+                                    plugin.status = 'normal';
+                                    o.removeClass('started');
+                                    plugin.instance && plugin.instance.stop();
                                     $(document).trigger('timer:complete');
+                                }
                             }, step);
                             break;
                         case 'started':
                             plugin.status = 'stopped';
                             o.removeClass('started').addClass('stopped');
-                            plugin.instance && plugin.instance.stop(plugin);
+                            plugin.instance && plugin.instance.stop();
                             break;
                         case 'stopped':
                             plugin.status = 'normal';
@@ -78,7 +88,7 @@ define(function(require, exports, module) {
 
                 t = setTimeout(_interval, 1000);
                 return {
-                    stop: function(plugin) {
+                    stop: function() {
                         clearTimeout(t);
                     }
                 }
@@ -128,6 +138,7 @@ define(function(require, exports, module) {
                 });
 
 
+
                 $('.task-hidden', el).click(function(e) {
                     e.preventDefault();
                     var o = $(this);
@@ -137,7 +148,7 @@ define(function(require, exports, module) {
                 var TaskView = Backbone.View.extend({
                     tagName: 'li',
                     className: 'task',
-                    template: _.template($('#task-template').html()),
+                    template: _.template($('#task-current-template').html()),
                     initialize: function() {
                         _.bindAll(this, 'render');
                     },
@@ -281,11 +292,32 @@ define(function(require, exports, module) {
                         model: taskModel
                     });
 
-                    $('#task-today-current ul', el).append(taskView.render().el);
+                    $('#task-today-current .task-list ul', el).append(taskView.render().el);
                     $(document).trigger('task:current:add', taskModel);
                     return taskModel;
                 }
 
+                $('#task-all-template').template('task-all');
+
+                function addToToday(task) {
+                    var data = _.clone(task);
+                    data.period = _.map(data.period, function(date) {
+                        var d = new Date(date);
+                        return d.toLocaleTimeString().slice(0, -3);
+                    });
+
+                    var result = $.tmpl('task-all', data, {
+                        progress: function() {
+                            if (this.data.progress[0] == 0 && this.data.progress[1] == 100) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    });
+                    $('#task-today-all ul').append(result);
+                }
+
+                plugin.addToToday = addToToday;
                 plugin.addToCurrent = addToCurrent;
             }
         },

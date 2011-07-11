@@ -9,7 +9,6 @@ define(function(require, exports, module) {
 
     var plugins = app.initPlugins;
 
-    var initial = false;
     var storage = plugins.storage,
         timer = plugins.timer,
         message = plugins.message,
@@ -27,20 +26,35 @@ define(function(require, exports, module) {
                 task.addToCurrent(taskModel);
             });
         }
+
+        arr = storage.get(getDateHandle(), true);
+        if (arr) {
+            _.each(arr, function(data) {
+                task.addToToday(data);
+            });
+        }
     });
 
 
     var session = {},
-        working = true;
-    $(document).bind('timer:status:started', function(e) {
+        working = true,
+        initial = false;
+
+    $(document).bind('timer:status:beforeStart', function() {
+        $(document)[0].eventReturnValue = true;
         if (!initial && !storage.get('current')) {
             if(confirm('你不添加个任务先？')) {
-                $('input', plugins.task.el)[0].focus();
-                plugin.started = false;
+                $('input', task.el)[0].focus();
+                $(document)[0].eventReturnValue = false;
                 return;
             }
             initial = true;
         }
+    });
+
+    $(document).bind('timer:status:started', function(e) {
+        if (!working)
+            return;
         session.startTime = Date.now();
     });
 
@@ -82,26 +96,49 @@ define(function(require, exports, module) {
         currentObj[taskModel.get('id')] = taskModel;
     });
 
+
+    $(document).bind('task:del', perDelTask);
+
     $(document).bind('task:change', function(e, id, key, val) {
         var taskModel = currentObj[id],
             attr = {};
         attr[key] = val;
+        if (key == 'progress') {
+            taskSession(id, taskModel.get(key), val);
+        }
         taskModel.set(attr);
         storage.set(id, taskModel.attributes);
     });
 
-    $(document).bind('task:del', function(e, id) {
-        storage.remove(id);
-    });
+    $(document).bind('task:check', perDelTask);
 
-    $(document).bind('task:check', function(e, id) {
-        var date = Date.now().toString();
-        storage.append(date, id);
+    function taskSession(id, prevVal, currentVal) {
+        var taskModel = currentObj[id];
+        var date = getDateHandle(),
+            data = {
+                progress: [prevVal, currentVal],
+                period: [session.startTime, session.endTime],
+                content: taskModel.get('content')
+            };
+        storage.append(date, data);
+        task.addToToday(data);
+    }
 
+    function delCurrentItem(id) {
         var current = storage.get('current', true);
         current = _.without(current, id);
         storage.set('current', current);
-    });
+    }
+
+    function perDelTask(id) {
+        delCurrentItem(id);
+        storage.remove(id);
+        delete currentObj[id];
+    }
+
+    function getDateHandle() {
+        return new Date().toUTCString().slice(0, -12).replace(/\s+/g, '');
+    }
 
     window.app = app;
     return app;
