@@ -12,7 +12,7 @@
     <meta name="robots" content="index,follow"> 
     <meta name="robots" content="noodp">
     <link href="stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <link href="stylesheets/ui-lightness/jquery-ui-1.8.14.custom.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="stylesheets/Aristo/jquery-ui-1.8.7.custom.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <link href="stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
      <!--[if lt IE 8]>
     <link href="stylesheets/ie.css" media="screen, projection" rel="styleshee
@@ -48,7 +48,7 @@ t" type="text/css" />
             <div id="timer" class="container">
                 <div class="timer-time">25:00</div>
                 <div class="timer-start">
-                    <span class="button point"></span>
+                    <span class="button"></span>
                 </div>
             </div>
             <div id="message" class="notice hide">
@@ -64,15 +64,10 @@ t" type="text/css" />
                     <div id="task-today-current">
                         <div class="task-add">
                             <input placeholder="Add a task>>">
-                            <a href="" class="task-hidden">≈</a>
-                            <div class="task-hidden-content hide">
-                                <ul>
-                                    <li><a href="#">hello world</a></li>
-                                </ul>
-                            </div>
+                            <a class="ui-trigger">≈</a>
                         </div>
                         <div class="task-list">
-                            <div id="task-current-template" class="hide"><div class="task-check left"><div class="task-progress-container"><span class="task-process-val">{{ progress }}%</span><div class="point"></div><div class="task-progress right"></div></div></div><span class="task-content task-priority-{{ priority }}">{{ content }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
+                            <div id="task-current-template" class="hide"><div class="task-check left"><div class="task-progress-container"><span class="task-process-val">{{ progress }}%</span><div class="triangle"></div><div class="task-progress right"></div></div></div><span class="task-content task-priority-{{ priority }}">{{ content }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
                             <ul>
                             </ul>
                         </div>
@@ -95,7 +90,14 @@ t" type="text/css" />
                     </div>
                 </div>
                 <div id="task-past">
-                    coming soon
+                    <p>
+                        <input id="task-datepicker">
+                    </p>
+
+                    <div id="task-past-container">
+                        <ul>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div id="task-mask"></div>

@@ -30,7 +30,7 @@ define(function(require, exports, module) {
         arr = storage.get(getDateHandle(), true);
         if (arr) {
             _.each(arr, function(data) {
-                task.addToToday(data);
+                task.addToContainer(data, 'task-today-all');
             });
         }
     });
@@ -41,12 +41,10 @@ define(function(require, exports, module) {
         initial = false;
 
     $(document).bind('timer:status:beforeStart', function() {
-        $(document)[0].eventReturnValue = true;
         if (!initial && !storage.get('current')) {
             if(confirm('你不添加个任务先？')) {
                 $('input', task.el)[0].focus();
-                $(document)[0].eventReturnValue = false;
-                return;
+                return true;
             }
             initial = true;
         }
@@ -81,7 +79,16 @@ define(function(require, exports, module) {
         }
     });
 
-    
+
+
+        //autocomplete
+    var taskHidden = [{
+        id: 34234234343,
+        value: 'abc'
+    }],
+        taskHiddenID;
+
+
 
     $(document).bind('task:add', function(e, taskModel) {
         var task = _.clone(taskModel.attributes);
@@ -89,6 +96,7 @@ define(function(require, exports, module) {
         delete task.id;
         storage.set(id, task);
         storage.append('current', id);
+        taskHiddenID = null;
     });
 
     var currentObj = {};
@@ -98,6 +106,34 @@ define(function(require, exports, module) {
 
 
     $(document).bind('task:del', perDelTask);
+
+
+    $(document).bind('task:beforeAdd', function() {
+        if (taskHiddenID) {
+            taskHidden = _.filter(taskHidden, function(item) {
+                return item.id !== taskHiddenID;
+            });
+            return currentObj[taskHiddenID];
+        }
+    });
+
+    $('input', task.el).autocomplete({
+        source: taskHidden,
+        select: function( e, ui ) {
+            taskHiddenID = ui.item.id;
+            return false;
+        }
+    });
+
+
+    $(document).bind('task:hide', function(e, id) {
+        var taskModel = currentObj[id];
+        taskHidden.push({
+            id: id,
+            value: taskModel.get('content')
+        });
+        //data
+    });
 
     $(document).bind('task:change', function(e, id, key, val) {
         var taskModel = currentObj[id],
@@ -112,6 +148,10 @@ define(function(require, exports, module) {
 
     $(document).bind('task:check', perDelTask);
 
+
+    
+
+
     function taskSession(id, prevVal, currentVal) {
         var taskModel = currentObj[id];
         var date = getDateHandle(),
@@ -121,7 +161,7 @@ define(function(require, exports, module) {
                 content: taskModel.get('content')
             };
         storage.append(date, data);
-        task.addToToday(data);
+        task.addToContainer(data, 'task-today-all');
     }
 
     function delCurrentItem(id) {
@@ -136,9 +176,24 @@ define(function(require, exports, module) {
         delete currentObj[id];
     }
 
-    function getDateHandle() {
-        return new Date().toUTCString().slice(0, -12).replace(/\s+/g, '');
+    function getDateHandle(date) {
+        date || (date = new Date());
+        return date.toUTCString().slice(0, -12).replace(/\s+/g, '');
     }
+
+
+
+    $(document).bind('task:date:change', function(e, dateText) {
+        var date = getDateHandle(new Date(dateText));
+        var arr = storage.get(date, true);
+        if (arr) {
+            _.each(arr, function(data) {
+                task.addToContainer(data, 'task-past-container');
+            });
+        }
+
+    });
+
 
     window.app = app;
     return app;

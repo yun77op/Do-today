@@ -38,41 +38,44 @@ define(function(require, exports, module) {
 
                 el.delegate('.button', 'click', timing);
 
+                var statusHandler = {
+                    'normal': function() {
+                        if ($(document).triggerHandler('timer:status:beforeStart'))
+                            return true;
+
+                        var o = $(this);                        
+
+                        plugin.instance = plugin.interval(function(step) {
+                            width += step;
+                            progress.width(width);
+                            plugin.updateTime.call(plugin, --time);
+                            if (time == 0) {
+                                o.removeClass(plugin.status);
+                                plugin.status = 'normal';
+                                statusHandler.started();
+                                $(document).trigger('timer:complete');
+                            }
+                        }, step);
+                    },
+
+                    'started': function() {
+                        plugin.instance && plugin.instance.stop();
+                    },
+
+                    'stopped': function() {}
+
+                };
+
+                var status = _.keys(statusHandler);
+
                 function timing() {
-                    var o = el.find('.button');
-
-                    switch (plugin.status) {
-                        case 'normal':
-                            $(document).trigger('timer:status:beforeStart');
-                            if ($(document)[0].eventReturnValue === false)
-                                return;
-
-                            plugin.status = 'started';
-                            o.addClass('started');                            
-
-                            plugin.instance = plugin.interval(function(step) {
-                                width += step;
-                                progress.width(width);
-                                plugin.updateTime.call(plugin, --time);
-                                if (time == 0) {
-                                    plugin.status = 'normal';
-                                    o.removeClass('started');
-                                    plugin.instance && plugin.instance.stop();
-                                    $(document).trigger('timer:complete');
-                                }
-                            }, step);
-                            break;
-                        case 'started':
-                            plugin.status = 'stopped';
-                            o.removeClass('started').addClass('stopped');
-                            plugin.instance && plugin.instance.stop();
-                            break;
-                        case 'stopped':
-                            plugin.status = 'normal';
-                            o.removeClass('stopped');
-                            break;
-                    }
-                
+                    var button = el.find('.button');
+                    var prevStatus = plugin.status;
+                    if (statusHandler[prevStatus].call(button[0]))
+                        return;
+                    var index = (_.indexOf(status, prevStatus) + 1) % 3;
+                    plugin.status = status[index];
+                    button.removeClass(prevStatus).addClass(plugin.status);
                     $(document).trigger('timer:status:' + plugin.status , plugin);
                 }
 
@@ -138,12 +141,6 @@ define(function(require, exports, module) {
                 });
 
 
-
-                $('.task-hidden', el).click(function(e) {
-                    e.preventDefault();
-                    var o = $(this);
-                    o.siblings('.task-hidden-content').slideToggle();
-                });
 
                 var TaskView = Backbone.View.extend({
                     tagName: 'li',
@@ -242,7 +239,10 @@ define(function(require, exports, module) {
                     },
 
                     hide: function(e) {
-                        this.del(e);
+                        e.preventDefault();
+                        this.host.taskActions.overlay('hide');
+                        this.host.remove();
+                        $(document).trigger('task:hide', this.host.model.get('id'));
                     },
 
                     priority: function(e) {
@@ -263,11 +263,15 @@ define(function(require, exports, module) {
                         o.val('');
                         if (content === '')
                             return;
+                        
                         var task = {
                             content: content
                         };
 
-                        var taskModel = plugin.addToCurrent(task);
+                        var taskModel;
+                        if (!(taskModel = $(document).triggerHandler('task:beforeAdd', taskModel))) {
+                            taskModel = plugin.addToCurrent(task);
+                        }
                         $(document).trigger('task:add', taskModel);
                     }
                 });
@@ -299,7 +303,7 @@ define(function(require, exports, module) {
 
                 $('#task-all-template').template('task-all');
 
-                function addToToday(task) {
+                function addToContainer(task, container) {
                     var data = _.clone(task);
                     data.period = _.map(data.period, function(date) {
                         var d = new Date(date);
@@ -314,11 +318,19 @@ define(function(require, exports, module) {
                             return true;
                         }
                     });
-                    $('#task-today-all ul').append(result);
+                    $('#'+ container + ' ul').append(result);
                 }
 
                 plugin.addToToday = addToToday;
-                plugin.addToCurrent = addToCurrent;
+                plugin.addToContainer = addToContainer;
+
+
+
+                $('#task-datepicker', el).datepicker({
+                    onClose: function(dateText, inst) {
+                        $(document).trigger('task:date:change', dateText);
+                    }
+                });
             }
         },
 
