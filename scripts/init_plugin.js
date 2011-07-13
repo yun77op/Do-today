@@ -121,7 +121,16 @@ define(function(require, exports, module) {
                 };
 
 
-                el.tabs();
+                el.tabs({
+                    select: function(event, ui) {
+                        if (ui.index == 1) {
+                            var yesterday = new Date().valueOf() -  24 * 60 * 60 * 1000;
+                            $('#task-datepicker').val($.datepicker.formatDate('mm/dd/yy', new Date(yesterday)));
+                            $(document).trigger('task:date:change', yesterday);
+                        }
+                    }
+                });
+                
 
                 var sortable = true;
                 el.delegate('.actions #reorder-btn', 'click', function(e) {
@@ -321,7 +330,7 @@ define(function(require, exports, module) {
                     $('#'+ container + ' ul').empty().append(result);
                 }
 
-                plugin.addToToday = addToToday;
+                plugin.addToCurrent = addToCurrent;
                 plugin.addToContainer = addToContainer;
 
 
@@ -330,6 +339,7 @@ define(function(require, exports, module) {
                         $(document).trigger('task:date:change', dateText);
                     }
                 });
+
             }
         },
 

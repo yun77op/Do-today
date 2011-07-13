@@ -101,7 +101,6 @@ define(function(require, exports, module) {
         source: taskHidden,
         select: function( e, ui ) {
             taskHiddenID = ui.item.id;
-            return false;
         }
     });
 
@@ -158,9 +157,6 @@ define(function(require, exports, module) {
                 task.addToContainer(data, 'task-today-all');
             });
         }
-
-        //yesterday
-        $(document).trigger('task:date:change', new Date().valueOf() -  24 * 60 * 60 * 1000);
     });
 
 
