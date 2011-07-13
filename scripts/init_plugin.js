@@ -318,12 +318,11 @@ define(function(require, exports, module) {
                             return true;
                         }
                     });
-                    $('#'+ container + ' ul').append(result);
+                    $('#'+ container + ' ul').empty().append(result);
                 }
 
                 plugin.addToToday = addToToday;
                 plugin.addToContainer = addToContainer;
-
 
 
                 $('#task-datepicker', el).datepicker({

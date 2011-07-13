@@ -13,27 +13,7 @@ define(function(require, exports, module) {
         timer = plugins.timer,
         message = plugins.message,
         task = plugins.task;
-    
-    $(document).bind('init:domReady', function() {
-        Backbone.history = new Backbone.History();
-        Backbone.history.start({pushState: true, root: '/Do-today'});
-        timer.initialize('work');
-        var arr = storage.get('current', true);
-        if (arr) {
-            _.each(arr, function(id) {
-                var taskModel = storage.get(id, true);
-                taskModel.id = id;
-                task.addToCurrent(taskModel);
-            });
-        }
 
-        arr = storage.get(getDateHandle(), true);
-        if (arr) {
-            _.each(arr, function(data) {
-                task.addToContainer(data, 'task-today-all');
-            });
-        }
-    });
 
 
     var session = {},
@@ -132,7 +112,6 @@ define(function(require, exports, module) {
             id: id,
             value: taskModel.get('content')
         });
-        //data
     });
 
     $(document).bind('task:change', function(e, id, key, val) {
@@ -148,8 +127,42 @@ define(function(require, exports, module) {
 
     $(document).bind('task:check', perDelTask);
 
-
     
+    $(document).bind('task:date:change', function(e, dateText) {
+        var date = getDateHandle(new Date(dateText));
+        var arr = storage.get(date, true);
+        if (arr) {
+            _.each(arr, function(data) {
+                task.addToContainer(data, 'task-past-container');
+            });
+        }
+    });
+
+
+    $(document).bind('init:domReady', function() {
+        Backbone.history = new Backbone.History();
+        Backbone.history.start({pushState: true, root: '/Do-today'});
+        timer.initialize('work');
+        var arr = storage.get('current', true);
+        if (arr) {
+            _.each(arr, function(id) {
+                var taskModel = storage.get(id, true);
+                taskModel.id = id;
+                task.addToCurrent(taskModel);
+            });
+        }
+
+        arr = storage.get(getDateHandle(), true);
+        if (arr) {
+            _.each(arr, function(data) {
+                task.addToContainer(data, 'task-today-all');
+            });
+        }
+
+        //yesterday
+        $(document).trigger('task:date:change', new Date().valueOf() -  24 * 60 * 60 * 1000);
+    });
+
 
 
     function taskSession(id, prevVal, currentVal) {
@@ -181,18 +194,6 @@ define(function(require, exports, module) {
         return date.toUTCString().slice(0, -12).replace(/\s+/g, '');
     }
 
-
-
-    $(document).bind('task:date:change', function(e, dateText) {
-        var date = getDateHandle(new Date(dateText));
-        var arr = storage.get(date, true);
-        if (arr) {
-            _.each(arr, function(data) {
-                task.addToContainer(data, 'task-past-container');
-            });
-        }
-
-    });
 
 
     window.app = app;
