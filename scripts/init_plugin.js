@@ -2,6 +2,7 @@ define(function(require, exports, module) {
 
 
     require('./lib/jquery-ui-1.8.14.custom.min.js');
+    //require('./lib/jquery.ui.autocomplete.js');
     require('./lib/jquery.tmpl.min.js');
     var ObjectID = require('./lib/objectid').ObjectID;
 
@@ -273,16 +274,31 @@ define(function(require, exports, module) {
                         if (content === '')
                             return;
                         
-                        var task = {
-                            content: content
-                        };
-
-                        var taskModel;
-                        if (!(taskModel = $(document).triggerHandler('task:beforeAdd', taskModel))) {
-                            taskModel = plugin.addToCurrent(task);
+                        var hiddenId = o.data('hiddenId'),
+                            taskModel;
+                        
+                        if (hiddenId) {
+                            taskModel = $(document).triggerHandler('task:beforeAdd', hiddenId);
+                            o.removeData('hiddenId');
+                            plugin.addToCurrent(taskModel)
+                        } else {
+                            taskModel = plugin.addToCurrent({
+                                content: content
+                            });
+                            $(document).trigger('task:add', taskModel);
                         }
-                        $(document).trigger('task:add', taskModel);
                     }
+                });
+
+                var input = $('input', el).autocomplete({
+                    source: [],
+                    select: function( e, ui ) {
+                        $(this).data('hiddenId', ui.item.id);
+                    }
+                });
+
+                $('.ui-trigger', el).click(function() {
+                    input.autocomplete('search', '');
                 });
 
                 var TaskModel = Backbone.Model.extend({
@@ -339,6 +355,9 @@ define(function(require, exports, module) {
                         $(document).trigger('task:date:change', dateText);
                     }
                 });
+
+
+                
 
             }
         },

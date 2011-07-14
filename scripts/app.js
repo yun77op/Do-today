@@ -61,13 +61,6 @@ define(function(require, exports, module) {
 
 
 
-        //autocomplete
-    var taskHidden = [{
-        id: 34234234343,
-        value: 'abc'
-    }],
-        taskHiddenID;
-
 
 
     $(document).bind('task:add', function(e, taskModel) {
@@ -76,7 +69,6 @@ define(function(require, exports, module) {
         delete task.id;
         storage.set(id, task);
         storage.append('current', id);
-        taskHiddenID = null;
     });
 
     var currentObj = {};
@@ -88,35 +80,27 @@ define(function(require, exports, module) {
     $(document).bind('task:del', perDelTask);
 
 
-    $(document).bind('task:beforeAdd', function() {
-        if (taskHiddenID) {
-            taskHidden = _.filter(taskHidden, function(item) {
-                return item.id !== taskHiddenID;
-            });
-            return currentObj[taskHiddenID];
-        }
+    $(document).bind('task:beforeAdd', function(e, id) {
+        return currentObj[id];
     });
 
-    $('input', task.el).autocomplete({
-        source: taskHidden,
-        select: function( e, ui ) {
-            taskHiddenID = ui.item.id;
-        }
-    });
+    
 
 
     $(document).bind('task:hide', function(e, id) {
-        var taskModel = currentObj[id];
-        taskHidden.push({
-            id: id,
-            value: taskModel.get('content')
-        });
+        var taskModel = currentObj[id],
+            item = {
+                id: id,
+                value: taskModel.get('content')
+            };
+        $('input', task.el).data('autocomplete').options.source.push(item);
     });
 
     $(document).bind('task:change', function(e, id, key, val) {
         var taskModel = currentObj[id],
             attr = {};
         attr[key] = val;
+        
         if (key == 'progress') {
             taskSession(id, taskModel.get(key), val);
         }
