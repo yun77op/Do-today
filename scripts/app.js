@@ -9,10 +9,10 @@ define(function(require, exports, module) {
 
     var plugins = app.initPlugins;
 
-    var storage = plugins.storage,
-        timer = plugins.timer,
-        message = plugins.message,
-        task = plugins.task;
+    var Storage = plugins.storage,
+        Timer = plugins.timer,
+        Message = plugins.message,
+        Task = plugins.task;
 
 
 
@@ -21,7 +21,7 @@ define(function(require, exports, module) {
         initial = false;
 
     $(document).bind('timer:status:beforeStart', function() {
-        if (!initial && !storage.get('current')) {
+        if (!initial && !Storage.get('current')) {
             if(confirm('你不添加个任务先？')) {
                 $('input', task.el)[0].focus();
                 return true;
@@ -34,28 +34,31 @@ define(function(require, exports, module) {
         if (!working)
             return;
         session.startTime = Date.now();
+        Task.mask.show();
     });
 
 
     $(document).bind('timer:status:stopped', function(e, task) {
         session.endTime = Date.now();
+        Task.mask.hide();
     });
 
     
     $(document).bind('timer:status:normal', function(e, task) {
-        timer.initialize(working ? 'work' : 'relax');
+        Timer.initialize(working ? 'work' : 'relax');
     });
 
     
-    $(document).bind('timer:complete', function(e, task) {
+    $(document).bind('timer:complete', function(e) {
         working = !working;
-        timer.initialize(working ? 'work' : 'relax');
+        Task.mask.hide();
+        Timer.initialize(working ? 'work' : 'relax');
         if (!working) {
-            message.show('休息，休息一下！', true);
-            timer.timing();
+            Message.show('休息，休息一下！', true);
+            Timer.timing();
             session.endTime = Date.now();
         } else {
-            message.show('开始工作了！');
+            Message.show('开始工作了！');
         }
     });
 
@@ -64,14 +67,16 @@ define(function(require, exports, module) {
 
 
     $(document).bind('task:add', function(e, taskModel) {
-        var task = _.clone(taskModel.attributes);
-        var id = task.id;
-        delete task.id;
-        storage.set(id, task);
-        storage.append('current', id);
+        var task = _.clone(taskModel.attributes),
+            id = task.id;
+        Storage.set(id, task);
+        Storage.append('current', id);
     });
 
-    var currentObj = {};
+    var currentObj = {},
+        hiddenObj = {};
+
+
     $(document).bind('task:current:add', function(e, taskModel) {
         currentObj[taskModel.get('id')] = taskModel;
     });
@@ -81,7 +86,12 @@ define(function(require, exports, module) {
 
 
     $(document).bind('task:beforeAdd', function(e, id) {
-        return currentObj[id];
+        if (hiddenObj[id]) {
+            delItem('hidden', id);
+            var result = _.clone(hiddenObj[id]);
+            delete hiddenObj[id];
+            return result;
+        }
     });
 
     
@@ -93,6 +103,9 @@ define(function(require, exports, module) {
                 id: id,
                 value: taskModel.get('content')
             };
+        Storage.append('hidden', id);
+        delItem('current', id);
+        hiddenObj[id] = taskModel.attributes;
         $('input', task.el).data('autocomplete').options.source.push(item);
     });
 
@@ -105,7 +118,7 @@ define(function(require, exports, module) {
             taskSession(id, taskModel.get(key), val);
         }
         taskModel.set(attr);
-        storage.set(id, taskModel.attributes);
+        Storage.set(id, taskModel.attributes);
     });
 
     $(document).bind('task:check', perDelTask);
@@ -113,34 +126,50 @@ define(function(require, exports, module) {
     
     $(document).bind('task:date:change', function(e, dateText) {
         var date = getDateHandle(new Date(dateText));
-        var arr = storage.get(date, true);
+        var arr = Storage.get(date, true);
         if (arr) {
             _.each(arr, function(data) {
-                task.addToContainer(data, 'task-past-container');
+                Task.addToContainer(data, 'task-past-container');
             });
         }
     });
 
 
+
     $(document).bind('init:domReady', function() {
         Backbone.history = new Backbone.History();
         Backbone.history.start({pushState: true, root: '/Do-today'});
-        timer.initialize('work');
-        var arr = storage.get('current', true);
+        Timer.initialize('work');
+        var arr = Storage.get('current', true);
         if (arr) {
             _.each(arr, function(id) {
-                var taskModel = storage.get(id, true);
-                taskModel.id = id;
-                task.addToCurrent(taskModel);
+                var taskModel = Storage.get(id, true);
+                Task.addToCurrent(taskModel);
             });
         }
 
-        arr = storage.get(getDateHandle(), true);
+        arr = Storage.get(getDateHandle(), true);
         if (arr) {
             _.each(arr, function(data) {
-                task.addToContainer(data, 'task-today-all');
+                Task.addToContainer(data, 'task-today-all');
             });
         }
+
+        var source = [];
+        arr = Storage.get('hidden', true);
+        if (arr) {
+            _.each(arr, function(id) {
+                var taskModel = Storage.get(id, true);
+                hiddenObj[id] = taskModel;
+                source.push({
+                    id: id,
+                    value: taskModel.content
+                });
+            });
+        }
+
+        Task.initAutocomplete(source);
+
     });
 
 
@@ -153,19 +182,20 @@ define(function(require, exports, module) {
                 period: [session.startTime, session.endTime],
                 content: taskModel.get('content')
             };
-        storage.append(date, data);
-        task.addToContainer(data, 'task-today-all');
+        Storage.append(date, data);
+        Task.addToContainer(data, 'task-today-all');
     }
 
-    function delCurrentItem(id) {
-        var current = storage.get('current', true);
-        current = _.without(current, id);
-        storage.set('current', current);
+    
+    function delItem(key, id) {
+        Storage.mapReduce(key, function(item) {
+            return item.id != id; 
+        });
     }
 
     function perDelTask(id) {
-        delCurrentItem(id);
-        storage.remove(id);
+        delItem('current', id);
+        Storage.remove(id);
         delete currentObj[id];
     }
 
@@ -173,7 +203,6 @@ define(function(require, exports, module) {
         date || (date = new Date());
         return date.toUTCString().slice(0, -12).replace(/\s+/g, '');
     }
-
 
 
     window.app = app;

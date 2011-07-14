@@ -14,6 +14,71 @@ define(function(require, exports, module) {
     };
 
     return {
+
+        storage: {
+            func: function(app, plugin) {
+                function set(key, val) {
+                    if (typeof val == 'object')
+                        val = JSON.stringify(val);
+                    try {
+                        localStorage[key] = val; 
+                    } catch(e) {
+                        
+                    }
+                }
+
+                function get(key, isObject) {
+                    var val = localStorage[key];
+                    if (val && isObject)
+                        val = JSON.parse(val);
+                    return val;
+                }
+
+                function append(key, val_) {
+                    var val = get(key, true);
+                    if (val) {
+                        val.push(val_);
+                    } else {
+                        val = [val_];
+                    }
+                    set(key, val);
+                }
+
+                function remove(key) {
+                    localStorage.removeItem(key);
+                }
+
+                function mapReduce(key, cb) {
+                    var items = storage.get(key, true), result;
+                    if (items) {
+                        result = _.filter(items, cb);
+                        storage.set(key, result);
+                    }
+                }
+
+                plugin.set = set;
+                plugin.append = append;
+                plugin.get = get;
+                plugin.remove = remove;
+                plugin.mapReduce = mapReduce;
+            }
+        },
+
+        message: {
+            func: function(app, plugin) {
+                var el = plugin.el = $('#message');
+
+                plugin.show = function(text) {
+                    $('.message-text', el).text(text);
+                    el.slideDown('slow');
+                };
+
+                $('.message-dismiss', el).click(function(e) {
+                    el.slideUp('slow');
+                })
+            }  
+        },
+
         timer: {
             func: function(app, plugin) {
                 var el = plugin.el = $('#timer');
@@ -290,16 +355,7 @@ define(function(require, exports, module) {
                     }
                 });
 
-                var input = $('input', el).autocomplete({
-                    source: [],
-                    select: function( e, ui ) {
-                        $(this).data('hiddenId', ui.item.id);
-                    }
-                });
-
-                $('.ui-trigger', el).click(function() {
-                    input.autocomplete('search', '');
-                });
+                
 
                 var TaskModel = Backbone.Model.extend({
                     defaults: {
@@ -345,10 +401,24 @@ define(function(require, exports, module) {
                     });
                     $('#'+ container + ' ul').empty().append(result);
                 }
-
+                
                 plugin.addToCurrent = addToCurrent;
                 plugin.addToContainer = addToContainer;
 
+                plugin.initAutocomplete = function(source) {
+                    var el = $('#task-today-current', el);
+                    var input = $('input', el).autocomplete({
+                        source: source,
+                        minLength: 0,
+                        select: function( e, ui ) {
+                            $(this).data('hiddenId', ui.item.id);
+                        }
+                    });
+
+                    $('.ui-trigger', el).click(function() {
+                        input.autocomplete('search', '');
+                    });
+                };
 
                 $('#task-datepicker', el).datepicker({
                     onClose: function(dateText, inst) {
@@ -356,65 +426,8 @@ define(function(require, exports, module) {
                     }
                 });
 
-
-                
-
+                plugin.mask = $('#task-mask');
             }
-        },
-
-        storage: {
-            func: function(app, plugin) {
-                function set(key, val) {
-                    if (typeof val == 'object')
-                        val = JSON.stringify(val);
-                    try {
-                        localStorage[key] = val; 
-                    } catch(e) {
-                        
-                    }
-                }
-
-                function get(key, isObject) {
-                    var val = localStorage[key];
-                    if (val && isObject)
-                        val = JSON.parse(val);
-                    return val;
-                }
-
-                function append(key, val_) {
-                    var val = get(key, true);
-                    if (val) {
-                        val.push(val_);
-                    } else {
-                        val = [val_];
-                    }
-                    set(key, val);
-                }
-
-                function remove(key) {
-                    localStorage.removeItem(key);
-                }
-
-                plugin.set = set;
-                plugin.append = append;
-                plugin.get = get;
-                plugin.remove = remove;
-            }
-        },
-
-        message: {
-            func: function(app, plugin) {
-                var el = plugin.el = $('#message');
-
-                plugin.show = function(text) {
-                    $('.message-text', el).text(text);
-                    el.slideDown('slow');
-                };
-
-                $('.message-dismiss', el).click(function(e) {
-                    el.slideUp('slow');
-                })
-            }  
         }
     }
 });
