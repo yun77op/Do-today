@@ -59,9 +59,9 @@
 .ui-widget { font-family: Helvetica,Arial,sans-serif; font-size: 1.1em; }
 .ui-widget .ui-widget { font-size: 1em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Helvetica,Arial,sans-serif; font-size: 1em; }
-.ui-widget-content { border: 1px solid #B6B6B6; color: #4F4F4F; }
+.ui-widget-content { border: 1px solid #B6B6B6; color: #4F4F4F; background: #FFF;}
 .ui-widget-content a { color: #4F4F4F; }
-.ui-widget-header { border: 1px solid #B6B6B6; color: #4F4F4F; font-weight: bold; }
+.ui-widget-header { border: 1px solid #000; color: #4F4F4F; font-weight: bold; }
 .ui-widget-header {
 	background: url(images/bg_fallback.png) 0 0 repeat-x;
 	background: -webkit-gradient(
@@ -81,43 +81,14 @@
 
 /* Interaction states
 ----------------------------------*/
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #B6B6B6; font-weight: normal; color: #4F4F4F; }
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { 
-	background: url(images/bg_fallback.png) 0 0 repeat-x;
-	background: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-    color-stop(1, rgb(237,237,237)),
-    color-stop(0, rgb(196,196,196))
-	);
-	background: -moz-linear-gradient(
-		center top,
-		rgb(237,237,237),
-		rgb(196,196,196)
-	);
-	-webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;
-	-moz-box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;
-}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { font-weight: normal; color: #FFF; }
+
 .ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: #4F4F4F; text-decoration: none; }
-.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #9D9D9D; font-weight: normal; color: #313131; }
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { font-weight: normal; color: #313131; }
 .ui-state-hover a, .ui-state-hover a:hover { color: #313131; text-decoration: none; }
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { 
 	outline: none;
-	color: #1c4257; border: 1px solid #7096ab;
-	background: url(images/bg_fallback.png) 0 -50px repeat-x;
-	background: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-    color-stop(1, rgb(185,224,245)),
-    color-stop(0, rgb(146,189,214))
-	);
-	background: -moz-linear-gradient(
-		center top,
-		rgb(185,224,245),
-		rgb(146,189,214)
-	);
+	border-bottom: 3px solid #000;
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 }
@@ -560,7 +531,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; background: url(images/icon_sprite.png) 0 -16px no-repeat; }
 .ui-dialog .ui-dialog-titlebar-close:hover span { background-position: -16px -16px; }
 .ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; border: 0; }
-.ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
+.ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: #FFF; overflow: auto; zoom: 1; }
 .ui-dialog .ui-dialog-buttonpane { text-align: left; border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: .3em 1em .5em .4em; }
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: right; }
 .ui-dialog .ui-dialog-buttonpane button { margin: .5em .4em .5em 0; cursor: pointer; }
@@ -609,12 +580,12 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	-webkit-border-radius: 0;
 	border-radius: 0;
 }
-.ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 .2em 1px 0; border-bottom: 0 !important; padding: 0; white-space: nowrap; }
-.ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; font-size: 12px; font-weight: bold; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
-.ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; background: #fff; border-color: #B6B6B6; }
+.ui-tabs .ui-tabs-nav li { list-style: none; float: left; position: relative; top: 1px; margin: 0 0 1px .6em; padding: 0; white-space: nowrap; }
+.ui-tabs .ui-tabs-nav li a { float: left; padding: .5em 1em; text-decoration: none; font-size: 14px; font-weight: bold; }
+.ui-tabs .ui-tabs-nav li.ui-tabs-selected { margin-bottom: 0; padding-bottom: 1px; border-color: #000; }
 .ui-tabs .ui-tabs-nav li.ui-tabs-selected a, .ui-tabs .ui-tabs-nav li.ui-state-disabled a, .ui-tabs .ui-tabs-nav li.ui-state-processing a { cursor: text; outline: none; }
 .ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
-.ui-tabs .ui-tabs-panel { display: block; border-width: 0 1px 1px 1px; padding: 1em 1.4em; background: none; }
+.ui-tabs .ui-tabs-panel { display: block; border: none; padding: 1em 1.4em; background: none; }
 .ui-tabs .ui-tabs-panel { 
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
@@ -654,7 +625,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-datepicker table {width: 100%; font-size: .9em; border-collapse: collapse; margin:0 0 .4em; }
 .ui-datepicker th { padding: .7em .3em; text-align: center; font-weight: bold; border: 0;  }
 .ui-datepicker td { border: 0; padding: 1px; }
-.ui-datepicker td span, .ui-datepicker td a { display: block; padding: .2em; text-align: right; text-decoration: none; }
+.ui-datepicker td span, .ui-datepicker td a { display: block; padding: .2em; text-align: center; text-decoration: none; }
 .ui-datepicker .ui-datepicker-buttonpane { background-image: none; margin: .7em 0 0 0; padding:0 .2em; border-left: 0; border-right: 0; border-bottom: 0; }
 .ui-datepicker .ui-datepicker-buttonpane button { float: right; margin: .5em .2em .4em; cursor: pointer; padding: .2em .6em .3em .6em; width:auto; overflow:visible; }
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current { float:left; }

@@ -2,40 +2,114 @@ define(function(require, exports, module) {
 
 
     require('./lib/jquery-ui-1.8.14.custom.min.js');
-    //require('./lib/jquery.ui.autocomplete.js');
-    require('./lib/jquery.tmpl.min.js');
-    var ObjectID = require('./lib/objectid').ObjectID;
+    require('./lib/ejs_production.js');
 
-    var config = {
-        timer: {
-            workTime: 10,
-            relaxTime: 10
-        }
-    };
+    var Settings = require('./settings.js');
+
+    var ObjectID = require('./lib/objectid').ObjectID;
 
     return {
 
+        settings: {
+            func: function(app, plugin) {
+                Settings.registerNamespace('timer', '计时器');
+                Settings.registerNamespace('notification', '提醒');
+
+                Settings.registerKey('timer', 'work', '工作间隔', 25, []);
+                Settings.registerKey('timer', 'break', '休息间隔', 5, []);
+
+                Settings.registerKey('notification', 'popup', '弹出提示', true, []);
+                Settings.registerKey('notification', 'sound', '声音提示', true, []);
+
+
+                var el = $('#settings');
+                
+                var data = Settings.data();
+                var dialogSettings = new EJS({url: 'views/settings-dialog.ejs'}).render({settings: data});
+                dialogSettings = $(dialogSettings);
+                dialogSettings.hide().appendTo('body').dialog({
+                    autoOpen: false
+                });
+
+                el.delegate('a', 'click', function() {
+                    dialogSettings.dialog('open');
+                });
+
+                el = $('#ui-dialog-settings');
+
+                el.delegate('input', 'change', function() {
+                    var o = $(this);
+                    var arr = o.attr('id').split('-');
+                    var ns = arr[1], key = arr[2], value;
+
+                    value = o.attr('type') == 'checkbox'? !!o.attr('checked') : o.val();
+                    Settings.set(ns, key, value);
+                });
+            }
+        },
+        
+
         storage: {
             func: function(app, plugin) {
-                function set(key, val) {
-                    if (typeof val == 'object')
-                        val = JSON.stringify(val);
-                    try {
-                        localStorage[key] = val; 
-                    } catch(e) {
-                        
-                    }
-                }
 
-                function get(key, isObject) {
+                
+
+                function _get(key) {
                     var val = localStorage[key];
-                    if (val && isObject)
-                        val = JSON.parse(val);
+                    val = JSON.parse(val);
                     return val;
                 }
 
+                function _set(key, val) {
+                    localStorage[key] = JSON.stringify(val);
+                }
+
+
+                function set(key, val) {
+
+                    if (!_.isArray(key)) {
+                        key = [key];
+                    }
+                    var primaryKey = key[0], result, primary;
+                    result = primary = _get(primaryKey);
+
+
+                    var l = key.length;
+                    if (l == 1) {
+                        if (val) {
+                            primary = val;
+                        }
+                    } else {
+                        if (result == null) {
+                            result = primary = {};
+                        }
+                        for (var i = 1; i < l - 1; ++i) {
+                            if (result[key[i]] == null) {
+                                result[key[i]] = {};
+                            }
+                            result = result[key[i]];
+                        }
+
+                        if (val) {
+                            result[key[i]] = val;
+                        } else {
+                            result = result[key[i]];
+                        }
+
+                    }
+
+                    if (!val) {
+                        return result;
+                    }
+                    
+                    _set(primaryKey, primary);
+                    
+                }
+
+
                 function append(key, val_) {
-                    var val = get(key, true);
+
+                    var val = set(key);
                     if (val) {
                         val.push(val_);
                     } else {
@@ -49,35 +123,20 @@ define(function(require, exports, module) {
                 }
 
                 function mapReduce(key, cb) {
-                    var items = storage.get(key, true), result;
+                    var items = set(key), result;
                     if (items) {
                         result = _.filter(items, cb);
-                        storage.set(key, result);
+                        set(key, result);
                     }
                 }
 
                 plugin.set = set;
                 plugin.append = append;
-                plugin.get = get;
                 plugin.remove = remove;
                 plugin.mapReduce = mapReduce;
             }
         },
 
-        message: {
-            func: function(app, plugin) {
-                var el = plugin.el = $('#message');
-
-                plugin.show = function(text) {
-                    $('.message-text', el).text(text);
-                    el.slideDown('slow');
-                };
-
-                $('.message-dismiss', el).click(function(e) {
-                    el.slideUp('slow');
-                })
-            }  
-        },
 
         timer: {
             func: function(app, plugin) {
@@ -94,8 +153,8 @@ define(function(require, exports, module) {
                 var time, step, width;
 
                 function initialize(type) {
-                    //get config
-                    time = config.timer[type + 'Time'];
+                    time = Settings.get('timer', type);
+                    //time *= 60;
                     step = (endWidth - initialWidth) / time;
                     width = initialWidth;
                     plugin.updateTime.call(plugin, time);
@@ -220,7 +279,7 @@ define(function(require, exports, module) {
                 var TaskView = Backbone.View.extend({
                     tagName: 'li',
                     className: 'task',
-                    template: _.template($('#task-current-template').html()),
+                    template: new EJS({url: 'views/task-current.ejs'}),
                     initialize: function() {
                         _.bindAll(this, 'render');
                     },
@@ -228,8 +287,7 @@ define(function(require, exports, module) {
                     render: function() {
                         var o = this;
                         var data = this.model.attributes;
-                        var content = this.template(data);
-                        $(this.el).empty().append(content);
+                        this.template.update(this.el, data);
                         
                         this.taskActions = $('.task-actions-trigger', this.el).overlay({
                             srcNode: '#ui-overlay-task',
@@ -269,6 +327,7 @@ define(function(require, exports, module) {
 
                     showActions: function(e) {
                         e.preventDefault();
+                        e.stopPropagation();
                         overlayView.host = this;
                         this.taskActions.overlay('toggle', e);
                     },
@@ -285,9 +344,8 @@ define(function(require, exports, module) {
                     check: function(e) {
                         var id = this.model.get('id');
                         this.remove();
-                        //$('#task-today-all ul', el).
-                        $(document).trigger('task:check', id);
                         $(document).trigger('task:change', [id, 'progress', 100]);
+                        $(document).trigger('task:check', id);
                     }
                 });
 
@@ -308,14 +366,12 @@ define(function(require, exports, module) {
 
                     del: function(e) {
                         e.preventDefault();
-                        this.host.taskActions.overlay('hide');
                         this.host.remove();
                         $(document).trigger('task:del', this.host.model.get('id'));
                     },
 
                     hide: function(e) {
                         e.preventDefault();
-                        this.host.taskActions.overlay('hide');
                         this.host.remove();
                         $(document).trigger('task:hide', this.host.model.get('id'));
                     },
@@ -377,29 +433,41 @@ define(function(require, exports, module) {
                         model: taskModel
                     });
 
-                    $('#task-today-current .task-list ul', el).append(taskView.render().el);
+                    $('#task-today-current .task-list', el).append(taskView.render().el);
                     $(document).trigger('task:current:add', taskModel);
                     return taskModel;
                 }
 
-                $('#task-all-template').template('task-all');
+                var templateTaskSession = new EJS({element: 'task-session-template'}),
+                    templateTask = new EJS({element: 'task-template'});
 
-                function addToContainer(task, container) {
-                    var data = _.clone(task);
-                    data.period = _.map(data.period, function(date) {
-                        var d = new Date(date);
-                        return d.toLocaleTimeString().slice(0, -3);
-                    });
-
-                    var result = $.tmpl('task-all', data, {
-                        progress: function() {
-                            if (this.data.progress[0] == 0 && this.data.progress[1] == 100) {
-                                return false;
-                            }
-                            return true;
+                function addToContainer(session_, taskData, container) {
+                    var sessionHanle = session_.startTime + '-' + session_.endTime;
+                    
+                    var containerEl = $('#'+ container + ' .task-list'), target;
+                    containerEl.children().each(function(index, el) {
+                        if ($(el).data('session') == sessionHanle) {
+                            target = $(el);
                         }
                     });
-                    $('#'+ container + ' ul').empty().append(result);
+
+                    if (!target) {
+                        var session = _.clone(session_);
+                        
+                        session = _.map(session, function(date) {
+                            var d = new Date(+date);
+                            return d.toLocaleTimeString().slice(0, -3);
+                        });
+
+                        target = templateTaskSession.render({session: session});
+
+                        target = $(target);
+                        target.data('session', sessionHanle);
+                        containerEl.append(target);
+                    }
+
+                    var task = templateTask.render(taskData);
+                    target.find('ul').append(task);
                 }
                 
                 plugin.addToCurrent = addToCurrent;
@@ -425,8 +493,6 @@ define(function(require, exports, module) {
                         $(document).trigger('task:date:change', dateText);
                     }
                 });
-
-                plugin.mask = $('#task-mask');
             }
         }
     }

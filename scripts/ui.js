@@ -58,7 +58,11 @@ $.fn.overlay = function() {
         },
 
         'show': function(fn) {
-            o.unbind('overlayshow').bind('overlayshow', fn);
+            o.unbind('overlayshow').bind('overlayshow', function() {
+                $(document).one('click', function() {
+                    o.overlay('hide');
+                });  
+            }).bind('overlayshow', fn);
         },
 
         'hide': function(fn) {

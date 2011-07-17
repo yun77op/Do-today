@@ -2,6 +2,10 @@ define(function(require, exports, module) {
 
     var app = require('./base');
     var initPlugins = require('./init_plugin');
+    var message = require('./message');
+
+    var Settings = require('./settings.js');
+
     app.addInitPlugins(initPlugins);
 
 
@@ -11,19 +15,19 @@ define(function(require, exports, module) {
 
     var Storage = plugins.storage,
         Timer = plugins.timer,
-        Message = plugins.message,
-        Task = plugins.task;
+        Task = plugins.task,
+        Message = message.generate('main');
 
-
+        Message.show('loading...');
 
     var session = {},
         working = true,
         initial = false;
 
     $(document).bind('timer:status:beforeStart', function() {
-        if (!initial && !Storage.get('current')) {
+        if (!initial && !Storage.set('current')) {
             if(confirm('你不添加个任务先？')) {
-                $('input', task.el)[0].focus();
+                $('input', Task.el)[0].focus();
                 return true;
             }
             initial = true;
@@ -34,35 +38,53 @@ define(function(require, exports, module) {
         if (!working)
             return;
         session.startTime = Date.now();
-        Task.mask.show();
     });
 
 
     $(document).bind('timer:status:stopped', function(e, task) {
         session.endTime = Date.now();
-        Task.mask.hide();
     });
 
     
     $(document).bind('timer:status:normal', function(e, task) {
-        Timer.initialize(working ? 'work' : 'relax');
+        Timer.initialize(working ? 'work' : 'break');
     });
 
     
     $(document).bind('timer:complete', function(e) {
         working = !working;
-        Task.mask.hide();
-        Timer.initialize(working ? 'work' : 'relax');
+        Timer.initialize(working ? 'work' : 'break');
         if (!working) {
-            Message.show('休息，休息一下！', true);
             Timer.timing();
             session.endTime = Date.now();
-        } else {
-            Message.show('开始工作了！');
         }
+
+        if (!Settings.get('notification', 'popup')) {
+            return;
+        }
+
+        if (working) {
+            Message.options({
+                buttons: {
+                    'dismiss': {
+                        'label': '清除',
+                        'click': function() {
+                            this.el.slideUp('slow');
+                        }
+                    }
+                }
+            });
+            Message.show('开始工作了！');
+
+        } else {
+            Message.options({
+                buttons: {}
+            });
+            Message.show('休息，休息一下！', true);
+        }
+
+        
     });
-
-
 
 
 
@@ -106,7 +128,7 @@ define(function(require, exports, module) {
         Storage.append('hidden', id);
         delItem('current', id);
         hiddenObj[id] = taskModel.attributes;
-        $('input', task.el).data('autocomplete').options.source.push(item);
+        $('input', Task.el).data('autocomplete').options.source.push(item);
     });
 
     $(document).bind('task:change', function(e, id, key, val) {
@@ -126,7 +148,7 @@ define(function(require, exports, module) {
     
     $(document).bind('task:date:change', function(e, dateText) {
         var date = getDateHandle(new Date(dateText));
-        var arr = Storage.get(date, true);
+        var arr = Storage.set(date);
         if (arr) {
             _.each(arr, function(data) {
                 Task.addToContainer(data, 'task-past-container');
@@ -140,26 +162,29 @@ define(function(require, exports, module) {
         Backbone.history = new Backbone.History();
         Backbone.history.start({pushState: true, root: '/Do-today'});
         Timer.initialize('work');
-        var arr = Storage.get('current', true);
+        var arr = Storage.set('current');
         if (arr) {
             _.each(arr, function(id) {
-                var taskModel = Storage.get(id, true);
+                var taskModel = Storage.set(id);
                 Task.addToCurrent(taskModel);
             });
         }
 
-        arr = Storage.get(getDateHandle(), true);
-        if (arr) {
-            _.each(arr, function(data) {
-                Task.addToContainer(data, 'task-today-all');
+        var obj = Storage.set(getDateHandle());
+        if (obj) {
+            _.each(obj, function(tasks, sessionHandle) {
+                var session = sessionHandle.split('-');
+                _.each(tasks, function(task) {
+                    Task.addToContainer(session, task, 'task-today-all');
+                });
             });
         }
 
         var source = [];
-        arr = Storage.get('hidden', true);
+        arr = Storage.set('hidden');
         if (arr) {
             _.each(arr, function(id) {
-                var taskModel = Storage.get(id, true);
+                var taskModel = Storage.set(id);
                 hiddenObj[id] = taskModel;
                 source.push({
                     id: id,
@@ -169,31 +194,36 @@ define(function(require, exports, module) {
         }
 
         Task.initAutocomplete(source);
-
+        Message.hide();
     });
 
 
 
     function taskSession(id, prevVal, currentVal) {
+        if (!session.startTime || !session.endTime)
+            return;
         var taskModel = currentObj[id];
-        var date = getDateHandle(),
+        var dateHandle = getDateHandle(),
             data = {
                 progress: [prevVal, currentVal],
-                period: [session.startTime, session.endTime],
                 content: taskModel.get('content')
             };
-        Storage.append(date, data);
-        Task.addToContainer(data, 'task-today-all');
+        
+        var sessionHandle = session.startTime + '-' + session.endTime;
+
+        Storage.append([dateHandle, sessionHandle], data);
+
+        Task.addToContainer(session, data, 'task-today-all');
     }
 
     
     function delItem(key, id) {
-        Storage.mapReduce(key, function(item) {
-            return item.id != id; 
+        Storage.mapReduce(key, function(id_) {
+            return id_ != id; 
         });
     }
 
-    function perDelTask(id) {
+    function perDelTask(e, id) {
         delItem('current', id);
         Storage.remove(id);
         delete currentObj[id];
@@ -201,10 +231,10 @@ define(function(require, exports, module) {
 
     function getDateHandle(date) {
         date || (date = new Date());
-        return date.toUTCString().slice(0, -12).replace(/\s+/g, '');
+        return date.toUTCString().slice(0, -12).replace(/[\s|,]+/g, '');
     }
 
-
+    
     window.app = app;
     return app;
 });

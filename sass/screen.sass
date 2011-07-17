@@ -56,7 +56,7 @@ body.app
         padding-top: 50px
         width: 570px
         margin: 0 auto
-        font-size: 1.2em
+        font-size: 1.1em
         color: #FFF
         > .container
             margin: 10px
@@ -92,6 +92,7 @@ body.app
                 +rotateZ(180deg)
 
     #task
+        background: transparent
         > div
             margin-bottom: 10px
         .nav
@@ -100,6 +101,8 @@ body.app
                 a
                     font-weight: bold
                     border-bottom: 2px solid #000
+        .container
+            position: relative
         .task-add
             position: relative
             a
@@ -115,9 +118,10 @@ body.app
                 position: absolute
                 right: 0
                 top: 2px
-        .task-list
-            ul
-                list-style: none
+
+        .task-list     
+            color: #FFF
+            list-style: none
             .task
                 border-bottom: 1px dotted #000
                 padding: .5em
@@ -127,6 +131,9 @@ body.app
                         display: block
                 span
                     margin: 0 .5em 0 0
+                .task
+                    border: none
+                    border-top: 1px dotted #000
                 .task-actions-trigger
                     display: none
                 .reorder-icon
@@ -162,7 +169,8 @@ body.app
                     &:hover
                         .task-progress-container
                             display: block
-        
+        .task-session
+            list-style: upper-roman inside
         .sortable
             cursor: move
             .reorder-icon
@@ -174,15 +182,6 @@ body.app
             .active
                 background: orange
                 +border-radius(4px)
-
-    #task-mask
-        position: absolute
-        display: none
-        z-index: 2
-        top: 140px
-        left: 0
-        right: 0
-        bottom: 0
 
     .task-priority
         li
@@ -198,9 +197,28 @@ body.app
     .task-priority-0
         color: #202020
 
-    #message
+    #message-main
         position: absolute
-        top: 0
-        right: 0
+        top: 80px
+        left: 50%
+        margin-left: 180px
+        .ui-buttonset
+            float: right
+        .ui-button-text
+            font-size: .9em
+    .message
+        font-size: 14px
 
-   
+
+    #settings
+        position: absolute
+        right: 10px
+        top: 20px
+        a
+            border: 1px solid #EDE
+            +border-radius(3px)
+            span
+                padding: .2em .4em
+    #ui-dialog-settings
+        h3
+            text-align: center

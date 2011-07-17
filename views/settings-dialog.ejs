@@ -1,0 +1,24 @@
+<div id="ui-dialog-settings">   
+    <h3 class="hd">ABOUT:CONFIG</h3>
+    <div class="bd">
+        <figure>
+            <% for (var ns in settings) { %>
+                <% var nsEl = settings[ns]; %>
+                <figcaption><%= nsEl.label %></figcaption>
+                <% for (var key in nsEl.settings) { %>
+                    <% var name = 'settings-' + ns + '-' + key; %>
+                    <% var el = nsEl.settings[key]; %>
+                    <p>
+                        <% if (typeof el.value == 'boolean') { %>
+                            <input id="<%= name %>" type="checkbox" <% if (el.value) { %> checked <% } %>>
+                        <% } else { %>
+                            <input id="<%= name %>" type="number" step="2" value="<%= el.value %>">
+                            <span class="metric">分<span>
+                        <% } %>
+                        <label for="<%= name %>"><%= el.label %></label>
+                    </p>
+                <% } %>
+            <% } %>
+        </figure>
+    </div>
+</div>

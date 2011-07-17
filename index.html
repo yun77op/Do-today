@@ -50,10 +50,11 @@ t" type="text/css" />
                 <div class="timer-start">
                     <span class="button"></span>
                 </div>
-            </div>
-            <div id="message" class="notice hide">
-                <span class="message-text">你知道吗？</span>
-                <button class="message-dismiss button">知道了</button>
+                <div id="settings">
+                    <a href="#">
+                        <span>i</span>
+                    </a>
+                </div>
             </div>
             <div id="task" class="tabs">
                 <ul>
@@ -61,47 +62,55 @@ t" type="text/css" />
                     <li><a href="#task-past" class="button">往日记录</a></li> 
                 </ul>
                 <div id="task-today">
-                    <div id="task-today-current">
+                    <div id="task-today-current" class="container">
                         <div class="task-add">
                             <input placeholder="Add a task>>">
                             <a class="ui-trigger">≈</a>
                         </div>
-                        <div class="task-list">
-                            <div id="task-current-template" class="hide"><div class="task-check left"><div class="task-progress-container"><span class="task-process-val">{{ progress }}%</span><div class="triangle"></div><div class="task-progress right"></div></div></div><span class="task-content task-priority-{{ priority }}">{{ content }}</span><span class="ui-icon reorder-icon ui-icon-arrowthick-2-n-s"></span><a href="#"class="task-actions-trigger right">✿</a></div>
-                            <ul>
-                            </ul>
-                        </div>
+                        <ul class="task-list">
+                        </ul>
                         <div class="control actions">
                             <a id="viewall-btn" class="button" href="#task-today-all">查看全部</a>
                             <a id="reorder-btn" class="button" href="">重排</a>
                         </div>
                     </div>
                     <div id="task-today-all" class="hide">
-                        <div class="task-list">
-                            <script id="task-all-template" type="text/x-jquery-tmpl">
-                                <li class="task"><div><span class="task-period"><span class="task-time">${$item.data.period[0]}</span>到<span class="task-time">${$item.data.period[1]}</span></span><span class="task-content">${content}</span>{{if $item.progress()}}<span class="task-progress"><span>${$item.data.progress[0]}%</span>到<span>${$item.data.progress[1]}%</span></span>{{/if}}</div></li>
-                            </script>
-                            <ul>
-                                <li>还没有哦！</li>
-                            </ul>
-                        </div>
+                        <script id="task-session-template" type="x-ejs-tmpl">
+                            <li class="task">
+                                <span class="task-time"><%= session[0] %></span>到<span class="task-time"><%= session[1] %></span>
+                                <ul class="task-list">
+                                </ul>
+                            </li>
+                        </script>
+                        <script id="task-template" type="x-ejs-tmpl">
+                            <li class="task">
+                                <span class="task-content"><%= content %></span>
+                                <% if (!(progress[0] == 0 && progress[1] == 100)) { %>
+                                    <span class="task-progress"><%= progress[0] %>%</span>
+                                    到
+                                    <span class="task-progress"><%= progress[1] %>%</span>
+                                <% } %>
+                            </li>
+                        </script>
+                        <ul class="task-list task-session"> 
+                        </ul>
                         <div class="control actions">
                             <a id="return-btn" class="button" href="#task-today-current">返回</a>
                         </div>
                     </div>
                 </div>
-                <div id="task-past">
+                <div id="task-past" class="container">
                     <p>
                         <input id="task-datepicker">
                     </p>
 
                     <div id="task-past-container">
-                        <ul>
+                        <ul class="task-list task-session">
                         </ul>
                     </div>
                 </div>
             </div>
-            <div id="task-mask"></div>
+            
         </div>
     </div>
     <div id="ui-overlay-task" class="ui-overlay ui-helper-hidden">
