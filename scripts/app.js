@@ -4,7 +4,8 @@ define(function(require, exports, module) {
     var initPlugins = require('./init_plugin');
     var message = require('./message');
 
-    var Settings = require('./settings.js');
+    var Settings = require('./settings.js'),
+        Storage = require('./storage.js');
 
     app.addInitPlugins(initPlugins);
 
@@ -13,12 +14,20 @@ define(function(require, exports, module) {
 
     var plugins = app.initPlugins;
 
-    var Storage = plugins.storage,
-        Timer = plugins.timer,
+    var Timer = plugins.timer,
         Task = plugins.task,
         Message = message.generate('main');
 
+
         Message.show('loading...');
+
+        Message.show = _.wrap(Message.show, function(show) {
+            if (Settings.get('notification', 'popup')) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                show.apply(Message, args);
+            }
+        });
+
 
     var session = {},
         working = true,
@@ -50,20 +59,18 @@ define(function(require, exports, module) {
         Timer.initialize(working ? 'work' : 'break');
     });
 
-    
+
     $(document).bind('timer:complete', function(e) {
         working = !working;
         Timer.initialize(working ? 'work' : 'break');
         if (!working) {
             Timer.timing();
             session.endTime = Date.now();
-        }
-
-        if (!Settings.get('notification', 'popup')) {
-            return;
-        }
-
-        if (working) {
+            Message.options({
+                buttons: {}
+            });
+            Message.show('休息，休息一下！', true);
+        } else {
             Message.options({
                 buttons: {
                     'dismiss': {
@@ -75,15 +82,14 @@ define(function(require, exports, module) {
                 }
             });
             Message.show('开始工作了！');
+        }  
+    });
 
-        } else {
-            Message.options({
-                buttons: {}
-            });
-            Message.show('休息，休息一下！', true);
+
+    $(document).bind('timer:settings:changed', function(e, handle, value) {
+        if (handle === 'work' && working && !Timer.active) {
+            Timer.initialize('work');
         }
-
-        
     });
 
 

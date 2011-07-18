@@ -45,98 +45,13 @@ define(function(require, exports, module) {
                     value = o.attr('type') == 'checkbox'? !!o.attr('checked') : o.val();
                     Settings.set(ns, key, value);
                 });
+
+                Settings.subscribe('timer', 'work', function(value) {
+                    $(document).trigger('timer:settings:changed', ['work', value]);
+                });
+
             }
         },
-        
-
-        storage: {
-            func: function(app, plugin) {
-
-                
-
-                function _get(key) {
-                    var val = localStorage[key];
-                    val = JSON.parse(val);
-                    return val;
-                }
-
-                function _set(key, val) {
-                    localStorage[key] = JSON.stringify(val);
-                }
-
-
-                function set(key, val) {
-
-                    if (!_.isArray(key)) {
-                        key = [key];
-                    }
-                    var primaryKey = key[0], result, primary;
-                    result = primary = _get(primaryKey);
-
-
-                    var l = key.length;
-                    if (l == 1) {
-                        if (val) {
-                            primary = val;
-                        }
-                    } else {
-                        if (result == null) {
-                            result = primary = {};
-                        }
-                        for (var i = 1; i < l - 1; ++i) {
-                            if (result[key[i]] == null) {
-                                result[key[i]] = {};
-                            }
-                            result = result[key[i]];
-                        }
-
-                        if (val) {
-                            result[key[i]] = val;
-                        } else {
-                            result = result[key[i]];
-                        }
-
-                    }
-
-                    if (!val) {
-                        return result;
-                    }
-                    
-                    _set(primaryKey, primary);
-                    
-                }
-
-
-                function append(key, val_) {
-
-                    var val = set(key);
-                    if (val) {
-                        val.push(val_);
-                    } else {
-                        val = [val_];
-                    }
-                    set(key, val);
-                }
-
-                function remove(key) {
-                    localStorage.removeItem(key);
-                }
-
-                function mapReduce(key, cb) {
-                    var items = set(key), result;
-                    if (items) {
-                        result = _.filter(items, cb);
-                        set(key, result);
-                    }
-                }
-
-                plugin.set = set;
-                plugin.append = append;
-                plugin.remove = remove;
-                plugin.mapReduce = mapReduce;
-            }
-        },
-
 
         timer: {
             func: function(app, plugin) {
@@ -181,13 +96,17 @@ define(function(require, exports, module) {
                                 $(document).trigger('timer:complete');
                             }
                         }, step);
+                        plugin.active = true;
                     },
 
                     'started': function() {
                         plugin.instance && plugin.instance.stop();
+                        plugin.active = false;
                     },
 
-                    'stopped': function() {}
+                    'stopped': function() {
+                        plugin.active = false;
+                    }
 
                 };
 
@@ -236,7 +155,9 @@ define(function(require, exports, module) {
             },
             status: 'normal',
             
-            instance: null
+            instance: null,
+
+            active: false
         }, task: {
             func: function(app, plugin) {
                 var el = plugin.el = $('#task');

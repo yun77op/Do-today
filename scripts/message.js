@@ -22,7 +22,7 @@ define(function(require, exports, module) {
             if (this.autoOpen) {
                 this.show();
             }
-            _.bindAll(this, 'hide');
+            _.bindAll(this, 'hide', 'show');
         },
 
         show: function(text, autoHide) {
