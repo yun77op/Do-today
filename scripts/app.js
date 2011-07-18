@@ -154,11 +154,19 @@ define(function(require, exports, module) {
     
     $(document).bind('task:date:change', function(e, dateText) {
         var date = getDateHandle(new Date(dateText));
-        var arr = Storage.set(date);
-        if (arr) {
-            _.each(arr, function(data) {
-                Task.addToContainer(data, 'task-past-container');
+        console.log(date);
+        var obj = Storage.set(date);
+        var target = 'task-past-content';
+        var el = $('#' + target + ' ul').empty();
+        if (obj) {
+             _.each(obj, function(tasks, sessionHandle) {
+                var session = sessionHandle.split('-');
+                _.each(tasks, function(task) {
+                    Task.addToContainer(session, task, target);
+                });
             });
+        } else {
+            el.append('<li>没有记录哦！</li>');
         }
     });
 
@@ -237,7 +245,7 @@ define(function(require, exports, module) {
 
     function getDateHandle(date) {
         date || (date = new Date());
-        return date.toUTCString().slice(0, -12).replace(/[\s|,]+/g, '');
+        return date.toString().slice(0, -17).replace(/[\s|,]+/g, '');
     }
 
     

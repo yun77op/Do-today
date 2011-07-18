@@ -11,13 +11,11 @@
 @import partials/page
 @import partials/form
 @import partials/two_col
+@import partials/typography
 
 @import "compass/css3"
 @import "compass/typography"
 
-@import less/index
-
-@import app/index
 
 
 .triangle
@@ -29,196 +27,201 @@
     border-right-width: 0
 
 
-body.app
-    #header
-        height: 80px
-        position: relative
-        background: #FFF url(../images/header.png) repeat-x
-        h1
-            background: url(../images/logo.png)
-            margin: 16px 0 0 230px
-            float: left
-            a
-                display: block
-                height: 88px
-                width: 224px
-                +hide-text
-        .sub-title
-            position: absolute
-            width: 150px
-            height: 60px
-            background: url(../images/sprites.png) 0 -93px no-repeat
-            left: 68px
-            top: -10px
 
-    #content
-        position: relative
-        padding-top: 50px
-        width: 570px
-        margin: 0 auto
-        font-size: 1.1em
-        color: #FFF
-        > .container
-            margin: 10px
-    #timer
-        height: 66px
-        background: url(../images/sprites.png) -4px -6px
-        position: relative
-        .timer-time, .timer-start
-            height: 36px
-            margin-top: 20px
-            float: left
-        .timer-time
-            width: 50px
-            margin-left: 18px
-            font-size: 18px
-            font-weight: bold 
-            line-height: 36px
-        .timer-start
-            width: 20px
+#container
+    background: #443C2B
+#header
+    height: 80px
+    position: relative
+    background: #FFF url(../images/header.png) repeat-x
+    h1
+        background: url(../images/logo.png)
+        margin: 16px 0 0 230px
+        float: left
+        a
+            display: block
+            height: 88px
+            width: 224px
+            +hide-text
+    .sub-title
+        position: absolute
+        width: 150px
+        height: 60px
+        background: url(../images/sprites.png) 0 -93px no-repeat
+        left: 68px
+        top: -10px
+
+
+#content
+    position: relative
+    padding-top: 50px
+    width: 570px
+    margin: 0 auto
+    font-size: 1.1em
+    color: #FFF
+    > .container
+        margin: 10px
+#timer
+    height: 66px
+    background: url(../images/sprites.png) -4px -6px
+    position: relative
+    .timer-time, .timer-start
+        height: 36px
+        margin-top: 20px
+        float: left
+    .timer-time
+        width: 50px
+        margin-left: 18px
+        font-size: 18px
+        font-weight: bold 
+        line-height: 36px
+    .timer-start
+        width: 20px
+        margin-left: 6px
+        +linear-gradient(color-stops(#B1AD3F, #A4A148), left)
+        +border-radius(5px)
+        .button
+            margin: 9px 0 0 6px
+            @extend .triangle
+        .button.started
+            width: 8px
+            height: 14px
+            border: none
+            background: #FFF
             margin-left: 6px
-            +linear-gradient(color-stops(#B1AD3F, #A4A148), left)
-            +border-radius(5px)
-            .button
-                margin: 9px 0 0 6px
-                @extend .triangle
-            .button.started
-                width: 8px
-                height: 14px
-                border: none
-                background: #FFF
-                margin-left: 6px
-            .button.stopped
-                +rotateZ(180deg)
+        .button.stopped
+            +rotateZ(180deg)
 
-    #task
-        background: transparent
-        > div
-            margin-bottom: 10px
-        .nav
-            border-bottom: 1px solid #000
-            .selected
-                a
-                    font-weight: bold
-                    border-bottom: 2px solid #000
-        .container
-            position: relative
-        .task-add
-            position: relative
+#task
+    background: transparent
+    > div
+        margin-bottom: 10px
+    .nav
+        border-bottom: 1px solid #000
+        .selected
             a
-                color: #000
-            input
-                padding: 4px
-                width: 510px
-                +border-radius(4px, 4px)
-                border: 2px inset threedface
-                &:focus
-                    border-color: yellow
-            .ui-trigger        
+                font-weight: bold
+                border-bottom: 2px solid #000
+    .container
+        position: relative
+    .task-add
+        position: relative
+        a
+            color: #000
+        input
+            padding: 4px
+            width: 510px
+            +border-radius(4px, 4px)
+            border: 2px inset threedface
+            &:focus
+                border-color: yellow
+        .ui-trigger        
+            position: absolute
+            right: 0
+            top: 2px
+
+    .task-list     
+        color: #FFF
+        list-style: none
+        .task
+            border-bottom: 1px dotted #000
+            padding: .5em
+            position: relative
+            &:hover
+                .task-actions-trigger
+                    display: block
+            span
+                margin: 0 .5em 0 0
+            .task
+                border: none
+                border-top: 1px dotted #000
+            .task-actions-trigger
+                display: none
+            .reorder-icon
                 position: absolute
                 right: 0
-                top: 2px
-
-        .task-list     
-            color: #FFF
-            list-style: none
-            .task
-                border-bottom: 1px dotted #000
-                padding: .5em
-                position: relative
-                &:hover
-                    .task-actions-trigger
-                        display: block
-                span
-                    margin: 0 .5em 0 0
-                .task
-                    border: none
-                    border-top: 1px dotted #000
-                .task-actions-trigger
-                    display: none
-                .reorder-icon
-                    position: absolute
-                    right: 0
-                    top: 50%
-                    margin-top: -8px
-                    visibility: hidden
-                .task-progress-container
-                    display: none
-                    height: 30px
-                    line-height: 30px
-                    padding: 10px 10px
-                    position: absolute
-                    top: -50px
-                    left: -45px
-                    background: green
-                    +border-radius(5px)
-                    .task-progress
-                        width: 60px
-                        margin: 8px 0 0 10px
-                    .triangle
-                        position: absolute
-                        bottom: -14px
-                        left: 55px
-                        border-color: transparent green
-                        +rotateZ(90deg)
-                .task-check
-                    width: 16px
-                    height: 16px
-                    border: 1px solid #222
-                    margin: 0 1em 0 0
-                    &:hover
-                        .task-progress-container
-                            display: block
-        .task-session
-            list-style: upper-roman inside
-        .sortable
-            cursor: move
-            .reorder-icon
-                visibility: visible !important
-            .task-actions-trigger
+                top: 50%
+                margin-top: -8px
                 visibility: hidden
-        .actions
-            font-size: .9em
-            .active
-                background: orange
-                +border-radius(4px)
+            .task-progress-container
+                display: none
+                height: 30px
+                line-height: 30px
+                padding: 10px 10px
+                position: absolute
+                top: -50px
+                left: -45px
+                background: green
+                +border-radius(5px)
+                .task-progress
+                    width: 60px
+                    margin: 8px 0 0 10px
+                .triangle
+                    position: absolute
+                    bottom: -14px
+                    left: 55px
+                    border-color: transparent green
+                    +rotateZ(90deg)
+            .task-check
+                width: 16px
+                height: 16px
+                border: 1px solid #222
+                margin: 0 1em 0 0
+                &:hover
+                    .task-progress-container
+                        display: block
+    .task-session
+        list-style: upper-roman inside
+    .sortable
+        cursor: move
+        .reorder-icon
+            visibility: visible !important
+        .task-actions-trigger
+            visibility: hidden
+    .actions
+        font-size: .9em
+        .active
+            background: orange
+            +border-radius(4px)
 
-    .task-priority
-        li
-            cursor: pointer
-            border: 1px solid #222
+.task-priority
+    li
+        cursor: pointer
+        border: 1px solid #222
 
-    .task-priority-1
-        color: red
-    .task-priority-2
-        color: #007700
-    .task-priority-3
-        color: #006699
-    .task-priority-0
-        color: #202020
+.task-priority-1
+    color: red
+.task-priority-2
+    color: #007700
+.task-priority-3
+    color: #006699
+.task-priority-0
+    color: #202020
 
-    #message-main
-        position: absolute
-        top: 80px
-        left: 50%
-        margin-left: 180px
-        .ui-buttonset
-            float: right
-        .ui-button-text
-            font-size: .9em
-    .message
-        font-size: 14px
+#message-main
+    position: absolute
+    top: 80px
+    left: 50%
+    margin-left: 180px
+    .ui-buttonset
+        float: right
+    .ui-button-text
+        font-size: .9em
+.message
+    font-size: 14px
 
 
-    #settings
-        position: absolute
-        right: 10px
-        top: 20px
-        a
-            border: 1px solid #EDE
-            +border-radius(3px)
-            span
-                padding: .2em .4em
-    #ui-dialog-settings
-        h3
-            text-align: center
+#settings
+    position: absolute
+    right: 10px
+    top: 20px
+    a
+        border: 1px solid #EDE
+        +border-radius(3px)
+        span
+            padding: .2em .4em
+#ui-dialog-settings
+    h3
+        text-align: center
+
+    

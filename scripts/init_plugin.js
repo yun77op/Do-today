@@ -287,12 +287,14 @@ define(function(require, exports, module) {
 
                     del: function(e) {
                         e.preventDefault();
+                        this.host.taskActions.overlay('hide');
                         this.host.remove();
                         $(document).trigger('task:del', this.host.model.get('id'));
                     },
 
                     hide: function(e) {
                         e.preventDefault();
+                        this.host.taskActions.overlay('hide');
                         this.host.remove();
                         $(document).trigger('task:hide', this.host.model.get('id'));
                     },
