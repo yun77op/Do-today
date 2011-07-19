@@ -22,7 +22,7 @@ define(function(require, exports, module) {
           settings = {};
         }
       } else {
-        console.log("We really need localStorage!")
+        //console.log("We really need localStorage!")
         settings = {};
       }
     }
@@ -43,7 +43,7 @@ define(function(require, exports, module) {
     }
     Namespace.prototype = {
       keys: function () {
-        return Object.keys(this.settings).sort()
+        return _.keys(this.settings).sort()
       }
     }
     
@@ -71,7 +71,6 @@ define(function(require, exports, module) {
           return defaultSettings[namespace].settings[key].defaultValue;
         }
       //oops, this key was probably not registered in the namespace
-      console.log("[settings] key "+key+" not found in namespace "+namespace);
       return null;
     }
     
@@ -85,13 +84,12 @@ define(function(require, exports, module) {
       
       notify(namespace, key, value)
       
-      console.log("[settings] set "+namespace+"."+key+" = "+value);
       persist(); // maybe do this somewhat lazily, like once a second
     }
 
     // returns sorted (by name) list of namespaces
     function namespaces() {
-      var namespaces = Object.keys(defaultSettings).sort().map(function (name) {
+      var namespaces = _.keys(defaultSettings).sort().map(function (name) {
         return defaultSettings[name];
       });
       return namespaces;
@@ -146,7 +144,7 @@ define(function(require, exports, module) {
       
       data: function() {
           var data = {};
-          var namespaces = Object.keys(defaultSettings).sort();
+          var namespaces = _.keys(defaultSettings).sort();
           _.each(namespaces, function(ns) {
             data[ns] = {
               label: defaultSettings[ns].label

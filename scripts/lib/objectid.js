@@ -122,9 +122,11 @@ ObjectID.prototype.equals = function equals (otherID) {
  * @return {Number}
  */
 
+/*
 ObjectID.prototype.__defineGetter__("generationTime", function() {
   return BinaryParser.decodeInt(this.id.substring(0,4), 32, true, true) * 1000;
 });
+*/
 
 /**
  * Statics.

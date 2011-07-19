@@ -8,7 +8,7 @@ var Class = {
       this.initialize.apply(this, arguments);
     }
 
-    Object.extend(klass, Class.Methods);
+    _.extend(klass, Class.Methods);
     klass.superclass = parent;
     klass.subclasses = [];
 
@@ -36,16 +36,15 @@ var Class = {
 Class.Methods = {
   addMethods: function(source) {
     var ancestor   = this.superclass && this.superclass.prototype;
-    var properties = Object.keys(source);
+    var properties = _.keys(source);
 
-    if (!Object.keys({ toString: true }).length)
+    if (!_.keys({ toString: true }).length)
       properties.push("toString", "valueOf");
 
     for (var i = 0, length = properties.length; i < length; i++) {
       var property = properties[i], value = source[property];
-      if (ancestor && Object.isFunction(value) &&
-          value.argumentNames().first() == "$super") {
-        var method = value, value = Object.extend((function(m) {
+      if (ancestor && typeof value == 'function' && value.argumentNames()[0] == "$super") {
+        var method = value, value = _.extend((function(m) {
           return function() { return ancestor[m].apply(this, arguments) };
         })(property).wrap(method), {
           valueOf:  function() { return method },
@@ -59,12 +58,14 @@ Class.Methods = {
   }
 };
 
-Object.extend = function(destination, source) {
-  for (var property in source)
-    destination[property] = source[property];
-  return destination;
-};
-
+_.extend(Function.prototype, {
+  argumentNames: function() {
+    var names = this.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
+      .replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
+      .replace(/\s+/g, '').split(',');
+    return names.length == 1 && !names[0] ? [] : names;
+  }
+});
 
 define(function(require, exports, module) {
 

@@ -7,32 +7,24 @@
 // Import all the default blueprint modules so that we can access their mixins.
 @import blueprint
 
+
+@import "compass/css3"
+@import "compass/typography"
+
 // Combine the partials into a single screen stylesheet.
+@import partials/util
 @import partials/page
 @import partials/form
 @import partials/two_col
 @import partials/typography
 
-@import "compass/css3"
-@import "compass/typography"
-
-
-
-.triangle
-    width: 0
-    height: 0
-    border-style: solid
-    border-width: 10px
-    border-color: transparent #FFF
-    border-right-width: 0
-
 
 
 #container
     background: #443C2B
+    position: relative
 #header
     height: 80px
-    position: relative
     background: #FFF url(../images/header.png) repeat-x
     h1
         background: url(../images/logo.png)
@@ -51,18 +43,27 @@
         left: 68px
         top: -10px
 
-
+#mask
+    position: absolute
+    z-index: 2
+    left: 0
+    right: 0
+    bottom: 0
+    top: 80px
+    background: rgba($background-color, 0.9)
+    .mask-message
+        margin: 40px auto
+        text-align: center
 #content
     position: relative
     padding-top: 50px
     width: 570px
     margin: 0 auto
     font-size: 1.1em
-    color: #FFF
-    > .container
-        margin: 10px
+            
 #timer
     height: 66px
+    margin: 10px
     background: url(../images/sprites.png) -4px -6px
     position: relative
     .timer-time, .timer-start
@@ -80,32 +81,42 @@
         margin-left: 6px
         +linear-gradient(color-stops(#B1AD3F, #A4A148), left)
         +border-radius(5px)
-        .button
+        .ui-button
             margin: 9px 0 0 6px
-            @extend .triangle
-        .button.started
+            +triangle
+        .ui-button.started
             width: 8px
             height: 14px
             border: none
             background: #FFF
             margin-left: 6px
-        .button.stopped
+        .ui-button.stopped
             +rotateZ(180deg)
 
 #task
     background: transparent
-    > div
-        margin-bottom: 10px
     .nav
         border-bottom: 1px solid #000
         .selected
             a
                 font-weight: bold
                 border-bottom: 2px solid #000
-    .container
+    .task-list-container
         position: relative
+
+    .task-default
+        display: none
+    .task-list-empty
+        ul
+            list-style: none
+        .task-default
+            display: list-item
+        .ui-button-reorder
+            display: none
+        
     .task-add
         position: relative
+        margin-bottom: 1.5em
         a
             color: #000
         input
@@ -117,8 +128,8 @@
                 border-color: yellow
         .ui-trigger        
             position: absolute
-            right: 0
-            top: 2px
+            right: .5em
+            top: 4px
 
     .task-list     
         color: #FFF
@@ -151,7 +162,8 @@
                 position: absolute
                 top: -50px
                 left: -45px
-                background: green
+                background: rgba($background-color, 0.7)
+                +box-shadow()
                 +border-radius(5px)
                 .task-progress
                     width: 60px
@@ -160,14 +172,15 @@
                     position: absolute
                     bottom: -14px
                     left: 55px
-                    border-color: transparent green
+                    border-color: transparent rgba($background-color, 0.7)
                     +rotateZ(90deg)
             .task-check
-                width: 16px
-                height: 16px
-                border: 1px solid #222
+                width: 19px
+                height: 19px
+                background: url(../images/sprites.png) -16px -169px
                 margin: 0 1em 0 0
                 &:hover
+                    background-position: -34px -169px
                     .task-progress-container
                         display: block
     .task-session
@@ -220,8 +233,5 @@
         +border-radius(3px)
         span
             padding: .2em .4em
-#ui-dialog-settings
-    h3
-        text-align: center
 
     

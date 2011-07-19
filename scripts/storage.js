@@ -1,13 +1,17 @@
 define(function(require, exports, module) {
 
     function _get(key) {
-        var val = localStorage[key];
-        val = JSON.parse(val);
-        return val;
+        var val = localStorage.getItem(key);
+        try {
+            val = JSON.parse(val);
+            return val;
+        } catch (e) {
+            
+        }
     }
 
     function _set(key, val) {
-        localStorage[key] = JSON.stringify(val);
+        localStorage.setItem(key, JSON.stringify(val));
     }
 
 

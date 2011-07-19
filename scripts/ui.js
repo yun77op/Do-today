@@ -116,7 +116,7 @@ $.fn.overlay = function() {
 
         
         if ($(opts.srcNode).length == 0) {
-            opts.srcNode = $('<div class="ui-helper-hidden" id="ui-overlay-' + $.guid() + '"></div>');
+            opts.srcNode = $('<div class="ui-overlay ui-helper-hidden" id="ui-overlay-' + $.guid() + '"></div>');
         }
 
         o.overlay('option', opts);

@@ -14,12 +14,11 @@ define(function(require, exports, module) {
 
     var plugins = app.initPlugins;
 
+    
+
     var Timer = plugins.timer,
         Task = plugins.task,
         Message = message.generate('main');
-
-
-        Message.show('loading...');
 
         Message.show = _.wrap(Message.show, function(show) {
             if (Settings.get('notification', 'popup')) {
@@ -118,11 +117,10 @@ define(function(require, exports, module) {
             delItem('hidden', id);
             var result = _.clone(hiddenObj[id]);
             delete hiddenObj[id];
+            Storage.append('current', id);
             return result;
         }
     });
-
-    
 
 
     $(document).bind('task:hide', function(e, id) {
@@ -165,19 +163,19 @@ define(function(require, exports, module) {
                     Task.addToContainer(session, task, target);
                 });
             });
-        } else {
-            el.append('<li>没有记录哦！</li>');
         }
     });
-
-
 
     $(document).bind('init:domReady', function() {
         Backbone.history = new Backbone.History();
         Backbone.history.start({pushState: true, root: '/Do-today'});
+
         Timer.initialize('work');
+        
+
         var arr = Storage.set('current');
-        if (arr) {
+
+        if (arr && arr.length > 0) {
             _.each(arr, function(id) {
                 var taskModel = Storage.set(id);
                 Task.addToCurrent(taskModel);
@@ -208,7 +206,7 @@ define(function(require, exports, module) {
         }
 
         Task.initAutocomplete(source);
-        Message.hide();
+        $('#mask').fadeOut();
     });
 
 
@@ -245,9 +243,11 @@ define(function(require, exports, module) {
 
     function getDateHandle(date) {
         date || (date = new Date());
-        return date.toString().slice(0, -17).replace(/[\s|,]+/g, '');
-    }
+        var dateText = date.toString();
+        dateText = dateText.slice(0, dateText.lastIndexOf('('));
 
+        return dateText.slice(0, -18).replace(/[\s|,]+/g, '');
+    }
     
     window.app = app;
     return app;

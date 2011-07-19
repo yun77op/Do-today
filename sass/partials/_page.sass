@@ -15,16 +15,57 @@ body
 	// Or leave it in if you're happy with how blueprint looks out-of-the-box
 	+blueprint-scaffolding
 
-	font: 13px/1.231 sans-serif
-	*font-size: small
+	a
+		text-decoration: none
+		&:visited
+			color: $link-color
 
-a
-	color: #FFF
-	text-decoration: none
+	figcaption
+		margin-bottom: 10px
+		font-weight: bold
+		font-size: 1.2em
+		text-align: center
 
-figcaption
-	margin-bottom: 10px
-	font-weight: bold
-	font-size: 1.2em
-	text-align: center
+	h3
+		text-align: center
 
+	h1, h2, h3, h4, h5, h6
+		color: $dark-color
+
+	.left
+		+float-left
+
+	.right
+		+float-right
+
+	.triangle
+		+triangle()
+		
+	.horizontal-list
+		li
+			display: inline
+
+	.control .ui-button
+		+border-radius(2px)
+		padding: 0.2em 0.5em
+		+linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
+
+	.ui-overlay
+		float: left
+		background: #FFF
+		+border-radius(3px)
+		+single-box-shadow()
+		.ui-menu
+			width: 100%
+			margin-left: -2px
+			.ui-menu-item
+				border-bottom: 1px solid #000
+			color: $dark-color
+			a
+				color: $dark-color
+				text-align: left
+				&:hover
+					background: $dark-color
+					color: $link-color
+	.ui-widget-content a
+		color: #4F4F4F

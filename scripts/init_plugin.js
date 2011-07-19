@@ -1,15 +1,25 @@
 define(function(require, exports, module) {
 
-
     require('./lib/jquery-ui-1.8.14.custom.min.js');
     require('./lib/ejs_production.js');
+    require('./lib/jquery.tipsy.js');
 
     var Settings = require('./settings.js');
 
     var ObjectID = require('./lib/objectid').ObjectID;
 
-    return {
+    $('.func-tipsy').tipsy();
 
+    return {
+        detect: {
+            func: function() {
+                var el = $('#mask');
+
+                if (!window.localStorage) {
+                    el.find('.mask-text').html('<p><img src="images/detect.gif">不好意思，必须使用现代浏览器才能使用本应用哦！</p>');   
+                }
+            }
+        },
         settings: {
             func: function(app, plugin) {
                 Settings.registerNamespace('timer', '计时器');
@@ -31,7 +41,8 @@ define(function(require, exports, module) {
                     autoOpen: false
                 });
 
-                el.delegate('a', 'click', function() {
+                el.delegate('a', 'click', function(e) {
+                    e.preventDefault();
                     dialogSettings.dialog('open');
                 });
 
@@ -76,7 +87,7 @@ define(function(require, exports, module) {
                     progress.width(width);
                 }
 
-                el.delegate('.button', 'click', timing);
+                var startButton = $('#ui-button-timerStart', el).click(timing);
 
                 var statusHandler = {
                     'normal': function() {
@@ -113,13 +124,12 @@ define(function(require, exports, module) {
                 var status = _.keys(statusHandler);
 
                 function timing() {
-                    var button = el.find('.button');
                     var prevStatus = plugin.status;
-                    if (statusHandler[prevStatus].call(button[0]))
+                    if (statusHandler[prevStatus].call(startButton[0]))
                         return;
                     var index = (_.indexOf(status, prevStatus) + 1) % 3;
                     plugin.status = status[index];
-                    button.removeClass(prevStatus).addClass(plugin.status);
+                    startButton.removeClass(prevStatus).addClass(plugin.status);
                     $(document).trigger('timer:status:' + plugin.status , plugin);
                 }
 
@@ -179,14 +189,14 @@ define(function(require, exports, module) {
                 
 
                 var sortable = true;
-                el.delegate('.actions #reorder-btn', 'click', function(e) {
+                el.delegate('.actions .ui-button-reorder', 'click', function(e) {
                     e.preventDefault();
                     $(this).toggleClass('active');
                     $(this).text((sortable ? '完成': '') + '重排');
                     sortable = !sortable;
                     $( ".task-list ul" ).sortable({ disabled: sortable });
                     $('#task-today-current .task-list', el).toggleClass('sortable');
-                }).delegate('.actions #viewall-btn, .actions #return-btn', 'click', function(e) {
+                }).delegate('.actions .ui-button-viewall, .actions .ui-button-return', 'click', function(e) {
                     e.preventDefault();
                     var o = $(this);
                     var target = $(o.attr('href'));
@@ -237,6 +247,8 @@ define(function(require, exports, module) {
                             value: o.model.get('progress')
                         });
 
+                        $('.task-content', this.el).tipsy();
+
                         return this;
                     },
 
@@ -280,8 +292,8 @@ define(function(require, exports, module) {
                var OverlayView = Backbone.View.extend({
                     el: $('#ui-overlay-task'),
                     events: {
-                        'click .del-btn': 'del',
-                        'click .hide-btn': 'hide',
+                        'click .ui-button-del': 'del',
+                        'click .ui-button-hide': 'hide',
                         'click .task-priority li': 'priority'
                     },
 
@@ -324,7 +336,7 @@ define(function(require, exports, module) {
                         if (hiddenId) {
                             taskModel = $(document).triggerHandler('task:beforeAdd', hiddenId);
                             o.removeData('hiddenId');
-                            plugin.addToCurrent(taskModel)
+                            plugin.addToCurrent(taskModel);
                         } else {
                             taskModel = plugin.addToCurrent({
                                 content: content
@@ -356,7 +368,11 @@ define(function(require, exports, module) {
                         model: taskModel
                     });
 
-                    $('#task-today-current .task-list', el).append(taskView.render().el);
+                    var container = $('#task-today-current', el);
+
+                    container.removeClass('task-list-empty');
+
+                    $('.task-list', container).append(taskView.render().el);
                     $(document).trigger('task:current:add', taskModel);
                     return taskModel;
                 }
@@ -364,11 +380,14 @@ define(function(require, exports, module) {
                 var templateTaskSession = new EJS({element: 'task-session-template'}),
                     templateTask = new EJS({element: 'task-template'});
 
-                function addToContainer(session_, taskData, container) {
-                    var sessionHanle = session_.startTime + '-' + session_.endTime;
-                    
-                    var containerEl = $('#'+ container + ' .task-list'), target;
-                    containerEl.children().each(function(index, el) {
+                function addToContainer(session_, taskData, containerID) {
+                    var sessionHanle = session_.startTime + '-' + session_.endTime; 
+                    var container = $('#'+ containerID);
+
+                    container.removeClass('task-list-empty');
+
+                    var list = $('.task-list', container), target;
+                    list.children().each(function(index, el) {
                         if ($(el).data('session') == sessionHanle) {
                             target = $(el);
                         }
@@ -386,7 +405,7 @@ define(function(require, exports, module) {
 
                         target = $(target);
                         target.data('session', sessionHanle);
-                        containerEl.append(target);
+                        list.append(target);
                     }
 
                     var task = templateTask.render(taskData);
