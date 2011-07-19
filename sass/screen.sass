@@ -50,7 +50,7 @@
     right: 0
     bottom: 0
     top: 80px
-    background: rgba($background-color, 0.9)
+    background: rgba($background-color, 1)
     .mask-message
         margin: 40px auto
         text-align: center
@@ -148,7 +148,7 @@
                 border-top: 1px dotted #000
             .task-actions-trigger
                 display: none
-            .reorder-icon
+            .ui-icon-arrowthick-2-n-s
                 position: absolute
                 right: 0
                 top: 50%
@@ -175,19 +175,23 @@
                     border-color: transparent rgba($background-color, 0.7)
                     +rotateZ(90deg)
             .task-check
-                width: 19px
-                height: 19px
-                background: url(../images/sprites.png) -16px -169px
+                cursor: pointer
+                width: 17px
+                height: 17px
                 margin: 0 1em 0 0
+                border: 1px solid rgba($background-color, 0.7)
+                +border-radius(5px)
+                +hide-text()
                 &:hover
-                    background-position: -34px -169px
+                    +box-shadow()
+                    text-indent: 1px
                     .task-progress-container
                         display: block
     .task-session
         list-style: upper-roman inside
     .sortable
         cursor: move
-        .reorder-icon
+        .ui-icon-arrowthick-2-n-s
             visibility: visible !important
         .task-actions-trigger
             visibility: hidden

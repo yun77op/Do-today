@@ -1,5 +1,5 @@
 /*
- * Settings for Streamie
+ * Steal from Streamie
  */
 
 

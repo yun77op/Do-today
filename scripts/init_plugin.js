@@ -80,7 +80,7 @@ define(function(require, exports, module) {
 
                 function initialize(type) {
                     time = Settings.get('timer', type);
-                    //time *= 60;
+                    time *= 60;
                     step = (endWidth - initialWidth) / time;
                     width = initialWidth;
                     plugin.updateTime.call(plugin, time);
@@ -194,8 +194,9 @@ define(function(require, exports, module) {
                     $(this).toggleClass('active');
                     $(this).text((sortable ? '完成': '') + '重排');
                     sortable = !sortable;
-                    $( ".task-list ul" ).sortable({ disabled: sortable });
-                    $('#task-today-current .task-list', el).toggleClass('sortable');
+                    var container = $('#task-today-current');
+                    $('.task-list', container).sortable({ disabled: sortable })
+                        .toggleClass('sortable');
                 }).delegate('.actions .ui-button-viewall, .actions .ui-button-return', 'click', function(e) {
                     e.preventDefault();
                     var o = $(this);
