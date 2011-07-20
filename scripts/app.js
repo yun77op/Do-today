@@ -151,11 +151,12 @@ define(function(require, exports, module) {
 
     
     $(document).bind('task:date:change', function(e, dateText) {
-        var date = getDateHandle(new Date(dateText));
-        console.log(date);
-        var obj = Storage.set(date);
-        var target = 'task-past-content';
-        var el = $('#' + target + ' ul').empty();
+        var date = getDateHandle(new Date(dateText)),
+            obj = Storage.set(date),
+            target = 'task-past-content';
+        
+        $('#' + target + ' .task-list').empty();
+        
         if (obj) {
              _.each(obj, function(tasks, sessionHandle) {
                 var session = sessionHandle.split('-');
@@ -167,8 +168,8 @@ define(function(require, exports, module) {
     });
 
     $(document).bind('init:domReady', function() {
-        Backbone.history = new Backbone.History();
-        Backbone.history.start({pushState: true, root: '/Do-today'});
+        //Backbone.history = new Backbone.History();
+        //Backbone.history.start({pushState: true, root: '/Do-today'});
 
         Timer.initialize('work');
         
@@ -248,7 +249,8 @@ define(function(require, exports, module) {
 
         return dateText.slice(0, -18).replace(/[\s|,]+/g, '');
     }
-    
+
     window.app = app;
     return app;
+
 });

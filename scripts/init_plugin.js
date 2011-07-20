@@ -53,7 +53,7 @@ define(function(require, exports, module) {
                     var arr = o.attr('id').split('-');
                     var ns = arr[1], key = arr[2], value;
 
-                    value = o.attr('type') == 'checkbox'? !!o.attr('checked') : o.val();
+                    value = o.attr('type') == 'checkbox'? o.prop('checked') : o.val();
                     Settings.set(ns, key, value);
                 });
 
@@ -403,7 +403,6 @@ define(function(require, exports, module) {
                         });
 
                         target = templateTaskSession.render({session: session});
-
                         target = $(target);
                         target.data('session', sessionHanle);
                         list.append(target);
