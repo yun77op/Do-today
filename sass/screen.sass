@@ -23,6 +23,7 @@
 #container
     background: #443C2B
     position: relative
+
 #header
     height: 80px
     background: #FFF url(../images/header.png) repeat-x
@@ -42,8 +43,20 @@
         background: url(../images/sprites.png) 0 -93px no-repeat
         left: 68px
         top: -10px
+        +hide-text()
     .page-title
         clear: both
+
+#nav
+    position: absolute
+    right: 0
+    top: 0
+    ul
+        +float-right()
+        margin-top: .5em
+        li
+            +float-right()
+            margin-right: 1em
 
 #mask
     position: absolute
@@ -217,6 +230,10 @@
 .task-priority-0
     color: #202020
 
+
+.message
+    font-size: 14px
+
 #message-main
     position: absolute
     top: 80px
@@ -226,8 +243,13 @@
         float: right
     .ui-button-text
         font-size: .9em
-.message
-    font-size: 14px
+
+#message-loading
+    position: absolute
+    top: 50%
+    left: 50%
+    margin: -10px 0 0 -10px
+    background: url(../images/loading.gif)
 
 
 #settings

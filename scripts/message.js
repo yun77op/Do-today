@@ -5,35 +5,53 @@ define(function(require, exports, module) {
     var DEFAULTS = {
         interval: 2000,
         autoOpen: false,
-        text: '',
-        autoHide: false
+        autoHide: false,
+        className: 'message'
     };
 
 
+    var methodFunc = {
+        text: function(text) {
+            this.el.find('.message-text').text(text);
+        },
+
+        buttons: function(buttons) {
+            this.el.find('.ui-buttonset').remove();
+
+            if ($.isEmptyObject(buttons)) {
+                return;
+            }
+
+            var buttonset = $('<div class="ui-buttonset"></div>').appendTo(o.el);
+            
+            _.each(buttons, function(el, key) {
+                var button = $('<button class="ui-button ui-state-default ui-corner-all ui-button-text-only" id="ui-button-' + key + '"><span class="ui-button-text">' + el.label + '</span></button>').appendTo(buttonset);
+                button.click(_.bind(el.click, o));
+            });
+        }
+
+    };
 
     var Message = Class.create({
         initialize: function(name, opts) {
             Instances[name] = this;
-            var el = $('<div id="message-' + name + '" class="message notice"><span class="message-text"></span></div>');
+            var el = $('<div id="message-' + name + '"><span class="message-text"></span></div>');
             this.el = el.hide().appendTo('body');
-            _.extend(this, DEFAULTS);
-            this.options(opts);
+            this.options = {};
+            this.option(opts);
 
-            if (this.autoOpen) {
+            _.bindAll(this, 'hide', 'show');
+
+            if (this.options.autoOpen) {
                 this.show();
             }
-            _.bindAll(this, 'hide', 'show');
+            
         },
 
-        show: function(text, autoHide) {
-            if (arguments.length == 1 && typeof text == 'boolean') {
-                autoHide = text;
-                text = this.text;
-            }
-            text === undefined && (text = this.text);
-            autoHide === undefined && (autoHide = this.autoHide);
+        show: function(autoHide) {
+            autoHide === undefined && (autoHide = this.option('autoHide'));
             this.el.stop(true, false);
-            this.el.find('.message-text').text(text).end().show();
+            this.el.show();
             if (autoHide) {
                 this.addTimer();
             }
@@ -44,7 +62,7 @@ define(function(require, exports, module) {
         },
 
         addTimer: function() {
-            this.timer = window.setTimeout(this.hide, this.interval);
+            this.timer = window.setTimeout(this.hide, this.options.interval);
         },
 
         clearTimer: function () {
@@ -53,27 +71,39 @@ define(function(require, exports, module) {
             }
         },
 
-        options: function(opts) {
-            _.extend(this, opts);
-            var o = this;
-            if (this.buttons) {
-                var buttonset = this.el.find('.ui-buttonset');
-                if ($.isEmptyObject(this.buttons)) {
-                    buttonset.remove();
-                    return;
-                }
+        option: function( key, value ) {
+            var options = key;
 
-                if (buttonset.length == 0) {
-                    buttonset = $('<div class="ui-buttonset"></div>').appendTo(o.el); 
-                }
-                
-                buttonset.empty();
-                
-                _.each(this.buttons, function(el, key) {
-                    var button = $('<button class="ui-button ui-state-default ui-corner-all ui-button-text-only" id="ui-button-' + key + '"><span class="ui-button-text">' + el.label + '</span></button>').appendTo(buttonset);
-                    button.click(_.bind(el.click, o));
-                });
+            if ( arguments.length === 0 ) {
+                // don't return a reference to the internal hash
+                return $.extend( {}, this.options );
             }
+
+            if  (typeof key === "string" ) {
+                if ( value === undefined ) {
+                    return this.options[ key ];
+                }
+                options = {};
+                options[ key ] = value;
+            }
+
+            this._setOptions( options );
+
+            return this;
+        },
+        _setOptions: function( options ) {
+            var self = this;
+            $.each( options, function( key, value ) {
+                self._setOption( key, value );
+            });
+
+            return this;
+        },
+        _setOption: function( key, value ) {
+            this.options[ key ] = value;
+            methodFunc[key] && methodFunc[key].call(this, value);
+
+            return this;
         }
 
     });

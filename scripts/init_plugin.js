@@ -10,6 +10,10 @@ define(function(require, exports, module) {
 
     $('.func-tipsy').tipsy();
 
+    var message = require('./message');
+
+    Message = message.generate('loading');
+
     return {
         detect: {
             func: function() {
@@ -20,6 +24,7 @@ define(function(require, exports, module) {
                 }
             }
         },
+
         settings: {
             func: function(app, plugin) {
                 Settings.registerNamespace('timer', '计时器');
@@ -30,7 +35,6 @@ define(function(require, exports, module) {
 
                 Settings.registerKey('notification', 'popup', '弹出提示', true, []);
                 Settings.registerKey('notification', 'sound', '声音提示', true, []);
-
 
                 var el = $('#settings');
                 
@@ -61,6 +65,16 @@ define(function(require, exports, module) {
                     $(document).trigger('timer:settings:changed', ['work', value]);
                 });
 
+            }
+        },
+
+        nav: {
+            func: function() {
+                var el = $('#nav');
+                el.delegate('.about', 'click', function(e) {
+                    e.preventDefault();
+                    Message.show();
+                }); 
             }
         },
 

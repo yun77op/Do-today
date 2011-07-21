@@ -18,7 +18,9 @@ define(function(require, exports, module) {
 
     var Timer = plugins.timer,
         Task = plugins.task,
-        Message = message.generate('main');
+        Message = message.generate('main', {
+            className: 'notice'
+        });
 
         Message.show = _.wrap(Message.show, function(show) {
             if (Settings.get('notification', 'popup')) {
@@ -152,16 +154,12 @@ define(function(require, exports, module) {
     
     $(document).bind('task:date:change', function(e, dateText) {
         var date = getDateHandle(new Date(dateText)),
-            obj = Storage.set(date),
-            target = 'task-past-content';
-        
-        $('#' + target + ' .task-list').empty();
-        
+            obj = Storage.set(date);
         if (obj) {
              _.each(obj, function(tasks, sessionHandle) {
                 var session = sessionHandle.split('-');
                 _.each(tasks, function(task) {
-                    Task.addToContainer(session, task, target);
+                    Task.addToContainer(session, task, 'task-past-content');
                 });
             });
         }
