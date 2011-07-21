@@ -82,7 +82,7 @@ define(function(require, exports, module) {
         _initPlugins: function() {
             var o = this;
             _.each(this.initPlugins, function(plugin, handle) {
-                plugin.func.call(function() {}, o, plugin);
+                plugin.func.call(null, o, plugin);
                 o.initedPlugins.push(handle);
                 $(document).trigger('init:plugin:' + handle, handle);
             });

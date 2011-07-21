@@ -38,7 +38,7 @@ define(function(require, exports, module) {
             var el = $('<div id="message-' + name + '"><span class="message-text"></span></div>');
             this.el = el.hide().appendTo('body');
             this.options = {};
-            this.option(opts);
+            opts && this.option(opts);
 
             _.bindAll(this, 'hide', 'show');
 
@@ -92,6 +92,7 @@ define(function(require, exports, module) {
             return this;
         },
         _setOptions: function( options ) {
+
             var self = this;
             $.each( options, function( key, value ) {
                 self._setOption( key, value );
