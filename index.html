@@ -21,7 +21,7 @@
     <script>
         $LAB.setOptions({BasePath: '/Do-today/scripts/'})
             .script('lib/sea.js')
-            .script('lib/jquery-1.6.1.js').wait()
+            .script('lib/jquery-1.6.2.min.js').wait()
             .script('ui.js')
             .script('lib/underscore-min.js').wait()
             .script('lib/backbone.js')
@@ -32,6 +32,32 @@
                 seajs.use('app', function(app) {
                     app.init();
                 });
+
+                (function baiduapp() {
+                    if ()
+                    function getPageParams(){
+                        var s = location.search,
+                            params = {};
+                        if (s) {
+                            s = s.slice(1);
+                            _.each(s.split('&'), function(str) {
+                                var pair = str.split('=');
+                                params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+                            }); 
+                        }
+                        return params;
+                    }
+
+                    $(document).ready(function() {
+                        var params = getPageParams();
+                        if (params['s']) {
+                            $('#container').width(540);
+                        }
+                    })
+                })();
+                
+                
+
             });
     </script>
 </head>
