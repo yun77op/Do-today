@@ -32,32 +32,6 @@
                 seajs.use('app', function(app) {
                     app.init();
                 });
-
-                (function baiduapp() {
-                    if ()
-                    function getPageParams(){
-                        var s = location.search,
-                            params = {};
-                        if (s) {
-                            s = s.slice(1);
-                            _.each(s.split('&'), function(str) {
-                                var pair = str.split('=');
-                                params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-                            }); 
-                        }
-                        return params;
-                    }
-
-                    $(document).ready(function() {
-                        var params = getPageParams();
-                        if (params['s']) {
-                            $('#container').width(540);
-                        }
-                    })
-                })();
-                
-                
-
             });
     </script>
 </head>

@@ -3,6 +3,7 @@ define(function(require, exports, module) {
     require('./lib/jquery-ui-1.8.14.custom.min.js');
     require('./lib/ejs_production.js');
     require('./lib/jquery.tipsy.js');
+    var Util = require('./util.js');
 
     var Settings = require('./settings.js');
 
@@ -19,6 +20,15 @@ define(function(require, exports, module) {
 
                 if (!window.localStorage) {
                     el.find('.mask-text').html('<p><img src="images/detect.gif">不好意思，必须使用现代浏览器才能使用本应用哦！</p>');   
+                }
+
+                //baidu iframe
+                if (window != parent) {
+                    $('body').addClass('iframe');
+                    var params = Util.getPageParams();
+                    if (params['s']) {
+                        $('#container').width(540);
+                    }
                 }
             }
         },

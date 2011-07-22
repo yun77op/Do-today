@@ -34,10 +34,16 @@
 //    +--------+---------------+
     
 
-body
+
+#container
+    width: $blueprint-container-size
+    margin: 0 auto
+    min-height: 600px
+    position: relative
+    
+
+body.iframe
     #container
-        width: $blueprint-container-size
-        margin: 0 auto
-        min-height: 600px
-        position: relative
+        height: 500px
+        min-height: 0
         overflow-x: hidden
