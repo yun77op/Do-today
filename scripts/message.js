@@ -5,8 +5,7 @@ define(function(require, exports, module) {
     var DEFAULTS = {
         interval: 2000,
         autoOpen: false,
-        autoHide: false,
-        className: 'message'
+        autoHide: false
     };
 
 
@@ -16,18 +15,23 @@ define(function(require, exports, module) {
         },
 
         buttons: function(buttons) {
+            var o = this;
             this.el.find('.ui-buttonset').remove();
 
             if ($.isEmptyObject(buttons)) {
                 return;
             }
 
-            var buttonset = $('<div class="ui-buttonset"></div>').appendTo(o.el);
+            var buttonset = $('<div class="ui-buttonset"></div>').appendTo(this.el);
             
             _.each(buttons, function(el, key) {
                 var button = $('<button class="ui-button ui-state-default ui-corner-all ui-button-text-only" id="ui-button-' + key + '"><span class="ui-button-text">' + el.label + '</span></button>').appendTo(buttonset);
                 button.click(_.bind(el.click, o));
             });
+        }, 
+
+        className: function() {
+            this.el.addClass(this.option('className'));
         }
 
     };
@@ -35,14 +39,14 @@ define(function(require, exports, module) {
     var Message = Class.create({
         initialize: function(name, opts) {
             Instances[name] = this;
-            var el = $('<div id="message-' + name + '"><span class="message-text"></span></div>');
+            var el = $('<div id="message-' + name + '" class="message"><span class="message-text"></span></div>');
             this.el = el.hide().appendTo('body');
-            this.options = {};
+            this.options = $.extend({}, DEFAULTS);
             opts && this.option(opts);
 
             _.bindAll(this, 'hide', 'show');
 
-            if (this.options.autoOpen) {
+            if (this.option('autoOpen')) {
                 this.show();
             }
             
@@ -62,7 +66,8 @@ define(function(require, exports, module) {
         },
 
         addTimer: function() {
-            this.timer = window.setTimeout(this.hide, this.options.interval);
+            console.log(this.option('interval'));
+            this.timer = window.setTimeout(this.hide, this.option('interval'));
         },
 
         clearTimer: function () {

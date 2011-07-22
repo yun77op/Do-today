@@ -448,20 +448,24 @@ body h3 {
   text-align: center;
 }
 /* line 34, ../sass/partials/_page.sass */
-body h1, body h2, body h3, body h4, body h5, body h6 {
+body h2 {
+  color: #ec5800;
+}
+/* line 36, ../sass/partials/_page.sass */
+body h3, body h4, body h5, body h6 {
   color: #4f4f4f;
 }
-/* line 37, ../sass/partials/_page.sass */
+/* line 39, ../sass/partials/_page.sass */
 body .left {
   display: inline;
   float: left;
 }
-/* line 40, ../sass/partials/_page.sass */
+/* line 42, ../sass/partials/_page.sass */
 body .right {
   display: inline;
   float: right;
 }
-/* line 43, ../sass/partials/_page.sass */
+/* line 45, ../sass/partials/_page.sass */
 body .triangle {
   width: 0;
   height: 0;
@@ -470,26 +474,26 @@ body .triangle {
   border-color: transparent white;
   border-right-width: 0;
 }
-/* line 46, ../sass/partials/_page.sass */
+/* line 48, ../sass/partials/_page.sass */
 body .clearfix {
   zoom: 1;
 }
-/* line 48, ../sass/partials/_page.sass */
+/* line 50, ../sass/partials/_page.sass */
 body .clearfix:before, body .clearfix:after {
   content: "\0020";
   display: block;
   height: 0;
   visibility: hidden;
 }
-/* line 53, ../sass/partials/_page.sass */
+/* line 55, ../sass/partials/_page.sass */
 body .clearfix:after {
   clear: both;
 }
-/* line 57, ../sass/partials/_page.sass */
+/* line 59, ../sass/partials/_page.sass */
 body .horizontal-list li {
   display: inline;
 }
-/* line 60, ../sass/partials/_page.sass */
+/* line 62, ../sass/partials/_page.sass */
 body .control .ui-button {
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
@@ -504,7 +508,7 @@ body .control .ui-button {
   background-image: -o-linear-gradient(top, rgba(48, 39, 22, 0.7), rgba(48, 39, 22, 0.5));
   background-image: linear-gradient(top, rgba(48, 39, 22, 0.7), rgba(48, 39, 22, 0.5));
 }
-/* line 65, ../sass/partials/_page.sass */
+/* line 67, ../sass/partials/_page.sass */
 body .ui-overlay {
   float: left;
   background: white;
@@ -519,27 +523,27 @@ body .ui-overlay {
   -o-box-shadow: 0px 0px 5px #333333;
   box-shadow: 0px 0px 5px #333333;
 }
-/* line 70, ../sass/partials/_page.sass */
+/* line 72, ../sass/partials/_page.sass */
 body .ui-overlay .ui-menu {
   width: 100%;
   margin-left: -2px;
   color: #4f4f4f;
 }
-/* line 73, ../sass/partials/_page.sass */
+/* line 75, ../sass/partials/_page.sass */
 body .ui-overlay .ui-menu .ui-menu-item {
   border-bottom: 1px solid black;
 }
-/* line 76, ../sass/partials/_page.sass */
+/* line 78, ../sass/partials/_page.sass */
 body .ui-overlay .ui-menu a {
   color: #4f4f4f;
   text-align: left;
 }
-/* line 79, ../sass/partials/_page.sass */
+/* line 81, ../sass/partials/_page.sass */
 body .ui-overlay .ui-menu a:hover {
   background: #4f4f4f;
   color: white;
 }
-/* line 82, ../sass/partials/_page.sass */
+/* line 84, ../sass/partials/_page.sass */
 body .ui-widget-content a {
   color: #4f4f4f;
 }
@@ -1002,38 +1006,45 @@ body .control a, body .ui-tabs-nav a {
   font-size: 14px;
 }
 
-/* line 237, ../sass/screen.sass */
+/* line 238, ../sass/screen.sass */
+.message .ui-button {
+  border: none;
+}
+
+/* line 240, ../sass/screen.sass */
 #message-main {
   position: absolute;
   top: 80px;
   left: 50%;
   margin-left: 180px;
 }
-/* line 242, ../sass/screen.sass */
+/* line 245, ../sass/screen.sass */
 #message-main .ui-buttonset {
   float: right;
 }
-/* line 244, ../sass/screen.sass */
+/* line 247, ../sass/screen.sass */
 #message-main .ui-button-text {
   font-size: 0.9em;
 }
 
-/* line 247, ../sass/screen.sass */
+/* line 250, ../sass/screen.sass */
 #message-loading {
   position: absolute;
   top: 50%;
   left: 50%;
-  margin: -10px 0 0 -10px;
-  background: url(../images/loading.gif);
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 -25px;
+  background: url(../images/loading.png);
 }
 
-/* line 255, ../sass/screen.sass */
+/* line 260, ../sass/screen.sass */
 #settings {
   position: absolute;
   right: 10px;
   top: 20px;
 }
-/* line 259, ../sass/screen.sass */
+/* line 264, ../sass/screen.sass */
 #settings a {
   border: 1px solid #eeddee;
   -moz-border-radius: 3px;
@@ -1043,7 +1054,7 @@ body .control a, body .ui-tabs-nav a {
   -khtml-border-radius: 3px;
   border-radius: 3px;
 }
-/* line 262, ../sass/screen.sass */
+/* line 267, ../sass/screen.sass */
 #settings a span {
   padding: 0.2em 0.4em;
 }

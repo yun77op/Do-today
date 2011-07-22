@@ -12,8 +12,6 @@ define(function(require, exports, module) {
 
     var message = require('./message');
 
-    Message = message.generate('loading');
-
     return {
         detect: {
             func: function() {
@@ -68,16 +66,6 @@ define(function(require, exports, module) {
             }
         },
 
-        nav: {
-            func: function() {
-                var el = $('#nav');
-                el.delegate('.about', 'click', function(e) {
-                    e.preventDefault();
-                    Message.show();
-                }); 
-            }
-        },
-
         timer: {
             func: function(app, plugin) {
                 var el = plugin.el = $('#timer');
@@ -94,7 +82,7 @@ define(function(require, exports, module) {
 
                 function initialize(type) {
                     time = Settings.get('timer', type);
-                    time *= 60;
+                    //time *= 60;
                     step = (endWidth - initialWidth) / time;
                     width = initialWidth;
                     plugin.updateTime.call(plugin, time);

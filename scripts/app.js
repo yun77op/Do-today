@@ -24,6 +24,7 @@ define(function(require, exports, module) {
 
         Message.show = _.wrap(Message.show, function(show) {
             if (Settings.get('notification', 'popup')) {
+
                 var args = Array.prototype.slice.call(arguments, 1);
                 show.apply(Message, args);
             }
@@ -67,12 +68,14 @@ define(function(require, exports, module) {
         if (!working) {
             Timer.timing();
             session.endTime = Date.now();
-            Message.options({
-                buttons: {}
+            Message.option({
+                buttons: {},
+                text: '休息，休息一下！'
             });
-            Message.show('休息，休息一下！', true);
+
+            Message.show(true);
         } else {
-            Message.options({
+            Message.option({
                 buttons: {
                     'dismiss': {
                         'label': '清除',
@@ -80,9 +83,12 @@ define(function(require, exports, module) {
                             this.el.slideUp('slow');
                         }
                     }
-                }
+                },
+
+                text: '开始工作了！'
             });
-            Message.show('开始工作了！');
+
+            Message.show();
         }  
     });
 
