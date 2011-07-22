@@ -26,7 +26,7 @@ define(function(require, exports, module) {
                 if (window != parent) {
                     $('body').addClass('iframe');
                     var params = Util.getPageParams();
-                    if (params['s']) {
+                    if (params['canvas_pos'] === 'search') {
                         $('#container').width(540);
                     }
                 }
