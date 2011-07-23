@@ -12,12 +12,13 @@
 @import "compass/typography"
 
 // Combine the partials into a single screen stylesheet.
+
 @import partials/util
 @import partials/page
 @import partials/form
 @import partials/two_col
 @import partials/typography
-
+@import partials/ui
 
 
 #container
@@ -70,13 +71,13 @@
 #content
     position: relative
     padding-top: 50px
-    width: 570px
+    width: 550px
     margin: 0 auto
     font-size: 1.1em
             
 #timer
     height: 66px
-    margin: 10px
+    margin: 10px 0
     background: url(../images/sprites.png) -4px -6px
     position: relative
     .timer-time, .timer-start
@@ -108,6 +109,7 @@
 
 #task
     background: transparent
+    margin-top: 30px
     .nav
         border-bottom: 1px solid #000
         .selected
@@ -133,8 +135,9 @@
         a
             color: #000
         input
+            font-size: 12px
             padding: 4px
-            width: 510px
+            width: 490px
             +border-radius(4px, 4px)
             border: 2px inset threedface
             &:focus
@@ -143,6 +146,10 @@
             position: absolute
             right: .5em
             top: 4px
+            background: url(../images/sprites.png) -107px -174px
+            width: 10px
+            height: 12px
+            margin-top: 4px
 
     .task-list     
         color: #FFF
@@ -160,7 +167,11 @@
                 border: none
                 border-top: 1px dotted #000
             .task-actions-trigger
+                margin-top: 6px
                 display: none
+                background: url(../images/sprites.png) -129px -173px
+                width: 13px
+                height: 13px
             .ui-icon-arrowthick-2-n-s
                 position: absolute
                 right: 0
@@ -195,6 +206,7 @@
                 border: 1px solid rgba($background-color, 0.7)
                 +border-radius(5px)
                 +hide-text()
+                color: $dark-color
                 &:hover
                     +box-shadow()
                     text-indent: 1px
@@ -260,11 +272,9 @@
     right: 10px
     top: 20px
     a
-        border: 1px solid #EDE
-        +border-radius(3px)
-        span
-            padding: .2em .4em
-
-
+        width: 16px
+        height: 15px
+        background: url(../images/sprites.png) -77px -173px
+        +hide-text()
 
     

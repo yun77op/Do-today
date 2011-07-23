@@ -15,7 +15,6 @@ define(function(require, exports, module) {
     var plugins = app.initPlugins;
 
     
-
     var Timer = plugins.timer,
         Task = plugins.task,
         Message = message.generate('main', {
@@ -24,7 +23,6 @@ define(function(require, exports, module) {
 
         Message.show = _.wrap(Message.show, function(show) {
             if (Settings.get('notification', 'popup')) {
-
                 var args = Array.prototype.slice.call(arguments, 1);
                 show.apply(Message, args);
             }

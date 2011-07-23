@@ -1,0 +1,48 @@
+$ui-overlay-border-color        : rgba(0, 0, 0, 0.8)
+
+/* ui */
+.ui-enhanced
+  position: relative
+
+.ui-detail
+  display: none
+
+.ui-trigger
+  cursor: pointer
+
+.ui-close
+  position: absolute
+  top: 5px
+  right: 5px
+
+
+/* ui.overlay */
+.ui-overlay
+  float: left
+  background: #FFF
+  +border-radius(3px)
+  +single-box-shadow()
+  .ui-menu
+    width: 100%
+    margin-left: -2px
+    .ui-menu-item
+      border-bottom: 1px solid #000
+    color: $dark-color
+    a
+      color: $dark-color
+      text-align: left
+      &:hover
+        background: $dark-color
+        color: $link-color
+
+.ui-overlay.ui-active .ui-overlay-detail
+  display: block
+
+/* ui.slide */
+.ui-slide-detail
+  cursor: pointer
+
+.ui-trigger-1
+  padding: 1px 3px
+  border: 1px $blueprint-border-color solid
+  +border-radius(3px)

@@ -62,24 +62,11 @@ body
 	.control .ui-button
 		+border-radius(2px)
 		padding: 0.2em 0.5em
+		font-size: 12px
 		+linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
-
-	.ui-overlay
-		float: left
-		background: #FFF
-		+border-radius(3px)
-		+single-box-shadow()
-		.ui-menu
-			width: 100%
-			margin-left: -2px
-			.ui-menu-item
-				border-bottom: 1px solid #000
-			color: $dark-color
-			a
-				color: $dark-color
-				text-align: left
-				&:hover
-					background: $dark-color
-					color: $link-color
+		&:hover
+			color: $font-color
+			+box-shadow()
+	
 	.ui-widget-content a
 		color: #4F4F4F
