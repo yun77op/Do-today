@@ -33,7 +33,6 @@ define(function(require, exports, module) {
         className: function() {
             this.el.addClass(this.option('className'));
         }
-
     };
 
     var Message = Class.create({
@@ -66,7 +65,6 @@ define(function(require, exports, module) {
         },
 
         addTimer: function() {
-            console.log(this.option('interval'));
             this.timer = window.setTimeout(this.hide, this.option('interval'));
         },
 
@@ -97,7 +95,6 @@ define(function(require, exports, module) {
             return this;
         },
         _setOptions: function( options ) {
-
             var self = this;
             $.each( options, function( key, value ) {
                 self._setOption( key, value );

@@ -7,12 +7,12 @@ define(function(require, exports, module) {
     var Settings = require('./settings.js'),
         Storage = require('./storage.js');
 
-    app.addInitPlugins(initPlugins);
+    app.use(initPlugins);
 
 
     //connect timer with task with storage
 
-    var plugins = app.initPlugins;
+    var plugins = app.getMods();
 
     
     var Timer = plugins.timer,
@@ -170,11 +170,7 @@ define(function(require, exports, module) {
     });
 
     $(document).bind('init:domReady', function() {
-        //Backbone.history = new Backbone.History();
-        //Backbone.history.start({pushState: true, root: '/Do-today'});
-
         Timer.initialize('work');
-        
 
         var arr = Storage.set('current');
 

@@ -84,12 +84,12 @@
                         </div>
                     </div>
                 </div>
-                <div id="task-past" class="task-list-container task-list-empty">
+                <div id="task-past" class="task-list-container">
                     <p>
                         <input id="task-datepicker">
                     </p>
 
-                    <div id="task-past-content" class="task-empty">
+                    <div id="task-past-content" class="task-list-empty">
                         <ul class="task-list task-session">
                             <li class="task-default">没有记录哦！</li>
                         </ul>
@@ -103,7 +103,7 @@
             </div>
         </div>
     </div> <!-- #container -->
-    <div id="ui-overlay-task" class="ui-overlay ui-helper-hidden">
+    <div id="ui-overlay-task" class="ui-overlay">
         <ul class="ui-menu">
             <li class="ui-menu-item"><a class="ui-button-del ui-button" href="#">删除</a></li>
             <li class="ui-menu-item"><a class="ui-button-hide ui-button" href="#">隐藏</a></li>
@@ -118,6 +118,16 @@
             </li>
         </ul>
     </div>
+
+    <div id="ui-overlay-notes" class="ui-overlay">
+        <div class="triangle"></div>
+        <textarea></textarea>
+        <div class="ui-buttonset">
+            <button class="ui-button ui-button-ok">确定</button>
+            <button class="ui-button ui-button-discard">取消</button>
+        </div>
+    </div>
+
     <script id="task-session-template" type="x-ejs-tmpl">
         <li class="task">
             <span class="task-time"><%= session[0] %></span>到<span class="task-time"><%= session[1] %></span>

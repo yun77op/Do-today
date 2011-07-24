@@ -22,259 +22,260 @@
 
 
 #container
-    background: #443C2B
+	background: #443C2B
 #header
-    height: 80px
-    background: #FFF url(../images/header.png) repeat-x
-    .site-title
-        background: url(../images/logo.png)
-        margin: 16px 0 0 230px
-        float: left
-        a
-            display: block
-            height: 88px
-            width: 224px
-            +hide-text
-    .sub-title
-        position: absolute
-        width: 150px
-        height: 60px
-        background: url(../images/sprites.png) 0 -93px no-repeat
-        left: 68px
-        top: -10px
-        +hide-text()
-    .page-title
-        clear: both
+	height: 80px
+	background: #FFF url(../images/header.png) repeat-x
+	.site-title
+		background: url(../images/logo.png)
+		margin: 16px 0 0 230px
+		float: left
+		a
+			display: block
+			height: 88px
+			width: 224px
+			+hide-text
+	.sub-title
+		position: absolute
+		width: 150px
+		height: 60px
+		background: url(../images/sprites.png) 0 -93px no-repeat
+		left: 68px
+		top: -10px
+		+hide-text()
+	.page-title
+		clear: both
 
 #nav
-    position: absolute
-    right: 0
-    top: 0
-    ul
-        +float-right()
-        margin-top: .5em
-        li
-            +float-right()
-            margin-right: 1em
+	position: absolute
+	right: 0
+	top: 0
+	ul
+		+float-right()
+		margin-top: .5em
+		li
+			+float-right()
+			margin-right: 1em
 
 #mask
-    position: absolute
-    z-index: 2
-    left: 0
-    right: 0
-    bottom: 0
-    top: 80px
-    background: rgba($background-color, 1)
-    .mask-message
-        margin: 40px auto
-        text-align: center
+	position: absolute
+	z-index: 2
+	left: 0
+	right: 0
+	bottom: 0
+	top: 80px
+	background: rgba($background-color, 1)
+	.mask-message
+		margin: 40px auto
+		text-align: center
 #content
-    position: relative
-    padding-top: 50px
-    width: 550px
-    margin: 0 auto
-    font-size: 1.1em
-            
+	position: relative
+	padding-top: 50px
+	width: 550px
+	margin: 0 auto
+	font-size: 1.1em
+			
 #timer
-    height: 66px
-    margin: 10px 0
-    background: url(../images/sprites.png) -4px -6px
-    position: relative
-    .timer-time, .timer-start
-        height: 36px
-        margin-top: 20px
-        float: left
-    .timer-time
-        width: 50px
-        margin-left: 18px
-        font-size: 18px
-        font-weight: bold 
-        line-height: 36px
-    .timer-start
-        width: 20px
-        margin-left: 6px
-        +linear-gradient(color-stops(#B1AD3F, #A4A148), left)
-        +border-radius(5px)
-        .ui-button
-            margin: 9px 0 0 6px
-            +triangle
-        .ui-button.started
-            width: 8px
-            height: 14px
-            border: none
-            background: #FFF
-            margin-left: 6px
-        .ui-button.stopped
-            +rotateZ(180deg)
+	height: 66px
+	margin: 10px 0
+	background: url(../images/sprites.png) -4px -6px
+	position: relative
+	.timer-time, .timer-start
+		height: 36px
+		margin-top: 20px
+		float: left
+	.timer-time
+		width: 50px
+		margin-left: 18px
+		font-size: 18px
+		font-weight: bold 
+		line-height: 36px
+	.timer-start
+		width: 20px
+		margin-left: 6px
+		+linear-gradient(color-stops(#B1AD3F, #A4A148), left)
+		+border-radius(5px)
+		.ui-button
+			margin: 9px 0 0 6px
+			+triangle
+		.ui-button.started
+			width: 8px
+			height: 14px
+			border: none
+			background: #FFF
+			margin-left: 6px
+		.ui-button.stopped
+			+rotateZ(180deg)
 
 #task
-    background: transparent
-    margin-top: 30px
-    .nav
-        border-bottom: 1px solid #000
-        .selected
-            a
-                font-weight: bold
-                border-bottom: 2px solid #000
-    .task-list-container
-        position: relative
+	background: transparent
+	margin-top: 30px
+	.nav
+		border-bottom: 1px solid #000
+		.selected
+			a
+				font-weight: bold
+				border-bottom: 2px solid #000
+	.task-list-container
+		position: relative
+		color: $font-color
 
-    .task-default
-        display: none
-    .task-list-empty
-        ul
-            list-style: none
-        .task-default
-            display: list-item
-        .ui-button-reorder
-            display: none
-        
-    .task-add
-        position: relative
-        margin-bottom: 1.5em
-        a
-            color: #000
-        input
-            font-size: 12px
-            padding: 4px
-            width: 490px
-            +border-radius(4px, 4px)
-            border: 2px inset threedface
-            &:focus
-                border-color: yellow
-        .ui-trigger        
-            position: absolute
-            right: .5em
-            top: 4px
-            background: url(../images/sprites.png) -107px -174px
-            width: 10px
-            height: 12px
-            margin-top: 4px
+	.task-default
+		display: none
+	.task-list-empty
+		ul
+			list-style: none
+		.task-default
+			display: list-item
+		.ui-button-reorder
+			display: none
 
-    .task-list     
-        color: #FFF
-        list-style: none
-        .task
-            border-bottom: 1px dotted #000
-            padding: .5em
-            position: relative
-            &:hover
-                .task-actions-trigger
-                    display: block
-            span
-                margin: 0 .5em 0 0
-            .task
-                border: none
-                border-top: 1px dotted #000
-            .task-actions-trigger
-                margin-top: 6px
-                display: none
-                background: url(../images/sprites.png) -129px -173px
-                width: 13px
-                height: 13px
-            .ui-icon-arrowthick-2-n-s
-                position: absolute
-                right: 0
-                top: 50%
-                margin-top: -8px
-                visibility: hidden
-            .task-progress-container
-                display: none
-                height: 30px
-                line-height: 30px
-                padding: 10px 10px
-                position: absolute
-                top: -50px
-                left: -45px
-                background: rgba($background-color, 0.7)
-                +box-shadow()
-                +border-radius(5px)
-                .task-progress
-                    width: 60px
-                    margin: 8px 0 0 10px
-                .triangle
-                    position: absolute
-                    bottom: -14px
-                    left: 55px
-                    border-color: transparent rgba($background-color, 0.7)
-                    +rotateZ(90deg)
-            .task-check
-                cursor: pointer
-                width: 17px
-                height: 17px
-                margin: 0 1em 0 0
-                border: 1px solid rgba($background-color, 0.7)
-                +border-radius(5px)
-                +hide-text()
-                color: $dark-color
-                &:hover
-                    +box-shadow()
-                    text-indent: 1px
-                    .task-progress-container
-                        display: block
-    .task-session
-        list-style: upper-roman inside
-    .sortable
-        cursor: move
-        .ui-icon-arrowthick-2-n-s
-            visibility: visible !important
-        .task-actions-trigger
-            visibility: hidden
-    .actions
-        font-size: .9em
-        .active
-            background: orange
-            +border-radius(4px)
+	.task-add
+		position: relative
+		margin-bottom: 1.5em
+		a
+			color: #000
+		input
+			font-size: 12px
+			padding: 4px
+			width: 490px
+			+border-radius(4px, 4px)
+			border: 2px inset threedface
+			&:focus
+				border-color: yellow
+		.ui-trigger        
+			position: absolute
+			right: .5em
+			top: 4px
+			background: url(../images/sprites.png) -107px -174px
+			width: 10px
+			height: 12px
+			margin-top: 4px
+
+	.task-list
+		list-style: none
+		.task
+			border-bottom: 1px dotted #000
+			padding: .5em
+			position: relative
+			.task
+				border: none
+				border-top: 1px dotted #000
+			&:hover
+				.control
+					visibility: visible
+			.control
+				visibility: hidden
+			span
+				margin: 0 .5em 0 0
+
+			.task-actions-trigger
+				margin-top: 6px
+				background: url(../images/sprites.png) -129px -173px
+				width: 13px
+				height: 13px
+			.ui-icon-arrowthick-2-n-s
+				position: absolute
+				right: 0
+				top: 50%
+				margin-top: -8px
+				visibility: hidden
+			.task-progress-container
+				display: none
+				height: 30px
+				line-height: 30px
+				padding: 10px 10px
+				position: absolute
+				top: -50px
+				left: -45px
+				background: rgba($background-color, 0.7)
+				+box-shadow()
+				+border-radius(5px)
+				.task-progress
+					width: 60px
+					margin: 8px 0 0 10px
+				.triangle
+					position: absolute
+					bottom: -14px
+					left: 55px
+					border-color: transparent rgba($background-color, 0.7)
+					+rotateZ(90deg)
+			.task-check
+				cursor: pointer
+				width: 17px
+				height: 17px
+				margin: 0 1em 0 0
+				border: 1px solid rgba($background-color, 0.7)
+				+border-radius(5px)
+				+hide-text()
+				color: $dark-color
+				&:hover
+					+box-shadow()
+					text-indent: 1px
+					.task-progress-container
+						display: block
+	.task-session
+		list-style: upper-roman inside
+	.sortable
+		cursor: move
+		.task
+			.ui-icon-arrowthick-2-n-s
+				visibility: visible !important
+			.control
+				visibility: hidden !important
+
+
 
 .task-priority
-    li
-        cursor: pointer
-        border: 1px solid #222
+	li
+		cursor: pointer
+		border: 1px solid #222
 
 .task-priority-1
-    color: red
+	color: red
 .task-priority-2
-    color: #007700
+	color: #007700
 .task-priority-3
-    color: #006699
+	color: #006699
 .task-priority-0
-    color: #202020
+	color: #202020
 
 
 .message
-    font-size: 14px
+	font-size: 14px
 
 .message
-    .ui-button
-        border: none
+	.ui-button
+		border: none
 #message-main
-    position: absolute
-    top: 80px
-    left: 50%
-    margin-left: 180px
-    .ui-buttonset
-        float: right
-    .ui-button-text
-        font-size: .9em
+	position: absolute
+	top: 80px
+	left: 50%
+	margin-left: 180px
+	.ui-buttonset
+		float: right
+	.ui-button-text
+		font-size: .9em
 
 #message-loading
-    position: absolute
-    top: 50%
-    left: 50%
-    width: 50px
-    height: 50px
-    margin: -25px 0 0 -25px
-    background: url(../images/loading.png)
+	position: absolute
+	top: 50%
+	left: 50%
+	width: 50px
+	height: 50px
+	margin: -25px 0 0 -25px
+	background: url(../images/loading.png)
 
 
 #settings
-    position: absolute
-    right: 10px
-    top: 20px
-    a
-        width: 16px
-        height: 15px
-        background: url(../images/sprites.png) -77px -173px
-        +hide-text()
+	position: absolute
+	right: 10px
+	top: 20px
+	a
+		width: 16px
+		height: 15px
+		background: url(../images/sprites.png) -77px -173px
+		+hide-text()
 
-    
+
+ui-overlay-notes

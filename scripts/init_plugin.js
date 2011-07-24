@@ -247,6 +247,20 @@ define(function(require, exports, module) {
                             }
                         });
 
+                        $('.task-actions-notes', this.el).overlay({
+                            srcNode: '#ui-overlay-notes',
+                            width: '10em',
+                            visible: false,
+                            show: function(e, ui) {
+                                $(this).overlay('option', {
+                                    align: {
+                                        node: e.target,
+                                        points: ['RT', 'LB']
+                                    }
+                                });
+                            }
+                        });
+
                         $('.task-progress', this.el).slider({
                             change: function(e, ui) {
                                 var valEl = $(this).siblings('.task-process-val');
@@ -266,16 +280,8 @@ define(function(require, exports, module) {
                     },
 
                     events: {
-                        'click .task-actions-trigger': 'showActions',
                         'click .task-content': 'edit',
                         'click .task-check': 'check'
-                    },
-
-                    showActions: function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        overlayView.host = this;
-                        this.taskActions.overlay('toggle', e);
                     },
 
                     edit: function(e) {
@@ -393,22 +399,21 @@ define(function(require, exports, module) {
                 var templateTaskSession = new EJS({element: 'task-session-template'}),
                     templateTask = new EJS({element: 'task-template'});
 
-                function addToContainer(session_, taskData, containerID) {
-                    var sessionHanle = session_.startTime + '-' + session_.endTime; 
+                function addToContainer(session, taskData, containerID) {
+
+                    var sessionHanle = session[0] + '-' + session[1];
                     var container = $('#'+ containerID);
 
                     container.removeClass('task-list-empty');
 
-                    var list = $('.task-list', container), target;
+                    var list = $('.task-session', container), target;
                     list.children().each(function(index, el) {
                         if ($(el).data('session') == sessionHanle) {
                             target = $(el);
                         }
                     });
-
+                    
                     if (!target) {
-                        var session = _.clone(session_);
-                        
                         session = _.map(session, function(date) {
                             var d = new Date(+date);
                             return d.toLocaleTimeString().slice(0, -3);
@@ -421,7 +426,7 @@ define(function(require, exports, module) {
                     }
 
                     var task = templateTask.render(taskData);
-                    target.find('ul').append(task);
+                    target.find('.task-list').append(task);
                 }
                 
                 plugin.addToCurrent = addToCurrent;

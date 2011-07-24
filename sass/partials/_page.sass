@@ -32,7 +32,8 @@ body
 		text-align: center
 
 	h2
-		color: #EC5800
+		color: $notice-color
+
 	h3, h4, h5, h6
 		color: $dark-color
 
@@ -42,6 +43,13 @@ body
 	.right
 		+float-right
 
+	.left
+		img
+			margin: 0 10px 10px 0
+
+	.right
+		img
+			margin: 0 0 10px 10px
 	.triangle
 		+triangle()
 
@@ -59,14 +67,26 @@ body
 		li
 			display: inline
 
-	.control .ui-button
+
+	.task-list-container > .control .ui-button
 		+border-radius(2px)
 		padding: 0.2em 0.5em
 		font-size: 12px
+		color: $link-hover-color
+		font-size: .9em
 		+linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
 		&:hover
-			color: $font-color
+			color: $link-color
 			+box-shadow()
+		&.active
+			background: $notice-color
+			+border-radius(4px)
+			color: $link-color
+
+	.task .control
+		+float-right()
+		.ui-button
+			+float-right()
 	
 	.ui-widget-content a
 		color: #4F4F4F
