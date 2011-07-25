@@ -4,19 +4,11 @@
 
     var optionFunc = {
         'visible': function(isVisible) {
-            if (!isVisible) {
-                srcNode.addClass('ui-helper-hidden');
-            } else {
-                srcNode.removeClass('ui-helper-hidden');
-            }
+            this.options.srcNode[!isVisible ? 'addClass' : 'removeClass' ]('ui-helper-hidden');
         },
 
         'host': function(host) {
             $(host).append(this.options.srcNode);
-        },
-
-        'srcNode': function(srcNode) {
-            this.options.srcNode = $(srcNode);
         },
 
         'width': function(val) {
@@ -25,15 +17,14 @@
         
         'align': function( val ) {
             var node = val.node,
-                points = val.points,
-                o = $(this);
+                points = val.points;
 
-            var srcNodePoint = calcPoints(srcNode, -1)[points[0]],
-                point = calcPoints(o, 1)[points[1]];
-                base = o.offset();
+            var srcNodePoint = calcPoints(this.options.srcNode, -1)[points[0]],
+                point = calcPoints(this.element, 1)[points[1]];
+                base = this.element.offset();
             var result = [base.left + srcNodePoint[0] + point[0], base.top + srcNodePoint[1] + point[1]];
 
-            srcNode.offset({
+            this.options.srcNode.offset({
                 left: result[0],
                 top: result[1]
             });
@@ -57,19 +48,21 @@
         options: {
             event: 'click',
             srcNode: null,
-            host: null,
             visible: false,
             host: 'body'
         },
 
         _create: function() {
-        
-            if (this.options.srcNode) {
-                this.options.srcNode = $('<div class="ui-overlay ui-helper-hidden" id="ui-overlay-' + $.guid() + '"></div>');
+            if (!this.options.srcNode) {
+                this.options.srcNode = $('<div class="ui-overlay ui-helper-hidden" id="' + _.uniqueId('ui-overlay-') + '"></div>');
+            } else {
+                this.options.srcNode = $(this.options.srcNode);
             }
 
-            this._setupEvents();
+            this._process();
+            this._setupEvents(this.options.event);
         },
+
         _setOption: function( key, value ) {
             this._super( "_setOption", key, value);
 
@@ -77,11 +70,24 @@
                 this._setupEvents( value );
             }
 
+            this.__process(key, value);
+        },
+
+        _process: function() {
+            var options = _.keys(optionFunc),
+                self = this;
+            _.each(options, function(key) {
+                if (typeof self.options[key] !== 'undefined') {
+                    self.__process(key, self.options[key]);    
+                }
+            });
+        },
+
+        __process: function(key, value) {
             optionFunc[key] && optionFunc[key].call(this, value);
         },
 
-
-        _setupEvents: function() {
+        _setupEvents: function(event) {
             // attach tab event handler, unbind to avoid duplicates from former tabifying...
             this.element.unbind( ".overlay" );
 
@@ -91,9 +97,18 @@
             }
 
             // disable click in any case
-            this.element.bind( "click.overlay", function( e ){
+            this.element.bind( "click.overlay", function( e ) {
                 e.preventDefault();
+                e.stopPropagation();
             });
+
+            this.options.srcNode.bind( "click.overlay", function( e ) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            
+
         },
 
         _eventHandler: function() {
@@ -109,7 +124,7 @@
             this._trigger('show');
             $(document).one('click', function() {
                 self.hide();
-            }); 
+            });
         },
 
         'hide': function(fn) {

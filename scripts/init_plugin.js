@@ -1,6 +1,5 @@
 define(function(require, exports, module) {
 
-    require('./lib/jquery-ui-1.8.14.custom.min.js');
     require('./lib/ejs_production.js');
     require('./lib/jquery.tipsy.js');
     var Util = require('./util.js');
@@ -238,6 +237,7 @@ define(function(require, exports, module) {
                             width: '10em',
                             visible: false,
                             show: function(e, ui) {
+                                $(document).trigger('overlay:task', o);
                                 $(this).overlay('option', {
                                     align: {
                                         node: e.target,
@@ -247,11 +247,12 @@ define(function(require, exports, module) {
                             }
                         });
 
-                        $('.task-actions-notes', this.el).overlay({
+                        this.taskNotes = $('.task-actions-notes', this.el).overlay({
                             srcNode: '#ui-overlay-notes',
-                            width: '10em',
+                            width: '197px',
                             visible: false,
                             show: function(e, ui) {
+                                $(document).trigger('overlay:notes', o);
                                 $(this).overlay('option', {
                                     align: {
                                         node: e.target,
@@ -306,39 +307,6 @@ define(function(require, exports, module) {
                         plugin.host = this;
                     }
                 });
-
-
-               var OverlayView = Backbone.View.extend({
-                    el: $('#ui-overlay-task'),
-                    events: {
-                        'click .ui-button-del': 'del',
-                        'click .ui-button-hide': 'hide',
-                        'click .task-priority li': 'priority'
-                    },
-
-                    del: function(e) {
-                        e.preventDefault();
-                        this.host.taskActions.overlay('hide');
-                        this.host.remove();
-                        $(document).trigger('task:del', this.host.model.get('id'));
-                    },
-
-                    hide: function(e) {
-                        e.preventDefault();
-                        this.host.taskActions.overlay('hide');
-                        this.host.remove();
-                        $(document).trigger('task:hide', this.host.model.get('id'));
-                    },
-
-                    priority: function(e) {
-                        var el = $(e.target),
-                            priority = el.data('priority');
-                        $(document).trigger('task:change', [this.host.model.get('id'), 'priority', priority]);
-                        this.host.render();
-                    }
-                });
-
-                var overlayView = new OverlayView();
 
 
                 el.delegate('input', 'keyup', function(e) {
@@ -451,6 +419,71 @@ define(function(require, exports, module) {
                     onClose: function(dateText, inst) {
                         $(document).trigger('task:date:change', dateText);
                     }
+                });
+            }
+        },
+
+        overlay: {
+            func: function() {
+                var OverlayView = Backbone.View.extend({
+                    el: $('#ui-overlay-task'),
+                    events: {
+                        'click .ui-button-del': 'del',
+                        'click .ui-button-hide': 'hide',
+                        'click .task-priority li': 'priority'
+                    },
+
+                    del: function(e) {
+                        e.preventDefault();
+                        this.host.taskActions.overlay('hide');
+                        this.host.remove();
+                        $(document).trigger('task:del', this.host.model.get('id'));
+                    },
+
+                    hide: function(e) {
+                        e.preventDefault();
+                        this.host.taskActions.overlay('hide');
+                        this.host.remove();
+                        $(document).trigger('task:hide', this.host.model.get('id'));
+                    },
+
+                    priority: function(e) {
+                        var el = $(e.target),
+                            priority = el.data('priority');
+                        $(document).trigger('task:change', [this.host.model.get('id'), 'priority', priority]);
+                        this.host.render();
+                    }
+                });
+
+                var overlayView = new OverlayView();
+
+                $(document).bind('overlay:task', function(e, host) {
+                    overlayView.host = host;
+                });
+
+                var NotesView = Backbone.View.extend({
+                    el: $('#ui-overlay-notes'),
+                    events: {
+                        'click .ui-button-ok': 'ok',
+                        'click .ui-button-discard': 'discard'
+                    },
+
+                    ok: function(e) {
+                        var val = $.trim(this.el.find('textarea').val());
+                        if (val) {
+                            $(document).trigger('task:change', [this.host.model.get('id'), 'notes', val]);
+                            this.host.taskNotes.overlay('hide');
+                        }
+                    },
+
+                    discard: function(e) {
+                        this.host.taskNotes.overlay('hide');
+                    }
+                });
+
+                var notesView = new NotesView();
+                $(document).bind('overlay:notes', function(e, host) {
+                    notesView.host = host;
                 });
             }
         }

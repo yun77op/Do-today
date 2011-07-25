@@ -148,6 +148,8 @@ define(function(require, exports, module) {
         
         if (key == 'progress') {
             taskSession(id, taskModel.get(key), val);
+        } else if (key == 'notes') {
+            taskSessionNotes(val);
         }
         taskModel.set(attr);
         Storage.set(id, taskModel.attributes);
@@ -209,10 +211,31 @@ define(function(require, exports, module) {
     });
 
 
+    function getSession() {
+        var result;
+        if (!session.startTime || !session.endTime) {
+            result = false;
+        } else {
+            result = session.startTime + '-' + session.endTime;
+        }
+        
+        return result; 
+    }
+
+    function taskSessionNotes(val) {
+        var sessionHandle = getSession();
+        if (!sessionHandle) return;
+        var dateHandle = getDateHandle();
+
+        Storage.append([dateHandle, sessionHandle], {
+            notes: val
+        });
+    }
+            
 
     function taskSession(id, prevVal, currentVal) {
-        if (!session.startTime || !session.endTime)
-            return;
+        var sessionHandle = getSession();
+        if (!sessionHandle) return;
         var taskModel = currentObj[id];
         var dateHandle = getDateHandle(),
             data = {
@@ -220,11 +243,8 @@ define(function(require, exports, module) {
                 content: taskModel.get('content')
             };
         
-        var sessionHandle = session.startTime + '-' + session.endTime;
 
         Storage.append([dateHandle, sessionHandle], data);
-
-        Task.addToContainer(session, data, 'task-today-all');
     }
 
     

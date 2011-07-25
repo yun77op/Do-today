@@ -22,6 +22,7 @@
         $LAB.setOptions({BasePath: '/Do-today/scripts/'})
             .script('lib/sea.js')
             .script('lib/jquery-1.6.2.min.js').wait()
+            .script('lib/jquery-ui.js').wait()
             .script('ui.js')
             .script('lib/underscore-min.js').wait()
             .script('lib/backbone.js')
@@ -103,7 +104,7 @@
             </div>
         </div>
     </div> <!-- #container -->
-    <div id="ui-overlay-task" class="ui-overlay">
+    <div id="ui-overlay-task" class="ui-overlay ui-helper-hidden ui-widget ui-widget-content">
         <ul class="ui-menu">
             <li class="ui-menu-item"><a class="ui-button-del ui-button" href="#">删除</a></li>
             <li class="ui-menu-item"><a class="ui-button-hide ui-button" href="#">隐藏</a></li>
@@ -119,8 +120,9 @@
         </ul>
     </div>
 
-    <div id="ui-overlay-notes" class="ui-overlay">
+    <div id="ui-overlay-notes" class="ui-overlay ui-helper-hidden ui-widget ui-widget-content">
         <div class="triangle"></div>
+        <p>添加备注</p>
         <textarea></textarea>
         <div class="ui-buttonset">
             <button class="ui-button ui-button-ok">确定</button>
