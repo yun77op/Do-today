@@ -1,22 +1,26 @@
 define(function(require, exports, module) {
 
+    Date.now = Date.now || function() {
+        return new Date().getTime();  
+    };
+
     var app = require('./base');
-    var initPlugins = require('./init_plugin');
+    var initMods = require('./init-mods');
     var message = require('./message');
 
     var Settings = require('./settings.js'),
         Storage = require('./storage.js');
 
-    app.use(initPlugins);
+    app.use(initMods);
 
 
     //connect timer with task with storage
 
-    var plugins = app.getMods();
+    var mods = app.getMods();
 
     
-    var Timer = plugins.timer,
-        Task = plugins.task,
+    var Timer = mods.timer,
+        Task = mods.task,
         Message = message.generate('main', {
             className: 'notice'
         });
@@ -27,9 +31,9 @@ define(function(require, exports, module) {
                 show.apply(Message, args);
             }
         });
+    
 
-
-    var session = {},
+    var sessionData = {},
         working = true,
         initial = false;
 
@@ -46,12 +50,12 @@ define(function(require, exports, module) {
     $(document).bind('timer:status:started', function(e) {
         if (!working)
             return;
-        session.startTime = Date.now();
+        sessionData.startTime = Date.now();
     });
 
 
     $(document).bind('timer:status:stopped', function(e, task) {
-        session.endTime = Date.now();
+        sessionData.endTime = Date.now();
     });
 
     
@@ -65,7 +69,7 @@ define(function(require, exports, module) {
         Timer.initialize(working ? 'work' : 'break');
         if (!working) {
             Timer.timing();
-            session.endTime = Date.now();
+            sessionData.endTime = Date.now();
             Message.option({
                 buttons: {},
                 text: '休息，休息一下！'
@@ -115,7 +119,7 @@ define(function(require, exports, module) {
     });
 
 
-    $(document).bind('task:del', perDelTask);
+    $(document).bind('task:del', taskPerDel);
 
 
     $(document).bind('task:beforeAdd', function(e, id) {
@@ -147,15 +151,15 @@ define(function(require, exports, module) {
         attr[key] = val;
         
         if (key == 'progress') {
-            taskSession(id, taskModel.get(key), val);
+            session(id, taskModel.get(key), val);
         } else if (key == 'notes') {
-            taskSessionNotes(val);
+            sessionNotes(val);
         }
         taskModel.set(attr);
         Storage.set(id, taskModel.attributes);
     });
 
-    $(document).bind('task:check', perDelTask);
+    $(document).bind('task:check', taskPerDel);
 
     
     $(document).bind('task:date:change', function(e, dateText) {
@@ -171,6 +175,11 @@ define(function(require, exports, module) {
         }
     });
 
+    $(document).bind('task:slide', function() {
+        return !!(sessionData.startTime && sessionData.endTime && !(Timer.active && working));
+    });
+
+
     $(document).bind('init:domReady', function() {
         Timer.initialize('work');
 
@@ -182,7 +191,7 @@ define(function(require, exports, module) {
                 Task.addToCurrent(taskModel);
             });
         }
-
+        
         var obj = Storage.set(getDateHandle());
         if (obj) {
             _.each(obj, function(tasks, sessionHandle) {
@@ -212,28 +221,13 @@ define(function(require, exports, module) {
 
 
     function getSession() {
-        var result;
-        if (!session.startTime || !session.endTime) {
-            result = false;
-        } else {
-            result = session.startTime + '-' + session.endTime;
-        }
-        
-        return result; 
+        return sessionData.startTime + '-' + sessionData.endTime; 
     }
 
-    function taskSessionNotes(val) {
-        var sessionHandle = getSession();
-        if (!sessionHandle) return;
-        var dateHandle = getDateHandle();
 
-        Storage.append([dateHandle, sessionHandle], {
-            notes: val
-        });
-    }
-            
+    var sessionTrack;
 
-    function taskSession(id, prevVal, currentVal) {
+    function session(id, prevVal, currentVal) {
         var sessionHandle = getSession();
         if (!sessionHandle) return;
         var taskModel = currentObj[id];
@@ -242,30 +236,42 @@ define(function(require, exports, module) {
                 progress: [prevVal, currentVal],
                 content: taskModel.get('content')
             };
-        
-
+        sessionTrack = true;
         Storage.append([dateHandle, sessionHandle], data);
     }
 
+    function sessionNotes(val) {
+        var sessionHandle = getSession();
+        if (!sessionHandle || !sessionTrack) return;
+
+        var dateHandle = getDateHandle();
+        Storage.extend([dateHandle, sessionHandle], {
+            notes: val
+        });
+    }
+
+    function fresh() {
+        sessionTrack = false;
+
+    }
+
+
+    function taskPerDel(e, id) {
+        delItem('current', id);
+        Storage.remove(id);
+        delete currentObj[id];
+    }
     
     function delItem(key, id) {
         Storage.mapReduce(key, function(id_) {
             return id_ != id; 
         });
     }
-
-    function perDelTask(e, id) {
-        delItem('current', id);
-        Storage.remove(id);
-        delete currentObj[id];
-    }
+    
 
     function getDateHandle(date) {
         date || (date = new Date());
-        var dateText = date.toString();
-        dateText = dateText.slice(0, dateText.lastIndexOf('('));
-
-        return dateText.slice(0, -18).replace(/[\s|,]+/g, '');
+        return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
     }
 
     window.app = app;

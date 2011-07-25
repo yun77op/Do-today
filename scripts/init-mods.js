@@ -10,16 +10,10 @@ define(function(require, exports, module) {
 
     $('.func-tipsy').tipsy();
 
-    var message = require('./message');
-
     return {
         detect: {
             func: function() {
                 var el = $('#mask');
-
-                if (!window.localStorage) {
-                    el.find('.mask-text').html('<p><img src="images/detect.gif">不好意思，必须使用现代浏览器才能使用本应用哦！</p>');   
-                }
 
                 //baidu iframe
                 if (window != parent) {
@@ -263,7 +257,14 @@ define(function(require, exports, module) {
                         });
 
                         $('.task-progress', this.el).slider({
-                            change: function(e, ui) {
+                            slide: function(e, ui) {
+                                var currentVal = ui.value,
+                                    val = $(this).slider('value');
+                                if (!$(document).triggerHandler('task:slide') || val >= currentVal) {
+                                    e.preventDefault();
+                                    return;
+                                }
+
                                 var valEl = $(this).siblings('.task-process-val');
                                 valEl.text(ui.value + '%');
                                 if (ui.value == 100) {
@@ -296,6 +297,8 @@ define(function(require, exports, module) {
 
                     check: function(e) {
                         var id = this.model.get('id');
+                        if(e.target != e.currentTarget) { return; }
+
                         this.remove();
                         $(document).trigger('task:change', [id, 'progress', 100]);
                         $(document).trigger('task:check', id);
@@ -342,7 +345,7 @@ define(function(require, exports, module) {
                     },
 
                     initialize: function(attrs) {
-                        attrs['id'] || (this.attributes['id'] = new ObjectID().toHexString());
+                        attrs['id'] || (this.attributes['id'] = 'o' + new ObjectID().toHexString());
                         attrs['created_at'] || (this.attributes['created_at'] = new Date());
                     }
                 });

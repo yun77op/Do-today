@@ -1,79 +1,71 @@
 define(function(require, exports, module) {
 
-    /* Based on Alex Arnell's inheritance implementation. */
-    window.Class = {
-      create: function() {
-        var parent = null, properties = Array.prototype.slice.call(arguments);
-        if (typeof properties[0] == 'function')
-          parent = properties.shift();
 
-        function klass() {
-          this.initialize.apply(this, arguments);
-        }
+    (function(){
+  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
 
-        _.extend(klass, Class.Methods);
-        klass.superclass = parent;
-        klass.subclasses = [];
+  // The base Class implementation (does nothing)
+  this.Class = function(){};
+ 
+  // Create a new Class that inherits from this class
+  Class.extend = function(prop) {
+    var _super = this.prototype;
+   
+    // Instantiate a base class (but only create the instance,
+    // don't run the init constructor)
+    initializing = true;
+    var prototype = new this();
+    initializing = false;
+   
+    // Copy the properties over onto the new prototype
+    for (var name in prop) {
+      // Check if we're overwriting an existing function
+      prototype[name] = typeof prop[name] == "function" &&
+        typeof _super[name] == "function" && fnTest.test(prop[name]) ?
+        (function(name, fn){
+          return function() {
+            var tmp = this._super;
+           
+            // Add a new ._super() method that is the same method
+            // but on the super-class
+            this._super = _super[name];
+           
+            // The method only need to be bound temporarily, so we
+            // remove it when we're done executing
+            var ret = fn.apply(this, arguments);       
+            this._super = tmp;
+           
+            return ret;
+          };
+        })(name, prop[name]) :
+        prop[name];
+    }
+   
+    // The dummy class constructor
+    function Class() {
+      // All construction is actually done in the init method
+      if ( !initializing && this.init )
+        this.init.apply(this, arguments);
+    }
+   
+    // Populate our constructed prototype object
+    Class.prototype = prototype;
+   
+    // Enforce the constructor to be what we expect
+    Class.constructor = Class;
 
-        if (parent) {
-          var subclass = function() { };
-          subclass.prototype = parent.prototype;
-          klass.prototype = new subclass;
-          parent.subclasses.push(klass);
-        }
-
-        for (var i = 0; i < properties.length; i++)
-          klass.addMethods(properties[i]);
-
-        if (!klass.prototype.initialize)
-          klass.prototype.initialize = this.emptyFunction;
-
-        klass.prototype.constructor = klass;
-
-        return klass;
-      },
-      emptyFunction:function () {},
-
-    };
-
-    Class.Methods = {
-      addMethods: function(source) {
-        var ancestor   = this.superclass && this.superclass.prototype;
-        var properties = _.keys(source);
-
-        if (!_.keys({ toString: true }).length)
-          properties.push("toString", "valueOf");
-
-        for (var i = 0, length = properties.length; i < length; i++) {
-          var property = properties[i], value = source[property];
-          if (ancestor && typeof value == 'function' && value.argumentNames()[0] == "$super") {
-            var method = value, value = _.extend((function(m) {
-              return function() { return ancestor[m].apply(this, arguments) };
-            })(property).wrap(method), {
-              valueOf:  function() { return method },
-              toString: function() { return method.toString() }
-            });
-          }
-          this.prototype[property] = value;
-        }
-
-        return this;
-      }
-    };
-
-    _.extend(Function.prototype, {
-      argumentNames: function() {
-        var names = this.toString().match(/^[\s\(]*function[^(]*\(([^)]*)\)/)[1]
-          .replace(/\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g, '')
-          .replace(/\s+/g, '').split(',');
-        return names.length == 1 && !names[0] ? [] : names;
-      }
-    });
+    // And make this class extendable
+    Class.extend = arguments.callee;
+   
+    return Class;
+  };
+})();
 
 
+    
     return  {
         _mods: {},
-            
+                
         initedMods: [],
 
         getMods: function() {
@@ -84,15 +76,15 @@ define(function(require, exports, module) {
             var o = this;
 
             if (!_.isArray(mod)) {
-                mod = [mod];
+                    mod = [mod];
             } else if (_.isString(mod) && arguments[1] !== undefined) {
-                mod = {
-                    mod: arguments[1]
-                };
+                    mod = {
+                            mod: arguments[1]
+                    };
             }
 
             _.each(mod, function(mod_) {
-                o._use(mod_);
+                    o._use(mod_);
             });
         },
 
@@ -102,25 +94,25 @@ define(function(require, exports, module) {
 
         _init: function() {
             var o = this,
-                mods = o._mods,
-                handles = _.keys(mods);
+                    mods = o._mods,
+                    handles = _.keys(mods);
 
             (function next() {
-                var handle = handles.shift(),
-                    mod = mods[handle],
-                    err = null;
-                if (!mod) {
-                    return;    
-                }
+                    var handle = handles.shift(),
+                            mod = mods[handle],
+                            err = null;
+                    if (!mod) {
+                            return;    
+                    }
 
-                try {
-                    mod.func.call(null, o, mod);
-                } catch (e) {
-                    err = e;
-                }
-                o.initedMods.push(handle);
-                $(document).trigger('init:mod:' + handle);
-                next(err, next);
+                    try {
+                            mod.func.call(null, o, mod);
+                    } catch (e) {
+                            err = e;
+                    }
+                    o.initedMods.push(handle);
+                    $(document).trigger('init:mod:' + handle);
+                    next(err, next);
             })();
         },
 
@@ -128,8 +120,8 @@ define(function(require, exports, module) {
             var o = this;
             $(document).trigger('init');
             $(document).ready(function() {
-                o._init();
-                $(document).trigger('init:domReady');
+                    o._init();
+                    $(document).trigger('init:domReady');
             });
             $(document).trigger('init:complete');
         }

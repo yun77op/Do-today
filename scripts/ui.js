@@ -16,7 +16,7 @@
         },
         
         'align': function( val ) {
-            var node = val.node,
+            var node = val.node || this.element,
                 points = val.points;
 
             var srcNodePoint = calcPoints(this.options.srcNode, -1)[points[0]],

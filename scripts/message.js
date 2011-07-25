@@ -1,5 +1,4 @@
 define(function(require, exports, module) {
-
     var Instances = {};
 
     var DEFAULTS = {
@@ -35,8 +34,8 @@ define(function(require, exports, module) {
         }
     };
 
-    var Message = Class.create({
-        initialize: function(name, opts) {
+    var Message = Class.extend({
+        init: function(name, opts) {
             Instances[name] = this;
             var el = $('<div id="message-' + name + '" class="message"><span class="message-text"></span></div>');
             this.el = el.hide().appendTo('body');
@@ -94,6 +93,7 @@ define(function(require, exports, module) {
 
             return this;
         },
+        
         _setOptions: function( options ) {
             var self = this;
             $.each( options, function( key, value ) {
@@ -102,21 +102,20 @@ define(function(require, exports, module) {
 
             return this;
         },
+        
         _setOption: function( key, value ) {
             this.options[ key ] = value;
-            methodFunc[key] && methodFunc[key].call(this, value);
 
+            methodFunc[key] && methodFunc[key].call(this, value);
             return this;
         }
-
     });
 
-
     return {
-        generate: function (name, opts) {
+        generate: function (name, options) {
             var cur = Instances[name];
             if(cur) return cur;
-            return new Message(name, opts);
+            return new Message(name, options);
         }
     }
         
