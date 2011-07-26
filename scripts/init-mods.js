@@ -206,6 +206,7 @@ define(function(require, exports, module) {
                     e.preventDefault();
                     var o = $(this);
                     var target = $(o.attr('href'));
+                    $(document).trigger('task:containerToggle', o.attr('href'));
                     target.siblings().fadeOut(function() {
                          target.fadeIn();
                     });
@@ -257,20 +258,27 @@ define(function(require, exports, module) {
                         });
 
                         $('.task-progress', this.el).slider({
+                            start: function(e, ui) {
+                                if (!$(document).triggerHandler('task:slide')) {
+                                    e.preventDefault();
+                                }
+                            },
+
                             slide: function(e, ui) {
                                 var currentVal = ui.value,
                                     val = $(this).slider('value');
-                                if (!$(document).triggerHandler('task:slide') || val >= currentVal) {
+                                if (currentVal <= val) {
                                     e.preventDefault();
-                                    return;
-                                }
+                                }  
+                            },
 
+                            stop: function(e, ui) {
                                 var valEl = $(this).siblings('.task-process-val');
                                 valEl.text(ui.value + '%');
                                 if (ui.value == 100) {
                                     o.check();
                                 }
-                                $(document).trigger('task:change', [o.model.get('id'), 'progress', ui.value]);
+                                $(document).trigger('task:change', [o.model.get('id'), 'progress', ui.value]);  
                             },
 
                             value: o.model.get('progress')
@@ -464,6 +472,7 @@ define(function(require, exports, module) {
                     overlayView.host = host;
                 });
 
+                /*
                 var NotesView = Backbone.View.extend({
                     el: $('#ui-overlay-notes'),
                     events: {
@@ -488,6 +497,8 @@ define(function(require, exports, module) {
                 $(document).bind('overlay:notes', function(e, host) {
                     notesView.host = host;
                 });
+
+                */
             }
         }
     }

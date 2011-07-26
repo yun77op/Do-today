@@ -175,8 +175,16 @@ define(function(require, exports, module) {
         }
     });
 
+
+    $(document).bind('task:containerToggle', function(e, target) {
+        if (target == '#task-today-all') {
+            freshTaskToday();
+        }
+    });
+
+
     $(document).bind('task:slide', function() {
-        return !!(sessionData.startTime && sessionData.endTime && !(Timer.active && working));
+        return !!(sessionData.startTime && sessionData.endTime && (!Timer.active || Timer.active && !working));
     });
 
 
@@ -192,15 +200,7 @@ define(function(require, exports, module) {
             });
         }
         
-        var obj = Storage.set(getDateHandle());
-        if (obj) {
-            _.each(obj, function(tasks, sessionHandle) {
-                var session = sessionHandle.split('-');
-                _.each(tasks, function(task) {
-                    Task.addToContainer(session, task, 'task-today-all');
-                });
-            });
-        }
+        freshTaskToday();
 
         var source = [];
         arr = Storage.set('hidden');
@@ -219,6 +219,18 @@ define(function(require, exports, module) {
         $('#mask').fadeOut();
     });
 
+    function freshTaskToday() {
+        var obj = Storage.set(getDateHandle());
+        if (obj) {
+            
+            _.each(obj, function(tasks, sessionHandle) {
+                var session = sessionHandle.split('-');
+                _.each(tasks, function(task) {
+                    Task.addToContainer(session, task, 'task-today-all');
+                });
+            });
+        }
+    }
 
     function getSession() {
         return sessionData.startTime + '-' + sessionData.endTime; 
