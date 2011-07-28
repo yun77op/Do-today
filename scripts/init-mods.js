@@ -330,10 +330,11 @@ define(function(require, exports, module) {
                         
                         var hiddenId = o.data('hiddenId'),
                             taskModel;
-                        
                         if (hiddenId) {
                             taskModel = $(document).triggerHandler('task:beforeAdd', hiddenId);
                             o.removeData('hiddenId');
+                            o.autocomplete('widget').empty();
+
                             plugin.addToCurrent(taskModel);
                         } else {
                             taskModel = plugin.addToCurrent({
@@ -412,7 +413,7 @@ define(function(require, exports, module) {
                 plugin.addToContainer = addToContainer;
 
                 plugin.initAutocomplete = function(source) {
-                    var el = $('#task-today-current', el);
+                    var el = $('#task-today-current');
                     var input = $('input', el).autocomplete({
                         source: source,
                         minLength: 0,

@@ -128,6 +128,13 @@ define(function(require, exports, module) {
             var result = _.clone(hiddenObj[id]);
             delete hiddenObj[id];
             Storage.append('current', id);
+
+            var t = _.select($('input', Task.el).data('autocomplete').options.source, function(item) {
+                return item.id != id;
+            });
+            console.log(t);
+            $('input', Task.el).data('autocomplete').options.source = t;
+
             return result;
         }
     });
