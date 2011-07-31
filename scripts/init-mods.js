@@ -85,7 +85,7 @@ define(function(require, exports, module) {
 
                 function initialize(type) {
                     time = Settings.get('timer', type);
-                    //time *= 60;
+                    time *= 60;
                     step = (endWidth - initialWidth) / time;
                     width = initialWidth;
                     plugin.updateTime.call(plugin, time);
@@ -333,7 +333,6 @@ define(function(require, exports, module) {
                         if (hiddenId) {
                             taskModel = $(document).triggerHandler('task:beforeAdd', hiddenId);
                             o.removeData('hiddenId');
-                            o.autocomplete('widget').empty();
 
                             plugin.addToCurrent(taskModel);
                         } else {
@@ -360,6 +359,10 @@ define(function(require, exports, module) {
                 });
 
 
+
+                var templateTaskSession = new EJS({element: 'task-session-template'}),
+                    templateTask = new EJS({element: 'task-template'});
+
                 function addToCurrent(task) {
                     var taskModel = task instanceof Backbone.Model ? task : new TaskModel(task);
                     
@@ -367,31 +370,47 @@ define(function(require, exports, module) {
                         model: taskModel
                     });
 
-                    var container = $('#task-today-current', el);
-
+                    var container = $('#task-today-current', el),
+                        list = container.find('.task-list');
+                        
                     container.removeClass('task-list-empty');
-
-                    $('.task-list', container).append(taskView.render().el);
+                    list.append(taskView.render().el);
+                    
                     $(document).trigger('task:current:add', taskModel);
                     return taskModel;
                 }
 
-                var templateTaskSession = new EJS({element: 'task-session-template'}),
-                    templateTask = new EJS({element: 'task-template'});
+                function freshList(data, selector) {
+                    var container = $(selector),
+                        list = container.find('.task-list');
+                    list.empty();
 
-                function addToContainer(session, taskData, containerID) {
+                    if (!data) {
+                        container.addClass('task-list-empty');
+                        list.append('<li>没有记录哦</li>');
+                    } else {
+                        _.each(data, function(tasks, sessionHandle) {
+                            _.each(tasks, function(task) {
+                                addToList(sessionHandle, task, selector);
+                            });
+                        });
+                    }
+                }
 
-                    var sessionHanle = session[0] + '-' + session[1];
-                    var container = $('#'+ containerID);
+                
+                function addToList(sessionHandle, taskData, selector) {
+                    var session = sessionHandle.split('-');
+                    var container = $(selector),
+                        list = container.find('.task-list'),
+                        target;
 
-                    container.removeClass('task-list-empty');
-
-                    var list = $('.task-session', container), target;
                     list.children().each(function(index, el) {
-                        if ($(el).data('session') == sessionHanle) {
+                        if ($(el).data('session') == sessionHandle) {
                             target = $(el);
                         }
                     });
+
+                    container.removeClass('task-list-empty');
                     
                     if (!target) {
                         session = _.map(session, function(date) {
@@ -401,20 +420,24 @@ define(function(require, exports, module) {
 
                         target = templateTaskSession.render({session: session});
                         target = $(target);
-                        target.data('session', sessionHanle);
+                        target.data('session', sessionHandle);
                         list.append(target);
                     }
 
                     var task = templateTask.render(taskData);
                     target.find('.task-list').append(task);
                 }
-                
+
+
                 plugin.addToCurrent = addToCurrent;
-                plugin.addToContainer = addToContainer;
+                plugin.addToList = addToList;
+                plugin.freshList = freshList;
+
+                var input = $('#task-today-current input', el);
 
                 plugin.initAutocomplete = function(source) {
-                    var el = $('#task-today-current');
-                    var input = $('input', el).autocomplete({
+                    input.data('autocomplete') && input.autocomplete('destroy');
+                    input.autocomplete({
                         source: source,
                         minLength: 0,
                         select: function( e, ui ) {
@@ -422,10 +445,26 @@ define(function(require, exports, module) {
                         }
                     });
 
-                    $('.ui-trigger', el).click(function() {
-                        input.autocomplete('search', '');
-                    });
+                    input.data( 'autocomplete' )._renderItem = function( ul, item ) {
+                        var a = $('<a>' + item.label + '</a>'),
+                            span = $('<span class="del" title="删除">x</span>');
+                            
+                        span.bind('click', function(e) {
+                            e.stopPropagation();
+                            $(this).parents('li').remove();
+                            $(document).trigger('task:autocomplete:remove', item.id);
+                        });
+                        a.append(span);
+                        return $( '<li></li>' )
+                            .data( 'item.autocomplete', item )
+                            .append( a )
+                            .appendTo( ul );
+                    };
                 };
+
+                $('.ui-trigger', el).click(function() {
+                    input.autocomplete('search', '');
+                });
 
                 $('#task-datepicker', el).datepicker({
                     onClose: function(dateText, inst) {

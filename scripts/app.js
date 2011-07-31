@@ -48,8 +48,7 @@ define(function(require, exports, module) {
     });
 
     $(document).bind('timer:status:started', function(e) {
-        if (!working)
-            return;
+        if (!working) return;
         sessionData.startTime = Date.now();
     });
 
@@ -111,7 +110,7 @@ define(function(require, exports, module) {
     });
 
     var currentObj = {},
-        hiddenObj = {};
+        hiddenObj;
 
 
     $(document).bind('task:current:add', function(e, taskModel) {
@@ -119,22 +118,15 @@ define(function(require, exports, module) {
     });
 
 
-    $(document).bind('task:del', taskPerDel);
-
+    $(document).bind('task:del', removeTask);
+    $(document).bind('task:check', removeTask);
 
     $(document).bind('task:beforeAdd', function(e, id) {
         if (hiddenObj[id]) {
-            delItem('hidden', id);
+            removeStorageItem('hidden', id);
             var result = _.clone(hiddenObj[id]);
-            delete hiddenObj[id];
             Storage.append('current', id);
-
-            var t = _.select($('input', Task.el).data('autocomplete').options.source, function(item) {
-                return item.id != id;
-            });
-            console.log(t);
-            $('input', Task.el).data('autocomplete').options.source = t;
-
+            initTaskHidden();
             return result;
         }
     });
@@ -147,9 +139,8 @@ define(function(require, exports, module) {
                 value: taskModel.get('content')
             };
         Storage.append('hidden', id);
-        delItem('current', id);
-        hiddenObj[id] = taskModel.attributes;
-        $('input', Task.el).data('autocomplete').options.source.push(item);
+        removeStorageItem('current', id);
+        initTaskHidden();
     });
 
     $(document).bind('task:change', function(e, id, key, val) {
@@ -166,27 +157,17 @@ define(function(require, exports, module) {
         Storage.set(id, taskModel.attributes);
     });
 
-    $(document).bind('task:check', taskPerDel);
-
     
     $(document).bind('task:date:change', function(e, dateText) {
         var date = getDateHandle(new Date(dateText)),
-            obj = Storage.set(date);
-        if (obj) {
-             _.each(obj, function(tasks, sessionHandle) {
-                var session = sessionHandle.split('-');
-                _.each(tasks, function(task) {
-                    Task.addToContainer(session, task, 'task-past-content');
-                });
-            });
-        }
+            data = Storage.set(date);
+
+        Task.freshList(data, '#task-past-content');
     });
 
 
     $(document).bind('task:containerToggle', function(e, target) {
-        if (target == '#task-today-all') {
-            freshTaskToday();
-        }
+        target == '#task-today-all' && initTaskToday();
     });
 
 
@@ -194,49 +175,57 @@ define(function(require, exports, module) {
         return !!(sessionData.startTime && sessionData.endTime && (!Timer.active || Timer.active && !working));
     });
 
+    $(document).bind('task:autocomplete:remove', function(e, id) {
+        removeStorageItem('hidden', id);
+        Storage.remove(id);
+        delete hiddenObj[id];
+
+        var array = _.select($('.task-add input', Task.el).data('autocomplete').options.source, function(item) {
+            return item.id != id;
+        });
+        $('.task-add input', Task.el).data('autocomplete').options.source = array;
+        $('.task-add input', Task.el).data('autocomplete').source = function( request, response ) {
+                response( $.ui.autocomplete.filter(array, request.term) );
+        };
+    });
 
     $(document).bind('init:domReady', function() {
         Timer.initialize('work');
 
-        var arr = Storage.set('current');
-
-        if (arr && arr.length > 0) {
-            _.each(arr, function(id) {
-                var taskModel = Storage.set(id);
-                Task.addToCurrent(taskModel);
+        var currentArr = Storage.set('current');
+        if (currentArr && currentArr.length > 0) {
+            _.each(currentArr, function(id) {
+                Task.addToCurrent(Storage.set(id));
             });
         }
-        
-        freshTaskToday();
 
-        var source = [];
-        arr = Storage.set('hidden');
-        if (arr) {
-            _.each(arr, function(id) {
-                var taskModel = Storage.set(id);
-                hiddenObj[id] = taskModel;
+        initTaskToday();
+        initTaskHidden();
+
+        $('#mask').fadeOut();
+    });
+
+    function initTaskHidden() {
+        var source = [],
+            hiddenArr = Storage.set('hidden');
+        if (hiddenArr) {
+            hiddenObj = {};
+            _.each(hiddenArr, function(id) {
+                var task = Storage.set(id);
+                hiddenObj[id] = task;
                 source.push({
                     id: id,
-                    value: taskModel.content
+                    value: task.content
                 });
             });
         }
 
         Task.initAutocomplete(source);
-        $('#mask').fadeOut();
-    });
+    }
 
-    function freshTaskToday() {
-        var obj = Storage.set(getDateHandle());
-        if (obj) {
-            
-            _.each(obj, function(tasks, sessionHandle) {
-                var session = sessionHandle.split('-');
-                _.each(tasks, function(task) {
-                    Task.addToContainer(session, task, 'task-today-all');
-                });
-            });
-        }
+    function initTaskToday() {
+        var data = Storage.set(getDateHandle());
+        Task.freshList(data, '#task-today-all');
     }
 
     function getSession() {
@@ -244,44 +233,26 @@ define(function(require, exports, module) {
     }
 
 
-    var sessionTrack;
-
     function session(id, prevVal, currentVal) {
         var sessionHandle = getSession();
-        if (!sessionHandle) return;
+
         var taskModel = currentObj[id];
         var dateHandle = getDateHandle(),
             data = {
                 progress: [prevVal, currentVal],
                 content: taskModel.get('content')
             };
-        sessionTrack = true;
         Storage.append([dateHandle, sessionHandle], data);
     }
 
-    function sessionNotes(val) {
-        var sessionHandle = getSession();
-        if (!sessionHandle || !sessionTrack) return;
 
-        var dateHandle = getDateHandle();
-        Storage.extend([dateHandle, sessionHandle], {
-            notes: val
-        });
-    }
-
-    function fresh() {
-        sessionTrack = false;
-
-    }
-
-
-    function taskPerDel(e, id) {
-        delItem('current', id);
+    function removeTask(e, id) {
+        removeStorageItem('current', id);
         Storage.remove(id);
         delete currentObj[id];
     }
     
-    function delItem(key, id) {
+    function removeStorageItem(key, id) {
         Storage.mapReduce(key, function(id_) {
             return id_ != id; 
         });

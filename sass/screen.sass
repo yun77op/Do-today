@@ -13,12 +13,12 @@
 
 // Combine the partials into a single screen stylesheet.
 
-@import partials/util
+@import partials/helper
 @import partials/page
 @import partials/form
-@import partials/two_col
-@import partials/typography
+@import partials/structure
 @import partials/ui
+@import partials/ext
 @import partials/ie
 
 #container
@@ -119,7 +119,20 @@
 	.task-list-container
 		position: relative
 		color: $font-color
-
+		& > .control .ui-button
+			+border-radius(2px)
+			padding: 0.2em 0.5em
+			font-size: 12px
+			color: $link-hover-color
+			font-size: .9em
+			+linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
+			&:hover
+				color: $link-color
+				+box-shadow()
+			&.active
+				background: $notice-color
+				+border-radius(4px)
+				color: $link-color
 	.task-default
 		display: none
 	.task-list-empty
@@ -152,6 +165,7 @@
 			height: 12px
 			margin-top: 4px
 
+
 	.task-list
 		list-style: none
 		.task
@@ -166,6 +180,10 @@
 					visibility: visible
 			.control
 				visibility: hidden
+				+float-right()
+				*margin-top: -25px
+				.ui-button
+					+float-right()
 			span
 				margin: 0 .5em 0 0
 
@@ -240,50 +258,3 @@
 	color: #006699
 .task-priority-0
 	color: #202020
-
-
-.message
-	font-size: 14px
-
-.message
-	.ui-button
-		border: none
-#message-main
-	position: absolute
-	top: 80px
-	left: 50%
-	margin-left: 180px
-	.ui-buttonset
-		float: right
-	.ui-button-text
-		font-size: .9em
-
-#message-loading
-	position: absolute
-	top: 50%
-	left: 50%
-	width: 50px
-	height: 50px
-	margin: -25px 0 0 -25px
-	background: url(../images/loading.png)
-
-
-#settings
-	position: absolute
-	right: 10px
-	top: 20px
-	a
-		width: 16px
-		height: 15px
-		background: url(../images/sprites.png) -77px -173px
-		+hide-text()
-
-
-#ui-overlay-notes
-	p
-		margin: .5em 0
-	.triangle
-		position: absolute
-		top: -15px
-		right: 6px
-		+rotateZ(-90deg)

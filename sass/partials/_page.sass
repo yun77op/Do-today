@@ -37,57 +37,7 @@ body
 	h3, h4, h5, h6
 		color: $dark-color
 
-	.left
-		+float-left
-
-	.right
-		+float-right
-
-	.left
-		img
-			margin: 0 10px 10px 0
-
-	.right
-		img
-			margin: 0 0 10px 10px
-	.triangle
-		+triangle()
-
-	.clearfix
-		zoom: 1
-		&:before, &:after
-			content: "\0020"
-			display: block
-			height: 0
-			visibility: hidden
-		&:after
-			clear: both
-		
 	.horizontal-list
+		+horizontal-list()
 		li
-			display: inline
-
-
-	.task-list-container > .control .ui-button
-		+border-radius(2px)
-		padding: 0.2em 0.5em
-		font-size: 12px
-		color: $link-hover-color
-		font-size: .9em
-		+linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
-		&:hover
-			color: $link-color
-			+box-shadow()
-		&.active
-			background: $notice-color
-			+border-radius(4px)
-			color: $link-color
-
-	.task .control
-		+float-right()
-		*margin-top: -25px
-		.ui-button
-			+float-right()
-	
-	.ui-widget-content a
-		color: #4F4F4F
+			margin-right: 5px

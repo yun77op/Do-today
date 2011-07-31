@@ -1,0 +1,60 @@
+body
+	.message
+		font-size: 14px
+		.ui-button
+			border: none
+
+	#message-main
+		position: absolute
+		top: 72px
+		left: 50%
+		margin-left: 180px
+		.ui-buttonset
+			float: right
+		.ui-button-text
+			font-size: .9em
+
+	#message-loading
+		position: absolute
+		top: 50%
+		left: 50%
+		width: 50px
+		height: 50px
+		margin: -25px 0 0 -25px
+		background: url(../images/loading.png)
+
+	#settings
+		position: absolute
+		right: 10px
+		top: 20px
+		a
+			width: 16px
+			height: 15px
+			background: url(../images/sprites.png) -77px -173px
+			+hide-text()
+
+	.ui-menu-item .del
+		float: right
+		magrin: 2px 2px 0 0
+		display: block
+		cursor: pointer
+		border: 1px solid $dark-color
+		height: 14px
+		line-height: 14px
+		padding: 0 2px
+
+
+	.ui-widget-content a
+		color: #4F4F4F
+
+	#ui-overlay-notes
+		p
+			margin: .5em 0
+		.triangle
+			position: absolute
+			top: -15px
+			right: 6px
+			+rotateZ(-90deg)
+
+	.ui-tabs-nav a
+		color: #FFF !important
