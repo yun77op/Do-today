@@ -1,7 +1,5 @@
 define(function(require, exports, module) {
 
-    require('./lib/ejs_production.js');
-    require('./lib/jquery.tipsy.js');
     var Util = require('./util.js');
 
     var Settings = require('./settings.js');

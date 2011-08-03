@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!--
+	jQuery UI Release!
+
+	Call task called 'deploy-release' to build a full release.
+	The release built will be stored on 'dist' dir.
+
+-->
+
+<project name="do-today" default="deploy-release" basedir=".">
+	
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="build/ant-contrib-0.6.jar"/>
+		</classpath>
+	</taskdef>
+	
+	<property file="ant.properties" />
+
+	<property name="build.dir" value="build" />
+
+	<property name="dist.dir" value="_dist" />
+	<property name="src.dir" value="." />
+
+	<property name="min.dir" value="${dist.dir}/minified" />
+
+	<property description="Google Closure" name="closure-jar" value="${build.dir}/google-compiler-20110320.jar" />
+	<property description="YUI Compressor" name="yuicompressor-jar" value="${build.dir}/yuicompressor-2.4.2.jar" />
+	
+
+
+	<target name="deploy-release" depends="clean, minify" description="Release builder">
+	</target>
+
+
+
+	<target name="concatenate">
+		<echo message="Building concatenated" />
+		<mkdir dir="${dist.dir}/scripts/" />
+
+		<concat encoding="utf-8" outputencoding="utf-8" destfile="${dist.dir}/scripts/base.js">  
+			<filelist dir="${src.dir}/scripts/">
+				<file name="lib/sea.js" />
+				<file name="lib/json2.js" />
+				<file name="lib/modernizr.js" />
+				<file name="lib/ejs.js" />
+				<file name="lib/underscore.js" />
+				<file name="lib/backbone.js" />
+			</filelist>
+		</concat>
+
+		<concat encoding="utf-8" outputencoding="utf-8" destfile="${dist.dir}/scripts/common.js">  
+			<filelist dir="${src.dir}/scripts/">
+				<file name="lib/jquery-ui.js" />
+				<file name="ui.js" />
+				<file name="lib/jquery.tipsy.js" />
+			</filelist>
+		</concat>
+
+		<echo message="Concatenated built." />
+	</target>
+
+	<target name="minify" depends="concatenate" description="Remove all comments and whitespace, no compression, great in combination with GZip">
+		<mkdir dir="${dist.dir}/minified" />
+		<echo message="Building minified" />
+		<parallel threadsperprocessor="1">
+
+			<apply executable="java" parallel="false">
+				<fileset dir="${dist.dir}/scripts" includes="*.js" />
+				<arg line="-jar" />
+				<arg path="${closure-jar}" />
+				<arg value="--warning_level" />
+				<arg value="QUIET" />
+				<arg value="--js_output_file" />
+				<targetfile />
+				<arg value="--js" />
+				<mapper type="glob" from="*.js" to="${min.dir}/*.min.js" />
+			</apply>
+
+		</parallel>
+
+		<copy todir="${dist.dir}/minified">
+			<fileset dir="${src.dir}/scripts/lib/" includes="jquery-1.6.2.min.js" />
+		</copy>
+		
+		<echo message="Minified ui/ built." />
+	</target>
+		
+	 <target name="clean">
+		<delete dir="dist" />
+	</target>
+	
+</project>

@@ -18,18 +18,13 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <script src="scripts/lib/LAB.min.js"></script>
     <script>
-        $LAB.setOptions({BasePath: '/Do-today/scripts/'})
-            .script('lib/sea.js')
-            .script('lib/json2.js')
-            .script('lib/modernizr.js')
-            .script('lib/jquery-1.6.2.min.js').wait()
-            .script('lib/jquery-ui.js').wait()
-            .script('ui.js')
-            .script('lib/underscore-min.js').wait()
-            .script('lib/backbone.js')
+        $LAB.setOptions({BasePath: '/Do-today/dist/minified/'})
+            .script('jquery-1.6.2.min.js')
+            .script('base.min.js').wait()
+            .script('common.min.js')
             .wait(function() {
                 seajs.config({
-                    base: '/Do-today/scripts/'
+                    base: '/Do-today/dist/minified/'
                 });
                 seajs.use('app', function(app) {
                     app.init();
@@ -100,6 +95,7 @@
         <div id="mask" class="mask">
             <div class="mask-message">
                 <strong class="mask-text">Loading...</strong>
+                <p><img src="images/loading.gif"></p>
             </div>
         </div>
     </div> <!-- #container -->
