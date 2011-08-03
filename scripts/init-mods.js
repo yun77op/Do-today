@@ -21,6 +21,8 @@ define(function(require, exports, module) {
                         $('#container').width(540);
                     }
                 }
+
+                $('#container').width(540);
             }
         },
 
@@ -173,12 +175,8 @@ define(function(require, exports, module) {
             active: false
         }, task: {
             func: function(app, plugin) {
+
                 var el = plugin.el = $('#task');
-
-                _.templateSettings = {
-                    interpolate : /\{\{(.+?)\}\}/g
-                };
-
 
                 el.tabs({
                     select: function(event, ui) {
@@ -317,7 +315,6 @@ define(function(require, exports, module) {
                     }
                 });
 
-
                 el.delegate('input', 'keyup', function(e) {
                     var o = $(this);
                     if (e.which == 13) {
@@ -356,10 +353,10 @@ define(function(require, exports, module) {
                     }
                 });
 
-
-
                 var templateTaskSession = new EJS({element: 'task-session-template'}),
                     templateTask = new EJS({element: 'task-template'});
+
+                
 
                 function addToCurrent(task) {
                     var taskModel = task instanceof Backbone.Model ? task : new TaskModel(task);
@@ -425,6 +422,7 @@ define(function(require, exports, module) {
                     var task = templateTask.render(taskData);
                     target.find('.task-list').append(task);
                 }
+
 
 
                 plugin.addToCurrent = addToCurrent;

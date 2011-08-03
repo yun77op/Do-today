@@ -14,6 +14,7 @@ define(function(require, exports, module) {
     app.use(initMods);
 
 
+
     //connect timer with task with storage
 
     var mods = app.getMods();
@@ -31,7 +32,6 @@ define(function(require, exports, module) {
                 show.apply(Message, args);
             }
         });
-    
 
     var sessionData = {},
         working = true,

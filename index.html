@@ -18,13 +18,20 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <script src="scripts/lib/LAB.min.js"></script>
     <script>
-        $LAB.setOptions({BasePath: '/Do-today/dist/minified/'})
-            .script('jquery-1.6.2.min.js')
-            .script('base.min.js').wait()
-            .script('common.min.js')
+        $LAB.setOptions({BasePath: '/Do-today/scripts/'})
+            .script('lib/jquery-1.6.2.min.js')
+            .script('lib/json2.js')
+            .script('lib/modernizr.js')
+            .script('lib/ejs.js')
+            .script('lib/sea.js')
+            .script('lib/underscore.js').wait()
+            .script('lib/backbone.js')
+            .script('lib/jquery-ui.js')
+            .script('ui.js')
+            .script('lib/jquery.tipsy.js')
             .wait(function() {
                 seajs.config({
-                    base: '/Do-today/dist/minified/'
+                    base: '/Do-today/scripts'
                 });
                 seajs.use('app', function(app) {
                     app.init();

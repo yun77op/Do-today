@@ -76,15 +76,15 @@ define(function(require, exports, module) {
             var o = this;
 
             if (!_.isArray(mod)) {
-                    mod = [mod];
+                mod = [mod];
             } else if (_.isString(mod) && arguments[1] !== undefined) {
-                    mod = {
-                            mod: arguments[1]
-                    };
+                mod = {
+                        mod: arguments[1]
+                };
             }
 
             _.each(mod, function(mod_) {
-                    o._use(mod_);
+                o._use(mod_);
             });
         },
 
@@ -94,25 +94,21 @@ define(function(require, exports, module) {
 
         _init: function() {
             var o = this,
-                    mods = o._mods,
-                    handles = _.keys(mods);
+                mods = o._mods,
+                handles = _.keys(mods);
 
             (function next() {
-                    var handle = handles.shift(),
-                            mod = mods[handle],
-                            err = null;
-                    if (!mod) {
-                            return;    
-                    }
+                var handle = handles.shift(),
+                    mod = mods[handle],
+                    err = null;
+                if (!mod) {
+                    return;    
+                }
 
-                    try {
-                            mod.func.call(null, o, mod);
-                    } catch (e) {
-                            err = e;
-                    }
-                    o.initedMods.push(handle);
-                    $(document).trigger('init:mod:' + handle);
-                    next(err, next);
+                mod.func(o, mod, next);
+                o.initedMods.push(handle);
+                $(document).trigger('init:mod:' + handle);
+                next();
             })();
         },
 
@@ -120,8 +116,8 @@ define(function(require, exports, module) {
             var o = this;
             $(document).trigger('init');
             $(document).ready(function() {
-                    o._init();
-                    $(document).trigger('init:domReady');
+                o._init();
+                $(document).trigger('init:domReady');
             });
             $(document).trigger('init:complete');
         }
