@@ -22,7 +22,7 @@ define(function(require, exports, module) {
                     }
                 }
 
-                $('#container').width(540);
+                //$('#container').width(540);
             }
         },
 

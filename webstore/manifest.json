@@ -1,0 +1,20 @@
+{
+  "name": "Do today",
+  "description": "Do today is a Pomodoro Technique web implementation.",
+  "version": "1.1",
+  "app": {
+    "urls": [
+      "http://dotoday.sinaapp.com/"
+    ],
+    "launch": {
+      "web_url": "http://dotoday.sinaapp.com/"
+    }
+  },
+  "icons": {
+    "128": "dotoday-128.png"
+  },
+  "permissions": [
+    "unlimitedStorage",
+    "notifications"
+  ]
+}
