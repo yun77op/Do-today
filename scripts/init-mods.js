@@ -21,6 +21,7 @@ define(function(require, exports, module) {
                         $('#container').width(540);
                     }
                 }
+                $('body').addClass('iframe');
 
                 //$('#container').width(540);
             }
@@ -265,7 +266,7 @@ define(function(require, exports, module) {
                                     val = $(this).slider('value');
                                 if (currentVal <= val) {
                                     e.preventDefault();
-                                }  
+                                }
                             },
 
                             stop: function(e, ui) {
