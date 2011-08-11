@@ -16,6 +16,29 @@
     <link href="stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
     <link type="image/x-icon" href="/favicon.ico" rel="shortcut icon">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <script>
+        function getPageParams() {
+            var s = location.search,
+                params = {};
+            if (s) {
+                s = s.slice(1);
+                _.each(s.split('&'), function(str) {
+                    var pair = str.split('=');
+                    params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+                }); 
+            }
+            return params;
+        }
+
+        //baidu iframe
+        if (window != parent) {
+            $('body').addClass('iframe');
+            var params = getPageParams();
+            if (params['canvas_pos'] === 'search') {
+                $('body').addClass('iframe-small');
+            }
+        }
+    </script>
 </head>
 <body class="two-col">
     <div id="container">

@@ -44,12 +44,22 @@
 #content
     width: 550px
 
-body.iframe
+body.iframe, body.iframe-small
     #container
         height: 500px
         min-height: 0
         overflow-x: hidden
+        overflow-y: scroll
+
+body.iframe-small
+    #container
+        width: 540px
     #content
         width: 520px
     #task .task-add input
         width: 460px
+    #timer
+        background-position: -4px -206px
+    #settings
+        top: 25px
+        right: 3px

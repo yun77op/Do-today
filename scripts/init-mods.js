@@ -11,19 +11,16 @@ define(function(require, exports, module) {
     return {
         detect: {
             func: function() {
-                var el = $('#mask');
 
                 //baidu iframe
                 if (window != parent) {
                     $('body').addClass('iframe');
                     var params = Util.getPageParams();
                     if (params['canvas_pos'] === 'search') {
-                        $('#container').width(540);
+                        $('body').addClass('iframe-small');
                     }
                 }
-                $('body').addClass('iframe');
 
-                //$('#container').width(540);
             }
         },
 
