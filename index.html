@@ -132,19 +132,24 @@
         </div>
     </div>
 
-    <script id="task-session-template" type="x-ejs-tmpl">
+    <script id="template-task-session" type="x-ejs-tmpl">
         <li class="task">
-            <span class="task-time"><%= session[0] %></span>到<span class="task-time"><%= session[1] %></span>
-            <ul class="task-list">
-            </ul>
+            <p>
+                <strong class="task-content"><%= task.content %></strong>
+                <% if (progress[0] != 0 || progress[1] != 100) { %>
+                    <em>完成从<%= progress[0] %>%到<%= progress[1] %>%</em>
+                <% } %>
+            </p>
+            <div class="task-notes">
+                
+            </div>
         </li>
     </script>
-    <script id="task-template" type="x-ejs-tmpl">
+    <script id="template-task" type="x-ejs-tmpl">
         <li class="task">
             <span class="task-content"><%= content %></span>
             <% if (!(progress[0] == 0 && progress[1] == 100)) { %>
-                <span class="task-progress"><%= progress[0] %>%</span>
-                到
+                <span class="task-progress"><%= progress[0] %>%</span>到
                 <span class="task-progress"><%= progress[1] %>%</span>
             <% } %>
         </li>
