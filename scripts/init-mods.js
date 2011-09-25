@@ -9,7 +9,6 @@ define(function(require, exports, module) {
 	return {
 		detect: {
 			func: function() {
-
 				//baidu iframe
 				if (window != parent) {
 					$('body').addClass('iframe');
@@ -18,7 +17,6 @@ define(function(require, exports, module) {
 						$('body').addClass('iframe-small');
 					}
 				}
-
 			}
 		},
 
@@ -39,7 +37,8 @@ define(function(require, exports, module) {
 				var dialogSettings = new EJS({url: 'views/settings-dialog.ejs'}).render({settings: data});
 				dialogSettings = $(dialogSettings);
 				dialogSettings.hide().appendTo('body').dialog({
-					autoOpen: false
+					autoOpen: false,
+					title: '设置'
 				});
 
 				el.delegate('a', 'click', function(e) {
@@ -50,127 +49,22 @@ define(function(require, exports, module) {
 				el = $('#ui-dialog-settings');
 
 				el.delegate('input', 'change', function() {
-					var o = $(this);
-					var arr = o.attr('id').split('-');
+					var el = $(this);
+					var arr = el.attr('id').split('-');
 					var ns = arr[1], key = arr[2], value;
 
-					value = o.attr('type') == 'checkbox'? o.prop('checked') : o.val();
+					value = el.attr('type') == 'checkbox'? el.prop('checked') : el.val();
 					Settings.set(ns, key, value);
 				});
 
 				Settings.subscribe('timer', 'work', function(value) {
 					$(document).trigger('timer:settings:changed', ['work', value]);
 				});
-
 			}
 		},
 
-		timer: {
+		task: {
 			func: function(app, plugin) {
-				var el = plugin.el = $('#timer');
-			
-				plugin.timeEl = $('.timer-time', el);
-
-				var progress = $('.timer-start', el);
-
-				var initialWidth = progress.width(),
-					endWidth = 432;
-
-
-				var time, step, width;
-
-				function initialize(type) {
-					time = Settings.get('timer', type);
-					time *= 60;
-					step = (endWidth - initialWidth) / time;
-					width = initialWidth;
-					plugin.updateTime.call(plugin, time);
-					progress.width(width);
-				}
-
-				var startButton = $('#ui-button-timerStart', el).click(timing);
-
-				var statusHandler = {
-					'normal': function() {
-						if ($(document).triggerHandler('timer:status:beforeStart'))
-							return true;
-
-						var o = $(this);                        
-
-						plugin.instance = plugin.interval(function(step) {
-							width += step;
-							progress.width(width);
-							plugin.updateTime.call(plugin, --time);
-							if (time == 0) {
-								o.removeClass(plugin.status);
-								plugin.status = 'normal';
-								statusHandler.started();
-								$(document).trigger('timer:complete');
-							}
-						}, step);
-						plugin.active = true;
-					},
-
-					'started': function() {
-						plugin.instance && plugin.instance.stop();
-						plugin.active = false;
-					},
-
-					'stopped': function() {
-						plugin.active = false;
-					}
-
-				};
-
-				var status = _.keys(statusHandler);
-
-				function timing() {
-					var prevStatus = plugin.status;
-					if (statusHandler[prevStatus].call(startButton[0]))
-						return;
-					var index = (_.indexOf(status, prevStatus) + 1) % 3;
-					plugin.status = status[index];
-					startButton.removeClass(prevStatus).addClass(plugin.status);
-					$(document).trigger('timer:status:' + plugin.status , plugin);
-				}
-
-				plugin.initialize = initialize;
-				plugin.timing = timing;
-
-			}, interval: function(cb, step) {
-				var t;
-				function _interval() {
-					t = setTimeout(_interval, 1000);
-					cb(step);
-				}
-
-				t = setTimeout(_interval, 1000);
-				return {
-					stop: function() {
-						clearTimeout(t);
-					}
-				}
-			},
-
-			updateTime: function(time) {
-				var m = Math.floor(time / 60),
-					s = Math.floor(time % 60);
-				
-				function zeroFill(s) {
-					s += '';
-					return s.length == 1 ? '0' + s : s;
-				}
-				this.timeEl.text(zeroFill(m) + ':' + zeroFill(s));
-
-			},
-			status: 'normal',
-			
-			instance: null,
-
-			active: false
-		}, task: {
-			func: function(app, plugin) {
-
 				var el = plugin.el = $('#task');
 
 				el.tabs({
@@ -183,8 +77,9 @@ define(function(require, exports, module) {
 					}
 				});
 				
+				//sort
 				var sortable = true;
-				el.delegate('.actions .ui-button-reorder', 'click', function(e) {
+				el.delegate('.actions .button-reorder', 'click', function(e) {
 					e.preventDefault();
 					$(this).toggleClass('active');
 					$(this).text((sortable ? '完成': '') + '重排');
@@ -192,7 +87,7 @@ define(function(require, exports, module) {
 					var container = $('#task-today-current');
 					$('.task-list', container).sortable({ disabled: sortable })
 						.toggleClass('sortable');
-				}).delegate('.actions .ui-button-viewall, .actions .ui-button-return', 'click', function(e) {
+				}).delegate('.actions .button-viewall, .actions .button-return', 'click', function(e) {
 					e.preventDefault();
 					var o = $(this);
 					var target = $(o.attr('href'));
@@ -211,16 +106,15 @@ define(function(require, exports, module) {
 					},
 
 					render: function() {
-						var o = this;
+						var self = this;
 						var data = this.model.attributes;
 						this.template.update(this.el, data);
 						
 						this.taskActions = $('.task-actions-trigger', this.el).overlay({
 							srcNode: '#ui-overlay-task',
-							width: '10em',
 							visible: false,
 							show: function(e, ui) {
-								$(document).trigger('overlay:task', o);
+								$(document).trigger('overlay:task', self);
 								$(this).overlay('option', {
 									align: {
 										node: e.target,
@@ -232,10 +126,9 @@ define(function(require, exports, module) {
 
 						this.taskNotes = $('.task-actions-notes', this.el).overlay({
 							srcNode: '#ui-overlay-notes',
-							width: '197px',
 							visible: false,
 							show: function(e, ui) {
-								$(document).trigger('overlay:notes', o);
+								$(document).trigger('overlay:notes', self);
 								$(this).overlay('option', {
 									align: {
 										node: e.target,
@@ -246,12 +139,6 @@ define(function(require, exports, module) {
 						});
 
 						$('.task-progress', this.el).slider({
-							start: function(e, ui) {
-								if (!$(document).triggerHandler('task:slide')) {
-									e.preventDefault();
-								}
-							},
-
 							slide: function(e, ui) {
 								var currentVal = ui.value,
 									val = $(this).slider('value');
@@ -264,12 +151,12 @@ define(function(require, exports, module) {
 								var valEl = $(this).siblings('.task-process-val');
 								valEl.text(ui.value + '%');
 								if (ui.value == 100) {
-									o.check();
+									self.check();
 								}
-								$(document).trigger('task:change', [o.model.get('id'), 'progress', ui.value]);  
+								$(document).trigger('task:change', [self.model.get('id'), 'progress', ui.value]);  
 							},
 
-							value: o.model.get('progress')
+							value: self.model.get('progress')
 						});
 
 						$('.task-content', this.el).tipsy();
@@ -316,14 +203,13 @@ define(function(require, exports, module) {
 							return;
 						
 						var hiddenId = o.data('hiddenId'),
-							taskModel;
+								taskModel;
 						if (hiddenId) {
 							taskModel = $(document).triggerHandler('task:beforeAdd', hiddenId);
 							o.removeData('hiddenId');
-
-							plugin.addToCurrent(taskModel);
+							addToCurrent(taskModel);
 						} else {
-							taskModel = plugin.addToCurrent({
+							taskModel = addToCurrent({
 								content: content
 							});
 							$(document).trigger('task:add', taskModel);
@@ -343,23 +229,19 @@ define(function(require, exports, module) {
 					}
 				});
 
-				var templateTaskSession = new EJS({element: 'template-task-session'}),
-					templateTask = new EJS({element: 'template-task'});
+				var templateTaskSession = new EJS({element: 'template-task-session'});
 
 				function addToCurrent(task) {
 					var taskModel = task instanceof Backbone.Model ? task : new TaskModel(task);
-					
 					var taskView = new TaskView({
 						model: taskModel
 					});
 
 					var container = $('#task-today-current', el),
-						list = container.find('.task-list');
+							list = container.find('.task-list');
 						
 					container.removeClass('task-list-empty');
 					list.append(taskView.render().el);
-					
-					$(document).trigger('task:current:add', taskModel);
 					return taskModel;
 				}
 
@@ -367,7 +249,7 @@ define(function(require, exports, module) {
 					var container = $(selector),
 							list = container.find('.task-list').empty();
 
-					if (!data) {
+					if (!items) {
 						container.addClass('task-list-empty');
 						list.append('<li>没有记录哦</li>');
 					} else {
@@ -390,7 +272,6 @@ define(function(require, exports, module) {
 				plugin.freshList = freshList;
 
 				var input = $('#task-today-current input', el);
-
 				plugin.initAutocomplete = function(source) {
 					input.data('autocomplete') && input.autocomplete('destroy');
 					input.autocomplete({
@@ -432,11 +313,11 @@ define(function(require, exports, module) {
 
 		overlay: {
 			func: function() {
-				var OverlayView = Backbone.View.extend({
+				var OverlayTaskActions = Backbone.View.extend({
 					el: $('#ui-overlay-task'),
 					events: {
-						'click .ui-button-del': 'del',
-						'click .ui-button-hide': 'hide',
+						'click .button-del': 'del',
+						'click .button-hide': 'hide',
 						'click .task-priority li': 'priority'
 					},
 
@@ -462,25 +343,30 @@ define(function(require, exports, module) {
 					}
 				});
 
-				var overlayView = new OverlayView();
+				var overlayTaskActions = new OverlayTaskActions();
 
 				$(document).bind('overlay:task', function(e, host) {
-					overlayView.host = host;
+					overlayTaskActions.host = host;
 				});
 
-				/*
-				var NotesView = Backbone.View.extend({
+				
+				var OverlayNotes = Backbone.View.extend({
 					el: $('#ui-overlay-notes'),
 					events: {
-						'click .ui-button-ok': 'ok',
-						'click .ui-button-discard': 'discard'
+						'click .button-ok': 'ok',
+						'click .button-discard': 'discard'
 					},
 
 					ok: function(e) {
 						var val = $.trim(this.el.find('textarea').val());
 						if (val) {
-							$(document).trigger('task:change', [this.host.model.get('id'), 'notes', val]);
+							$(document).trigger('task:change', [this.host.model.get('id'), 'notes', {
+								content: val,
+								time: Date.now()
+							}]);
 							this.host.taskNotes.overlay('hide');
+						} else {
+							alert('请输入内容');
 						}
 					},
 
@@ -489,12 +375,11 @@ define(function(require, exports, module) {
 					}
 				});
 
-				var notesView = new NotesView();
+				var overlayNotes = new OverlayNotes();
 				$(document).bind('overlay:notes', function(e, host) {
-					notesView.host = host;
+					overlayNotes.host = host;
 				});
 
-				*/
 			}
 		}
 	}

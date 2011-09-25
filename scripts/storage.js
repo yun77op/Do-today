@@ -67,43 +67,45 @@ define(function(require, exports, module) {
 	}
 
 
-	function set(key, val) {
-		if (!_.isArray(key)) {
-			key = [key];
+	function set(path, val) {
+		if (!_.isArray(path)) {
+			path = [path];
 		}
 
-		var primaryKey = key[0], result, primary;
-		result = primary = _get(primaryKey);
+		var primaryPath = path[0],
+				result = _get(primaryPath);
 
-		var l = key.length;
-		if (l == 1) {
+		var len = path.length;
+		if (len != 1) {
+			if (result == null) {
+				result = {};
+			}
+			for (var i = 1; i < len - 1; ++i) {
+				if (result[path[i]] == null) {
+					if (val) {
+						result[path[i]] = {};
+					} else {
+						return null;
+					}
+				}
+				result = result[path[i]];
+			}
 			if (val) {
-				primary = val;
+				result[path[i]] = val;
+			} else {
+				result = result[path[i]];	
 			}
 		} else {
-			if (result == null) {
-				result = primary = {};
-			}
-			for (var i = 1; i < l - 1; ++i) {
-				if (result[key[i]] == null) {
-					result[key[i]] = {};
-				}
-				result = result[key[i]];
-			}
-
 			if (val) {
-				result[key[i]] = val;
-			} else {
-				result = result[key[i]];
+				result = val;
 			}
-
 		}
 
-		if (!val) {
+		if (val) {
+			_set(primaryPath, result);
+		} else {
 			return result;
 		}
-		
-		_set(primaryKey, primary);
 	}
 
 
@@ -122,12 +124,12 @@ define(function(require, exports, module) {
 	}
 
 	_.each(['map', 'filter'], function(name) {
-		exports[name] = function() {
+		exports[name] = function(key, callback) {
 			var items = set(key), result;
 			if (items) {
-				result = _[name](items, cb);
+				result = _[name](items, callback);
 				set(key, result);
-			} 
+			}
 		};
 	});
 

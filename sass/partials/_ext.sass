@@ -1,8 +1,6 @@
 body
 	.message
 		font-size: 14px
-		.ui-button
-			border: none
 
 	#message-main
 		position: absolute
@@ -44,17 +42,17 @@ body
 		padding: 0 2px
 
 
-	.ui-widget-content a
-		color: #4F4F4F
-
 	#ui-overlay-notes
-		p
-			margin: .5em 0
+		padding: .4em .6em
+		h3
+			color: $dark-color
+		textarea
+			width: 240px
+			margin-bottom: 10px
 		.triangle
+			+triangle(top, 10px, #FFF)
 			position: absolute
-			top: -15px
-			right: 6px
-			+rotateZ(-90deg)
+			top: -10px
+			right: 0
 
-	.ui-tabs-nav a
-		color: #FFF !important
+	

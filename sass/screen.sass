@@ -13,13 +13,15 @@
 
 // Combine the partials into a single screen stylesheet.
 
-@import partials/helper
-@import partials/page
+@import partials/typography
 @import partials/form
 @import partials/layout
 @import partials/ui
+@import partials/utilities
 @import partials/ext
 @import partials/ie
+
++typography
 
 #container
 	background: #443C2B
@@ -68,6 +70,7 @@
 	.mask-message
 		margin: 40px auto
 		text-align: center
+
 #content
 	position: relative
 	padding-top: 20px
@@ -76,10 +79,10 @@
 			
 #timer
 	height: 66px
-	margin: 10px 0
+	margin: 10px 0 30px
 	background: url(../images/sprites.png) -4px -6px
 	position: relative
-	.timer-time, .timer-start
+	.timer-time, .timer-progress
 		height: 36px
 		margin-top: 20px
 		float: left
@@ -89,45 +92,34 @@
 		font-size: 18px
 		font-weight: bold 
 		line-height: 36px
-	.timer-start
+	.timer-progress
 		width: 20px
 		margin-left: 6px
 		+linear-gradient(color-stops(#B1AD3F, #A4A148), left)
 		+border-radius(5px)
-		.ui-button
-			margin: 9px 0 0 6px
-			+triangle
-		.ui-button.started
-			width: 8px
-			height: 14px
-			border: none
-			background: #FFF
-			margin-left: 6px
-		.ui-button.stopped
-			+rotateZ(180deg)
+	.timer-start
+		margin: 9px 0 0 6px
+		+triangle
+	.timer-start.started
+		width: 8px
+		height: 14px
+		border: none
+		background: #FFF
+		margin-left: 6px
+	.timer-start.stopped
+		+rotateZ(180deg)
 
 #task
 	background: transparent
-	margin-top: 30px
-	.nav
-		border-bottom: 1px solid #000
-		.selected
-			a
-				font-weight: bold
-				border-bottom: 2px solid #000
+	font-size: 1em
+	.ui-widget-content
+		color: $font-color
+	.ui-tabs-nav a
+		color: $font-color
 	.task-list-container
 		position: relative
-		color: $font-color
-		& > .control .ui-button
-			+border-radius(2px)
-			padding: 0.2em 0.5em
-			font-size: 12px
-			color: $link-hover-color
-			font-size: .9em
-			+linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
-			&:hover
-				color: $link-color
-				+box-shadow()
+		> .actions .button
+			@extend .button-dt
 			&.active
 				background: $notice-color
 				+border-radius(4px)
@@ -139,34 +131,32 @@
 			list-style: none
 		.task-default
 			display: list-item
-		.ui-button-reorder
+		.button-reorder
 			display: none
 
 	.task-add
 		position: relative
 		margin-bottom: 1.5em
-		a
-			color: #000
 		input
 			font-size: 12px
 			padding: 4px
-			width: 497px
+			width: 498px
 			+border-radius(4px, 4px)
 			border: 2px inset threedface
 			&:focus
 				border-color: yellow
 		.ui-trigger
 			position: absolute
-			right: .5em
+			right: 2px
 			top: 4px
 			background: url(../images/sprites.png) -107px -174px
 			width: 10px
 			height: 12px
 			margin-top: 4px
 
-
 	.task-list
 		list-style: none
+		margin: 0 1em 1em
 		.task
 			border-bottom: 1px dotted #000
 			padding: .5em
@@ -175,9 +165,9 @@
 				border: none
 				border-top: 1px dotted #000
 			&:hover
-				.control
+				.actions
 					visibility: visible
-			.control
+			.actions
 				visibility: hidden
 				+float-right()
 				*margin-top: -25px
@@ -213,11 +203,10 @@
 					width: 60px
 					margin: 8px 0 0 10px
 				.triangle
+					+triangle(bottom, 10px, rgba($background-color, 0.7))
 					position: absolute
-					bottom: -14px
-					left: 55px
-					border-color: transparent rgba($background-color, 0.7)
-					+rotateZ(90deg)
+					bottom: -10px
+					left: 50px
 			.task-check
 				cursor: pointer
 				width: 17px
@@ -229,7 +218,7 @@
 				color: $dark-color
 				&:hover
 					+box-shadow()
-					text-indent: 1px
+					text-indent: 4px
 					.task-progress-container
 						display: block
 	.task-session
@@ -239,21 +228,23 @@
 		.task
 			.ui-icon-arrowthick-2-n-s
 				visibility: visible !important
-			.control
+			.actions
 				visibility: hidden !important
 
-
-
 .task-priority
+	border-bottom: none !important
 	li
+		+horizontal-list-item(2px)
 		cursor: pointer
 		border: 1px solid #222
-
+		line-height: 1.1
+		margin-right: .2em
+		color: darken(#FFF, 20%)
+.task-priority-0
+	color: #202020
 .task-priority-1
 	color: red
 .task-priority-2
 	color: #007700
 .task-priority-3
 	color: #006699
-.task-priority-0
-	color: #202020

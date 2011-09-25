@@ -1,0 +1,94 @@
+// Only apply the blueprint form styles to forms with
+// a class of "bp". This makes it easier to style
+// forms from scratch if you need to.
+
+.bp {
+	@include blueprint-form;
+}
+
+/* thnx ivannikolic! www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/ */
+textarea { overflow: auto; }
+
+input, select { vertical-align:middle; }
+
+/* hand cursor on clickable input elements */
+label, input[type=button], input[type=submit], button { cursor: pointer; }
+ 
+
+/* webkit browsers add a 2px margin outside the chrome of form elements */  
+button, input, select, textarea { margin: 0; }
+
+.ie6 legend, .ie7 legend { margin-left: -7px; }
+
+/* colors for form validity 
+input:valid, textarea:valid   {  }
+input:invalid, textarea:invalid { 
+	border-radius: 1px;
+	box-shadow: 0px 0px 5px red;
+}
+*/
+.no-boxshadow input:invalid, 
+.no-boxshadow textarea:invalid { background-color: #f0dddd; }
+
+
+/* make buttons play nice in IE:    
+	 www.viget.com/inspire/styling-the-button-element-in-internet-explorer/ */
+button { width: auto; overflow: visible; }
+
+/* align checkboxes, radios, text inputs with their label
+	 by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css  */
+input[type="radio"] { vertical-align: text-bottom; }
+input[type="checkbox"] { vertical-align: middle; margin-right: .2em; }
+.ie7 input[type="checkbox"] { vertical-align: baseline; }
+.ie6 input { vertical-align: text-bottom; }
+
+
+.cr {
+	button,
+	input[type='button'],
+	input[type='submit'] {
+		border-radius: 2px;
+		box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+		-webkit-user-select: none;
+		background: -webkit-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
+		background: -moz-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
+		border: 1px solid #aaa;
+		color: #444;
+		font-size: inherit;
+		margin-bottom: 0px;
+		min-width: 4em;
+		padding: 3px 12px 3px 12px;
+	}
+
+	button:hover,
+	input[type='button']:hover,
+	input[type='submit']:hover {
+		box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+		background: #ebebeb -webkit-linear-gradient(#fefefe, #f8f8f8 40%, #e9e9e9);
+		background: #ebebeb -moz-linear-gradient(#fefefe, #f8f8f8 40%, #e9e9e9);
+		border-color: #999;
+		color: #222;
+	}
+
+	button:active,
+	input[type='button']:active,
+	input[type='submit']:active {
+		box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.2);
+		background: #ebebeb -webkit-linear-gradient(#f4f4f4, #efefef 40%, #dcdcdc);
+		background: #ebebeb -moz-linear-gradient(#f4f4f4, #efefef 40%, #dcdcdc);
+		color: #333;
+	}
+
+	button[disabled],
+	input[type='button'][disabled],
+	input[type='submit'][disabled],
+	button[disabled]:hover,
+	input[type='button'][disabled]:hover,
+	input[type='submit'][disabled]:hover {
+		box-shadow: none;
+		background: -webkit-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
+		background: -moz-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
+		border-color: #aaa;
+		color: #888;
+	}
+}

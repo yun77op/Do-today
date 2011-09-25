@@ -1,0 +1,112 @@
+@import "colors";
+@import "compass/typography/links/link-colors";
+@import "font";
+
+
+@mixin typography() {
+	html { overflow-y: scroll; overflow-x: hidden; }
+	body {
+		line-height: 1.5;
+		font-size: 13px;
+		line-height: $line-height;
+		color: $font-color;
+	}
+
+	@include typography-defaults;
+}
+
+
+@mixin header-text { font-weight: normal; color: $header-color; }
+
+@mixin typography-defaults() {
+
+	#{headers(all)} {
+		@include header-text;
+	}
+
+	h1 {font-size:3em;line-height:1;margin-bottom:0.5em;}
+	h2 {font-size:2em;margin-bottom:0.75em;}
+	h3 {font-size:1.5em;line-height:1;margin-bottom:1em;}
+	h4 {font-size:1.2em;line-height:1.25;margin-bottom:1.25em;}
+	h5 {font-size:1em;font-weight:bold;margin-bottom:1.5em;}
+	h6 {font-size:1em;font-weight:bold;}
+
+	nav ul { list-style: none; }
+	p {
+		margin: 0 0 1.5em;
+		.left {
+			margin: 1.5em 1.5em 1.5em 0;
+			padding: 0;
+		}
+		.right {
+			margin: 1.5em 0 1.5em 1.5em;
+			padding: 0;
+		}
+	}
+
+	a { @include link-colors($link-color, $link-hover-color, $link-active-color, $link-visited-color, $link-focus-color);
+		@include hover-link;
+	}
+
+	blockquote      { margin: 1.5em; color: $alt-text-color; font-style: italic; }
+	strong, dfn     { font-weight: bold; }
+	em, dfn         { font-style: italic; }
+	small { font-size: 85%; }
+	abbr[title], dfn[title] { border-bottom:1px dotted #666; cursor:help; }
+	address         { margin: 0 0 1.5em; font-style: italic; }
+	del             { color: $alt-text-color; text-decoration: line-through; }
+	ins { background-color:#ff9; color: $loud-color; text-decoration:none; }
+	mark { background-color:#ff9; color: $loud-color; font-style:italic;
+		font-weight:bold; }
+	pre { 
+		padding: 15px; 
+		/* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
+		white-space: pre; /* CSS2 */
+		white-space: pre-wrap; /* CSS 2.1 */
+		white-space: pre-line; /* CSS 3 (and 2.1 as well, actually) */
+		word-wrap: break-word; /* IE */
+	}
+	sub { vertical-align: sub; font-size: smaller; line-height: 0; }
+	sup { vertical-align: super; font-size: smaller; line-height: 0; }
+	hr { display:block; height:0; border-top: 1px solid #CCC; clear: both;
+		margin:1em 0; padding:0; }
+
+	li ul, li ol { margin: 0; }
+	ul, ol { margin-left: 1.8em; }
+	ol { list-style-type: decimal; }
+	ul { list-style: none; }
+	dl {
+		margin: 0 0 1.5em 0;
+		dt {
+			font-weight: bold;
+		}
+	}
+	dd { margin-left: 1.5em; }
+	table { width: 100%;
+		border-collapse:collapse; border-spacing:0; }
+	th { font-weight: bold; }
+	td, td img { vertical-align: middle; }
+	thead th { background: $table-header-color; }
+	th, td, caption { padding: 4px 10px 4px 5px; }
+	table.striped tr:nth-child(even) td,
+	table.striped tr.even td { background: $table-stripe-color; }
+	tfoot { font-style: italic; }
+	caption { background: $background-color; }
+
+
+	.quiet {
+		color: $quiet-color;
+	}
+
+	.loud {
+		color: $loud-color;
+	}
+
+	figcaption {
+		text-align: center;
+		margin-bottom: 1.5em;
+		font-size: 1.2em;
+	}
+
+}
+

@@ -9,22 +9,18 @@ define(function(require, exports, module) {
 	var message = require('./message');
 
 	var Settings = require('./settings.js'),
-		Storage = require('./storage.js');
+			Storage = require('./storage.js'),
+			Timer = require('./timer.js');
 
 	app.use(initMods);
 
-
-
-	//connect timer with task with storage
+	//Connect timer with task with storage
 
 	var mods = app.getMods();
-
-	
-	var Timer = mods.timer,
-		Task = mods.task,
-		Message = message.generate('main', {
-			className: 'notice'
-		});
+	var Task = mods.task,
+			Message = message.generate('main', {
+				className: 'notice'
+			});
 
 		Message.show = _.wrap(Message.show, function(show) {
 			if (Settings.get('notification', 'popup')) {
@@ -36,7 +32,7 @@ define(function(require, exports, module) {
 	var working = true,
 			initial = false;
 
-	$(document).bind('timer:status:beforeStart', function() {
+	$(document).bind('timer:beforeStart', function() {
 		if (!initial && !Storage.set('current')) {
 			if(confirm('你不添加个任务先？')) {
 				$('input', Task.el)[0].focus();
@@ -46,20 +42,18 @@ define(function(require, exports, module) {
 		}
 	});
 
-	$(document).bind('timer:status:normal', function(e, task) {
-		Timer.initialize(working ? 'work' : 'break');
+	$(document).bind('timer:action:reset', function(e) {
+		Timer.initialize('work');
 	});
 
 	$(document).bind('timer:complete', function(e) {
 		working = !working;
 		Timer.initialize(working ? 'work' : 'break');
 		if (!working) {
-			Timer.timing();
 			Message.option({
 				buttons: {},
 				text: '休息，休息一下！'
 			});
-
 			Message.show(true);
 		} else {
 			Message.option({
@@ -71,22 +65,103 @@ define(function(require, exports, module) {
 						}
 					}
 				},
-
 				text: '开始工作了！'
 			});
-
 			Message.show();
-		}  
+		}
 	});
 
 
 	$(document).bind('timer:settings:changed', function(e, handle, value) {
-		if (handle === 'work' && working && !Timer.active) {
+		if (handle === 'work' && working && !Timer.isActive()) {
 			Timer.initialize('work');
 		}
 	});
 
 
+	/**
+	 *@namespace Task init functions
+	 */
+	Task.init = function() {
+		var taskInit = Task.init;
+		for (var i in taskInit) {
+			if (taskInit.hasOwnProperty(i)) {
+				taskInit[i]();
+			}
+		}
+	};
+	
+	Task.init.current = function() {
+ 		var currentArr = Storage.set('current');
+		if (currentArr && currentArr.length > 0) {
+			_.each(currentArr, function(id) {
+				var task = Storage.set(id);
+				var taskModel = Task.addToCurrent(task);
+				Task.currentObj[id] = taskModel;
+			});
+		}
+	};
+	
+	Task.init.hidden = function() {
+		var source = [],
+			hiddenArr = Storage.set('hidden');
+		if (hiddenArr) {
+			_.each(hiddenArr, function(id) {
+				var task = Storage.set(id);
+				Task.hiddenObj[id] = task;
+				source.push({
+					id: id,
+					value: task.content
+				});
+			});
+		}
+		Task.initAutocomplete(source);
+	};
+
+	Task.init.today = function() {
+		var items = Storage.set(getDateHandle());
+		items = _.map(items, function(item, id) {
+			return {
+				progress: item,
+				task: Storage.set(id)
+			};
+		});
+		Task.freshList(items, '#task-today-all');
+	};
+
+	/**
+	 *@namespace Task attributes change handlers
+	 */
+	Task.fn = {};
+
+	Task.fn.progress = function(id, val) {
+		var path = [getDateHandle(), id];
+		var data = Storage.set(path);
+		if (!data) {
+			data = [0];	
+		};
+		data[1] = val;
+		Storage.set(path, data);
+	};
+
+	Task.fn.notes = function (id, val) {
+		var path = [id, 'notes'];
+		Storage.append(path, val);
+	};
+
+	/**
+	 *@namespace
+	 */
+	Task.util = {};
+
+	Task.util.removeTask = function(e, id) {
+		removeStorageItem('current', id);
+		Storage.remove(id);
+		delete Task.currentObj[id];
+	};
+
+	Task.currentObj = {},
+	Task.hiddenObj = {};
 
 	$(document).bind('task:add', function(e, taskModel) {
 		var task = _.clone(taskModel.attributes),
@@ -95,31 +170,26 @@ define(function(require, exports, module) {
 		Storage.append('current', id);
 	});
 
-	var currentObj = {},
-		hiddenObj;
-
-
-	$(document).bind('task:current:add', function(e, taskModel) {
-		currentObj[taskModel.get('id')] = taskModel;
+	$(document).bind('task:add', function(e, taskModel) {
+		Task.currentObj[taskModel.get('id')] = taskModel;
 	});
 
 
-	$(document).bind('task:del', removeTask);
-	$(document).bind('task:check', removeTask);
+	$(document).bind('task:del', Task.util.removeTask);
+	$(document).bind('task:check', Task.util.removeTask);
 
 	$(document).bind('task:beforeAdd', function(e, id) {
-		if (hiddenObj[id]) {
+		if (Task.hiddenObj[id]) {
 			removeStorageItem('hidden', id);
-			var result = _.clone(hiddenObj[id]);
+			var result = _.clone(Task.hiddenObj[id]);
 			Storage.append('current', id);
 			init_taskHidden();
 			return result;
 		}
 	});
 
-
 	$(document).bind('task:hide', function(e, id) {
-		var taskModel = currentObj[id],
+		var taskModel = Task.currentObj[id],
 			item = {
 				id: id,
 				value: taskModel.get('content')
@@ -130,19 +200,17 @@ define(function(require, exports, module) {
 	});
 
 	$(document).bind('task:change', function(e, id, key, val) {
-		var taskModel = currentObj[id],
+		var taskModel = Task.currentObj[id],
 			attr = {};
 		attr[key] = val;
 		
-		if (key == 'progress') {
-			session(id, taskModel.get(key), val);
-		} else if (key == 'notes') {
-			notes(val);
+		if (typeof Task.fn[key] != 'undefined') {
+			Task.fn[key].call(null, id, val);
 		}
+
 		taskModel.set(attr);
 		Storage.set(id, taskModel.attributes);
 	});
-
 	
 	$(document).bind('task:date:change', function(e, dateText) {
 		var date = getDateHandle(new Date(dateText)),
@@ -151,20 +219,14 @@ define(function(require, exports, module) {
 		Task.freshList(data, '#task-past-content');
 	});
 
-
 	$(document).bind('task:containerToggle', function(e, target) {
-		target == '#task-today-all' && init_taskToday();
-	});
-
-
-	$(document).bind('task:slide', function() {
-		return !Timer.active || Timer.active && !working;
+		target == '#task-today-all' && Task.init.today();
 	});
 
 	$(document).bind('task:autocomplete:remove', function(e, id) {
 		removeStorageItem('hidden', id);
 		Storage.remove(id);
-		delete hiddenObj[id];
+		delete Task.hiddenObj[id];
 
 		var array = _.select($('.task-add input', Task.el).data('autocomplete').options.source, function(item) {
 			return item.id != id;
@@ -175,67 +237,13 @@ define(function(require, exports, module) {
 		};
 	});
 
+
 	$(document).bind('init:domReady', function() {
 		Timer.initialize('work');
-
-		var currentArr = Storage.set('current');
-		if (currentArr && currentArr.length > 0) {
-			_.each(currentArr, function(id) {
-				Task.addToCurrent(Storage.set(id));
-			});
-		}
-
-		init_taskToday();
-		init_taskHidden();
-
+		Task.init();
 		$('#mask').fadeOut();
 	});
-
-	function init_taskHidden() {
-		var source = [],
-			hiddenArr = Storage.set('hidden');
-		if (hiddenArr) {
-			hiddenObj = {};
-			_.each(hiddenArr, function(id) {
-				var task = Storage.set(id);
-				hiddenObj[id] = task;
-				source.push({
-					id: id,
-					value: task.content
-				});
-			});
-		}
-
-		Task.initAutocomplete(source);
-	}
-
-	function init_taskToday() {
-		var items = Storage.set(getDateHandle());
-		items = _.map(items, function(item, id) {
-			return {
-				progress: item,
-				task: Storage.set(id)
-			};
-		});
-		Task.freshList(items, '#task-today-all');
-	}
-
-	function session(id, prevVal, currentVal) {
-		var dateHandle = getDateHandle();
-		Storage.map([dateHandle, id], function(item) {
-			if (item != null) {
-				prevVal = item[0];
-			}
-			return [prevVal, currentVal];
-		});
-	}
-
-
-	function removeTask(e, id) {
-		removeStorageItem('current', id);
-		Storage.remove(id);
-		delete currentObj[id];
-	}
+	
 	
 	function removeStorageItem(key, id) {
 		Storage.filter(key, function(id_) {
@@ -243,7 +251,6 @@ define(function(require, exports, module) {
 		});
 	}
 	
-
 	function getDateHandle(date) {
 		date || (date = new Date());
 		return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
@@ -251,5 +258,4 @@ define(function(require, exports, module) {
 
 	window.app = app;
 	return app;
-
 });
