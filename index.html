@@ -16,7 +16,7 @@
 	<link type="image/x-icon" href="/favicon.ico" rel="shortcut icon">
 	<script src="scripts/lib/LAB.min.js"></script>
 	<script>
-		$LAB.setOptions({BasePath: '/Do-today/scripts/'})
+		$LAB.setOptions({BasePath: '/scripts/'})
 			.script('lib/jquery-1.6.2.min.js')
 			.script('lib/json2.js')
 			.script('lib/modernizr.js')
@@ -29,7 +29,7 @@
 			.script('lib/jquery.tipsy.js')
 			.wait(function() {
 				seajs.config({
-					base: '/Do-today/scripts'
+					base: '/scripts'
 				});
 				seajs.use('app', function(app) {
 					app.init();
@@ -121,14 +121,12 @@
 
 	<div id="ui-overlay-notes" class="ui-overlay ui-widget-content ui-helper-hidden">
 		<div class="triangle"></div>
-		<form>
-			<h3>添加备注</h3>
-			<textarea required></textarea>
-			<div class="action-area cr">
-				<input type="submit" class="button button-ok" value="确定">
-				<button class="button button-discard">取消</button>
-			</div>
-		</form>
+		<h3>添加备注</h3>
+		<textarea></textarea>
+		<div class="action-area cr">
+			<button class="button button-ok">确定</button>
+			<button class="button button-discard">取消</button>
+		</div>
 	</div>
 
 	<script id="template-task-session" type="x-ejs-tmpl">

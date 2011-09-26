@@ -7,7 +7,6 @@ define(function(require, exports, module) {
     var EN_SINGLE_RE = /'/g;
   
     // encode text into HTML to avoid XSS attacks.
-    // underscore templates do not auto encode. If in doubt, use this!
     function htmlEncode(text){
         text = ""+text;
         text = text.toString().replace(EN_AMP_RE, "&amp;");
@@ -33,21 +32,18 @@ define(function(require, exports, module) {
         return text;
     }
 
-    function getPageParams() {
-        var s = location.search,
+    function parseQueryParams() {
+        var s = location.search.slice(1),
             params = {};
-        if (s) {
-            s = s.slice(1);
-            _.each(s.split('&'), function(str) {
-                var pair = str.split('=');
-                params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-            }); 
-        }
+        _.each(s.split('&'), function(str) {
+            var pair = str.split('=');
+            params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+        });
         return params;
     }
 
     return {
-        getPageParams: getPageParams,
+        parseQueryParams: parseQueryParams,
         htmlEncode: htmlEncode,
         htmlDecode: htmlDecode
     };

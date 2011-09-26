@@ -261,7 +261,7 @@ define(function(require, exports, module) {
 				
 				function addToList(id, item, selector) {
 					var container = $(selector), el,
-							list = container.find('.task-list');		
+							list = container.find('.task-list');
 					container.removeClass('task-list-empty');
 					el = templateTaskSession.render(item);
 					list.append(el);

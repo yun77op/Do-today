@@ -78,12 +78,64 @@ define(function(require, exports, module) {
 		}
 	});
 
+	function Store(storage) {
+		this.storage = storage;
+		this.stores = {};
+	}
+
+	Store.prototype.persist = function(ns) {
+		if (typeof this.stores[ns] != 'undefined') {
+			this.Storage.set(ns, _.keys(this.stores[ns]));
+		}
+	};
+
+	Store.prototype.register = function(ns) {
+		var self = this;
+		this.stores[ns] = {};
+
+		var actions = ['get', 'set', 'rm'], ret = {};
+
+		_.each(actions, function(action) {
+			ret[action] = function () {
+				var args = Array.prototype.slice.call(arguments);
+				args.unshift(ns);
+				self[action].apply(self, args);
+			};
+		});
+
+		return ret;
+	};
+
+	Store.prototype.get = function(ns, key) {
+		var store = this.stores[ns];
+		if (store != undefined) {
+			return store[key];
+		}
+	};
+
+	Store.prototype.set = function(ns, key, val) {
+		var store = this.stores[ns];
+		if (store != undefined) {
+			store[key] = val;
+		}
+	};
+
+	Store.prototype.rm = function(ns, key) {
+		var store = this.stores[ns];
+		if (store != undefined) {
+			var ret = _.clone(store[key]);
+			delete store[key];
+			return ret;
+		}
+	};
+
 
 	/**
 	 *@namespace Task init functions
 	 */
 	Task.init = function() {
 		var taskInit = Task.init;
+		Task.store = new Store(Storage);
 		for (var i in taskInit) {
 			if (taskInit.hasOwnProperty(i)) {
 				taskInit[i]();
@@ -92,23 +144,25 @@ define(function(require, exports, module) {
 	};
 	
 	Task.init.current = function() {
+		Task.storeCurrent = Task.store.register('current');
  		var currentArr = Storage.set('current');
 		if (currentArr && currentArr.length > 0) {
 			_.each(currentArr, function(id) {
 				var task = Storage.set(id);
-				var taskModel = Task.addToCurrent(task);
-				Task.currentObj[id] = taskModel;
+				taskModel = Task.addToCurrent(task);
+				Task.storeCurrent.set(id, taskModel);
 			});
 		}
 	};
-	
+
 	Task.init.hidden = function() {
 		var source = [],
-			hiddenArr = Storage.set('hidden');
+				hiddenArr = Storage.set('hidden');
+		Task.storeHidden = Task.store.register('hidden');
 		if (hiddenArr) {
 			_.each(hiddenArr, function(id) {
 				var task = Storage.set(id);
-				Task.hiddenObj[id] = task;
+				Task.storeHidden.set(id, task);
 				source.push({
 					id: id,
 					value: task.content
@@ -134,19 +188,25 @@ define(function(require, exports, module) {
 	 */
 	Task.fn = {};
 
-	Task.fn.progress = function(id, val) {
-		var path = [getDateHandle(), id];
-		var data = Storage.set(path);
-		if (!data) {
-			data = [0];	
-		};
+	Task.fn.progress = function(id, key, val) {
+		var taskModel = Task.storeCurrent.get(id),
+				data = taskModel.get(key);
+		if (data == undefined) {
+			data = [0];
+		}
 		data[1] = val;
-		Storage.set(path, data);
+		return data;
 	};
 
-	Task.fn.notes = function (id, val) {
-		var path = [id, 'notes'];
-		Storage.append(path, val);
+	Task.fn.notes = function (id, key, val) {
+		var taskModel = Task.storeCurrent.get(id),
+				data = taskModel.get(key);
+		if (data == undefined) {
+			data = [val];
+		} else {
+			data.push(val);
+		}
+		return data;
 	};
 
 	/**
@@ -155,61 +215,42 @@ define(function(require, exports, module) {
 	Task.util = {};
 
 	Task.util.removeTask = function(e, id) {
-		removeStorageItem('current', id);
-		Storage.remove(id);
-		delete Task.currentObj[id];
+		Task.storeCurrent.rm(id);
 	};
 
-	Task.currentObj = {},
-	Task.hiddenObj = {};
-
-	$(document).bind('task:add', function(e, taskModel) {
-		var task = _.clone(taskModel.attributes),
-			id = task.id;
-		Storage.set(id, task);
-		Storage.append('current', id);
+	$(document).bind('task:add', function(e, task) {
+		var id = task.id;
+		Storage.set(id, task.attributes);
+		Task.storeCurrent.set(id, task).persist();
 	});
-
-	$(document).bind('task:add', function(e, taskModel) {
-		Task.currentObj[taskModel.get('id')] = taskModel;
-	});
-
 
 	$(document).bind('task:del', Task.util.removeTask);
 	$(document).bind('task:check', Task.util.removeTask);
 
 	$(document).bind('task:beforeAdd', function(e, id) {
-		if (Task.hiddenObj[id]) {
-			removeStorageItem('hidden', id);
-			var result = _.clone(Task.hiddenObj[id]);
-			Storage.append('current', id);
-			init_taskHidden();
-			return result;
+		var task = Task.storeHidden.get(id);
+		if (task) {
+			Task.storeHidden.rm(id);
+			Task.init.hidden();
+			return task;
 		}
 	});
 
 	$(document).bind('task:hide', function(e, id) {
-		var taskModel = Task.currentObj[id],
-			item = {
-				id: id,
-				value: taskModel.get('content')
-			};
-		Storage.append('hidden', id);
-		removeStorageItem('current', id);
-		init_taskHidden();
+		var task = Task.storeCurrent.rm(id);
+		Task.storeHidden.set(id, task);
 	});
 
 	$(document).bind('task:change', function(e, id, key, val) {
-		var taskModel = Task.currentObj[id],
-			attr = {};
-		attr[key] = val;
-		
-		if (typeof Task.fn[key] != 'undefined') {
-			Task.fn[key].call(null, id, val);
+		var task = Task.storeCurrent.get(id),
+				attr = {}, result;
+		if (typeof Task.fn[key] == 'undefined' ||
+				(result = Task.fn[key].call(null, id, key, val)) != undefined) {
+			val = result;
 		}
-
-		taskModel.set(attr);
-		Storage.set(id, taskModel.attributes);
+		attr[key] = val;
+		task.set(attr);
+		Storage.set(id, task.attributes);
 	});
 	
 	$(document).bind('task:date:change', function(e, dateText) {
@@ -224,16 +265,15 @@ define(function(require, exports, module) {
 	});
 
 	$(document).bind('task:autocomplete:remove', function(e, id) {
-		removeStorageItem('hidden', id);
+		Task.storeHidden.rm(id);
 		Storage.remove(id);
-		delete Task.hiddenObj[id];
 
-		var array = _.select($('.task-add input', Task.el).data('autocomplete').options.source, function(item) {
+		var ary = _.select($('.task-add input', Task.el).data('autocomplete').options.source, function(item) {
 			return item.id != id;
 		});
-		$('.task-add input', Task.el).data('autocomplete').options.source = array;
+		$('.task-add input', Task.el).data('autocomplete').options.source = ary;
 		$('.task-add input', Task.el).data('autocomplete').source = function( request, response ) {
-				response( $.ui.autocomplete.filter(array, request.term) );
+				response( $.ui.autocomplete.filter(ary, request.term) );
 		};
 	});
 
@@ -243,13 +283,7 @@ define(function(require, exports, module) {
 		Task.init();
 		$('#mask').fadeOut();
 	});
-	
-	
-	function removeStorageItem(key, id) {
-		Storage.filter(key, function(id_) {
-			return id_ != id; 
-		});
-	}
+
 	
 	function getDateHandle(date) {
 		date || (date = new Date());

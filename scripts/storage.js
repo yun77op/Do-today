@@ -76,7 +76,7 @@ define(function(require, exports, module) {
 				result = _get(primaryPath);
 
 		var len = path.length;
-		if (len != 1) {
+		if (len > 1) {
 			if (result == null) {
 				result = {};
 			}
@@ -107,7 +107,6 @@ define(function(require, exports, module) {
 			return result;
 		}
 	}
-
 
 	function append(key, val_) {
 		var val = set(key);
