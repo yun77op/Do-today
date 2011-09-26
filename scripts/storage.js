@@ -118,6 +118,13 @@ define(function(require, exports, module) {
 		set(key, val);
 	}
 
+	function modify(key, callback) {
+		var val = set(key);
+		val = callback(val);
+		set(key, val);
+	}
+
+
 	function remove(key) {
 		localStorage.removeItem(key);
 	}
@@ -135,4 +142,5 @@ define(function(require, exports, module) {
 	exports.set = set;
 	exports.append = append;
 	exports.remove = remove;
+	exports.modify = modify;
 })

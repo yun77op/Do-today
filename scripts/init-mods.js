@@ -170,11 +170,11 @@ define(function(require, exports, module) {
 					},
 
 					edit: function(e) {
-						var o = this;
+						var self = this;
 						var contentEl = $('.task-content', this.el);
 						contentEl.hotedit('edit', function(text) {
 							contentEl.text(text);
-							$(document).trigger('task:change', [o.model.get('id'), 'content', text]);
+							$(document).trigger('task:change', [self.model.get('id'), 'content', text]);
 						});
 					},
 
@@ -212,7 +212,7 @@ define(function(require, exports, module) {
 							taskModel = addToCurrent({
 								content: content
 							});
-							$(document).trigger('task:add', taskModel);
+							$(document).trigger('task:add', taskModel.attributes);
 						}
 					}
 				});

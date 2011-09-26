@@ -83,26 +83,18 @@ define(function(require, exports, module) {
 		this.stores = {};
 	}
 
-	Store.prototype.persist = function(ns) {
-		if (typeof this.stores[ns] != 'undefined') {
-			this.Storage.set(ns, _.keys(this.stores[ns]));
-		}
-	};
-
 	Store.prototype.register = function(ns) {
 		var self = this;
 		this.stores[ns] = {};
 
-		var actions = ['get', 'set', 'rm'], ret = {};
-
+		var actions = ['get', 'set', 'rm', 'persist'], ret = {};
 		_.each(actions, function(action) {
 			ret[action] = function () {
 				var args = Array.prototype.slice.call(arguments);
 				args.unshift(ns);
-				self[action].apply(self, args);
+				return self[action].apply(self, args);
 			};
 		});
-
 		return ret;
 	};
 
@@ -129,6 +121,11 @@ define(function(require, exports, module) {
 		}
 	};
 
+	Store.prototype.persist = function(ns) {
+		if (typeof this.stores[ns] != 'undefined') {
+			this.storage.set(ns, _.keys(this.stores[ns]));
+		}
+	};
 
 	/**
 	 *@namespace Task init functions
@@ -149,8 +146,8 @@ define(function(require, exports, module) {
 		if (currentArr && currentArr.length > 0) {
 			_.each(currentArr, function(id) {
 				var task = Storage.set(id);
-				taskModel = Task.addToCurrent(task);
-				Task.storeCurrent.set(id, taskModel);
+				Task.addToCurrent(task);
+				Task.storeCurrent.set(id, task);
 			});
 		}
 	};
@@ -184,23 +181,24 @@ define(function(require, exports, module) {
 	};
 
 	/**
-	 *@namespace Task attributes change handlers
+	 * @namespace Task attributes change handlers
 	 */
 	Task.fn = {};
 
 	Task.fn.progress = function(id, key, val) {
-		var taskModel = Task.storeCurrent.get(id),
-				data = taskModel.get(key);
-		if (data == undefined) {
-			data = [0];
-		}
-		data[1] = val;
-		return data;
+		var dateHandle = getDateHandle();
+		Storage.modify([dateHandle, id], function(data) {
+			if (data == undefined) {
+				data = [0];
+			}
+			data[1] = val;
+			return data;
+		});
 	};
 
 	Task.fn.notes = function (id, key, val) {
-		var taskModel = Task.storeCurrent.get(id),
-				data = taskModel.get(key);
+		var task = Task.storeCurrent.get(id),
+				data = task[key];
 		if (data == undefined) {
 			data = [val];
 		} else {
@@ -210,7 +208,7 @@ define(function(require, exports, module) {
 	};
 
 	/**
-	 *@namespace
+	 * @namespace
 	 */
 	Task.util = {};
 
@@ -220,8 +218,9 @@ define(function(require, exports, module) {
 
 	$(document).bind('task:add', function(e, task) {
 		var id = task.id;
-		Storage.set(id, task.attributes);
-		Task.storeCurrent.set(id, task).persist();
+		Storage.set(id, task);
+		Task.storeCurrent.set(id, task);
+		Task.storeCurrent.persist();
 	});
 
 	$(document).bind('task:del', Task.util.removeTask);
@@ -243,20 +242,18 @@ define(function(require, exports, module) {
 
 	$(document).bind('task:change', function(e, id, key, val) {
 		var task = Task.storeCurrent.get(id),
-				attr = {}, result;
-		if (typeof Task.fn[key] == 'undefined' ||
+				result;
+		if (typeof Task.fn[key] != 'undefined' &&
 				(result = Task.fn[key].call(null, id, key, val)) != undefined) {
 			val = result;
 		}
-		attr[key] = val;
-		task.set(attr);
-		Storage.set(id, task.attributes);
+		task[key] = val;
+		Storage.set(id, task);
 	});
 	
 	$(document).bind('task:date:change', function(e, dateText) {
 		var date = getDateHandle(new Date(dateText)),
-			data = Storage.set(date);
-
+				data = Storage.set(date);
 		Task.freshList(data, '#task-past-content');
 	});
 
