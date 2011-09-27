@@ -121,7 +121,7 @@
 
 	<div id="ui-overlay-notes" class="ui-overlay ui-widget-content ui-helper-hidden">
 		<div class="triangle"></div>
-		<h3>添加备注</h3>
+		<h3>添加笔记</h3>
 		<textarea></textarea>
 		<div class="action-area cr">
 			<button class="button button-ok">确定</button>
@@ -133,12 +133,12 @@
 		<li class="task">
 			<strong class="task-content"><%= task.content %></strong>
 			<% if (progress[0] != 0 || progress[1] != 100) { %>
-				<em>完成从<%= progress[0] %>%到<%= progress[1] %>%</em>
+				<em class="right">完成从<%= progress[0] %>%到<%= progress[1] %>%</em>
 			<% } %>
 			<% if (typeof task.notes != 'undefined') { %>
 				<ul class="task-notes">
 					<% task.notes.forEach(function(note) { %>
-						<li><%= note.content %><em class="time"><%= note.time %></em></li>
+						<li><%= note.content %><em class="time right"><%= new Date(note.time).toLocaleString() %></em></li>
 					<% }); %>
 				</ul>
 			<% } %>

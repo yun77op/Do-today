@@ -98,14 +98,14 @@
 		+linear-gradient(color-stops(#B1AD3F, #A4A148), left)
 		+border-radius(5px)
 	.timer-start
-		margin: 9px 0 0 6px
+		margin: 9px 0 0 5px
 		+triangle
 	.timer-start.started
 		width: 8px
 		height: 14px
-		border: none
 		background: #FFF
-		margin-left: 6px
+		border: none
+		margin: 11px 0 0 6px
 	.timer-start.stopped
 		+rotateZ(180deg)
 
@@ -222,7 +222,9 @@
 					.task-progress-container
 						display: block
 	.task-session
-		list-style: upper-roman inside
+		list-style: upper-roman outside
+	.task-notes
+		list-style: disc inside
 	.sortable
 		cursor: move
 		.task

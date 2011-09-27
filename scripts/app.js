@@ -71,9 +71,8 @@ define(function(require, exports, module) {
 		}
 	});
 
-
-	$(document).bind('timer:settings:changed', function(e, handle, value) {
-		if (handle === 'work' && working && !Timer.isActive()) {
+	$(document).bind('timer:settings:changed', function(e, key, value) {
+		if (key === 'work' && working && !Timer.isActive()) {
 			Timer.initialize('work');
 		}
 	});
@@ -170,15 +169,9 @@ define(function(require, exports, module) {
 	};
 
 	Task.init.today = function() {
-		var items = Storage.set(getDateHandle());
-		items = _.map(items, function(item, id) {
-			return {
-				progress: item,
-				task: Storage.set(id)
-			};
-		});
-		Task.freshList(items, '#task-today-all');
+		Task.util.makeSessionList('#task-today-all', Date.now());
 	};
+
 
 	/**
 	 * @namespace Task attributes change handlers
@@ -216,6 +209,21 @@ define(function(require, exports, module) {
 		Task.storeCurrent.rm(id);
 	};
 
+	Task.util.makeSessionList = function(selector, date) {
+		var date = getDateHandle(date),
+				items = Storage.set(date);
+		if (items == null) {
+			items = [];
+		}
+		items = _.map(items, function(item, id) {
+			return {
+				progress: item,
+				task: Storage.set(id)
+			};
+		});
+		Task.makeSessionList(items, selector);
+	};
+
 	$(document).bind('task:add', function(e, task) {
 		var id = task.id;
 		Storage.set(id, task);
@@ -230,14 +238,16 @@ define(function(require, exports, module) {
 		var task = Task.storeHidden.get(id);
 		if (task) {
 			Task.storeHidden.rm(id);
-			Task.init.hidden();
+			Task.storeHidden.persist();
 			return task;
 		}
 	});
 
 	$(document).bind('task:hide', function(e, id) {
 		var task = Task.storeCurrent.rm(id);
+		Task.storeCurrent.persist();
 		Task.storeHidden.set(id, task);
+		Task.storeHidden.persist();
 	});
 
 	$(document).bind('task:change', function(e, id, key, val) {
@@ -250,11 +260,9 @@ define(function(require, exports, module) {
 		task[key] = val;
 		Storage.set(id, task);
 	});
-	
+
 	$(document).bind('task:date:change', function(e, dateText) {
-		var date = getDateHandle(new Date(dateText)),
-				data = Storage.set(date);
-		Task.freshList(data, '#task-past-content');
+		Task.util.makeSessionList('#task-past-content', dateText);
 	});
 
 	$(document).bind('task:containerToggle', function(e, target) {
@@ -263,15 +271,8 @@ define(function(require, exports, module) {
 
 	$(document).bind('task:autocomplete:remove', function(e, id) {
 		Task.storeHidden.rm(id);
+		Task.storeHidden.persist();
 		Storage.remove(id);
-
-		var ary = _.select($('.task-add input', Task.el).data('autocomplete').options.source, function(item) {
-			return item.id != id;
-		});
-		$('.task-add input', Task.el).data('autocomplete').options.source = ary;
-		$('.task-add input', Task.el).data('autocomplete').source = function( request, response ) {
-				response( $.ui.autocomplete.filter(ary, request.term) );
-		};
 	});
 
 
@@ -283,7 +284,12 @@ define(function(require, exports, module) {
 
 	
 	function getDateHandle(date) {
-		date || (date = new Date());
+		if (date == undefined) {
+			date = Date.now();
+		}
+		if (!(typeof date == 'object' && date instanceof Date)) {
+			date = new Date(date);
+		}
 		return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
 	}
 

@@ -195,25 +195,25 @@ define(function(require, exports, module) {
 				});
 
 				el.delegate('input', 'keyup', function(e) {
-					var o = $(this);
+					var el = $(this);
 					if (e.which == 13) {
-						var content = $.trim(o.val());
-						o.val('');
-						if (content === '')
-							return;
+						var content = $.trim(el.val());
+						el.val('');
+						if (content === '') { return; }
 						
-						var hiddenId = o.data('hiddenId'),
-								taskModel;
+						var hiddenId = el.data('hiddenId'), task;
 						if (hiddenId) {
-							taskModel = $(document).triggerHandler('task:beforeAdd', hiddenId);
-							o.removeData('hiddenId');
-							addToCurrent(taskModel);
+							task = $(document).triggerHandler('task:beforeAdd', hiddenId);
+							el.removeData('hiddenId');
+							task.content = content;
+							addToCurrent(task);
 						} else {
-							taskModel = addToCurrent({
+							var taskModel = addToCurrent({
 								content: content
 							});
-							$(document).trigger('task:add', taskModel.attributes);
+							task = taskModel.attributes;
 						}
+						$(document).trigger('task:add', task);
 					}
 				});
 
@@ -225,7 +225,7 @@ define(function(require, exports, module) {
 
 					initialize: function(attrs) {
 						attrs['id'] || (this.attributes['id'] = 'o' + new ObjectID().toHexString());
-						attrs['created_at'] || (this.attributes['created_at'] = new Date());
+						attrs['created_at'] || (this.attributes['created_at'] = Date.now());
 					}
 				});
 
@@ -245,11 +245,10 @@ define(function(require, exports, module) {
 					return taskModel;
 				}
 
-				function freshList(items, selector) {
+				function makeSessionList(items, selector) {
 					var container = $(selector),
 							list = container.find('.task-list').empty();
-
-					if (!items) {
+					if (!items || items.length == 0) {
 						container.addClass('task-list-empty');
 						list.append('<li>没有记录哦</li>');
 					} else {
@@ -260,20 +259,44 @@ define(function(require, exports, module) {
 				}
 				
 				function addToList(id, item, selector) {
-					var container = $(selector), el,
+					var container = $(selector),
 							list = container.find('.task-list');
 					container.removeClass('task-list-empty');
-					el = templateTaskSession.render(item);
+					var el = templateTaskSession.render(item);
 					list.append(el);
 				}
 
 				plugin.addToCurrent = addToCurrent;
-				plugin.addToList = addToList;
-				plugin.freshList = freshList;
+				plugin.makeSessionList = makeSessionList;
 
 				var input = $('#task-today-current input', el);
+				
+				$(document).bind('task:hide', function(e, id, task) {
+					var source = _.clone(input.data('autocomplete').options.source);
+					if (!source) { source = []; }
+					source.push({
+						id: id,
+						value: task.content
+					});
+					initSource(source);
+				});
+
+				$(document).bind('task:autocomplete:remove', function(e, id) {
+					var source = _.select(input.data('autocomplete').options.source, function(item) {
+						return item.id != id;
+					});
+					initSource(source);
+				});
+
+				function initSource(source) {
+					input.data('autocomplete').options.source = source;
+					input.data('autocomplete').source = function( request, response ) {
+						response( $.ui.autocomplete.filter(source, request.term) );
+					};
+				}
+				
+
 				plugin.initAutocomplete = function(source) {
-					input.data('autocomplete') && input.autocomplete('destroy');
 					input.autocomplete({
 						source: source,
 						minLength: 0,
@@ -289,6 +312,9 @@ define(function(require, exports, module) {
 						span.bind('click', function(e) {
 							e.stopPropagation();
 							$(this).parents('li').remove();
+							if ($(this).parents('ul').find('li').length == 0) {
+								input.autocomplete('close');
+							}
 							$(document).trigger('task:autocomplete:remove', item.id);
 						});
 						a.append(span);
@@ -332,7 +358,7 @@ define(function(require, exports, module) {
 						e.preventDefault();
 						this.host.taskActions.overlay('hide');
 						this.host.remove();
-						$(document).trigger('task:hide', this.host.model.get('id'));
+						$(document).trigger('task:hide', [this.host.model.get('id'), this.host.model.attributes]);
 					},
 
 					priority: function(e) {
