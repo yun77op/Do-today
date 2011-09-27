@@ -168,19 +168,22 @@
 				.actions
 					visibility: visible
 			.actions
-				visibility: hidden
 				+float-right()
 				*margin-top: -25px
-				.ui-button
-					+float-right()
+				.button
+					margin-top: 6px
+					width: 13px
+					height: 13px
+					+hide-text
+					background-image: url(../images/sprites.png)
+				.task-actions-trigger
+					background-position: -129px -173px
+				.task-actions-notes
+					background-position: -171px -173px
 			span
 				margin: 0 .5em 0 0
 
-			.task-actions-trigger
-				margin-top: 6px
-				background: url(../images/sprites.png) -129px -173px
-				width: 13px
-				height: 13px
+				
 			.ui-icon-arrowthick-2-n-s
 				position: absolute
 				right: 0
