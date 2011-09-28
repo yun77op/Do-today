@@ -61,8 +61,7 @@ define(function(require, exports, module) {
 	var actions = _.keys(actionHandlers);
 
 	function run(canTrigger) {
-		var prevActionHandler = actionHandlers[actions[actionIndex]];
-		actionIndex = (actionIndex++) % 3;
+		var prevActionHandler = actionHandlers[actions[(actionIndex + 2) % 3]];
 		var actionHandler = actionHandlers[actions[actionIndex]];
 		if (actionHandler.fn.call(buttonStart[0])) {
 			return;
@@ -71,6 +70,7 @@ define(function(require, exports, module) {
 		if (canTrigger != false) {
 			$(document).trigger('timer:action:' + actions[actionIndex]);
 		}
+		actionIndex = (++actionIndex) % 3;
 	}
 
 	function interval(callback) {
