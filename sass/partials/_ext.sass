@@ -1,19 +1,22 @@
 body
 	.message
 		font-size: 14px
-
-	#message-main
 		position: absolute
+		padding: .2em .6em
+	#message-main
 		top: 72px
 		left: 50%
+		background: $notice-bg-color
 		margin-left: 180px
-		.ui-buttonset
-			float: right
-		.ui-button-text
-			font-size: .9em
+		+border-bottom-radius(3px)
+		.actions
+			+float-right
+			a
+				text-decoration: underline
+				color: $loud-color
+				font-size: .9em
 
 	#message-loading
-		position: absolute
 		top: 50%
 		left: 50%
 		width: 50px

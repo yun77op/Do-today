@@ -21,7 +21,7 @@ define(function(require, exports, module) {
 		progress.width(initialWidth);
 	}
 
-	var actionIndex = 2;
+	var actionIndex = 0;
 	var actionHandlers = {
 		'start': {
 			fn: function() {
@@ -29,16 +29,16 @@ define(function(require, exports, module) {
 					return;
 				}
 				var el = $(this);
-				instance = interval(function(step) {
+				instance = interval(function() {
 					progressWidth += step;
 					progress.width(progressWidth);
 					updateTime(timeEl, --count);
 					if (count == 0) {
-						actionIndex = 2;
-						instance.stop();
+						run();
+						run(false);
 						$(document).trigger('timer:complete');
 					}
-				}, step);
+				});
 				active = true;
 			},
 			className: 'started'
@@ -57,30 +57,27 @@ define(function(require, exports, module) {
 			className: 'normal'
 		}
 	};
+
 	var actions = _.keys(actionHandlers);
 
-	function run() {
+	function run(canTrigger) {
 		var prevActionHandler = actionHandlers[actions[actionIndex]];
-		actionIndex = (++actionIndex) % 3;
+		actionIndex = (actionIndex++) % 3;
 		var actionHandler = actionHandlers[actions[actionIndex]];
 		if (actionHandler.fn.call(buttonStart[0])) {
 			return;
 		}
 		buttonStart.removeClass(prevActionHandler.className).addClass(actionHandler.className);
-		$(document).trigger('timer:action:' + actions[actionIndex]);
+		if (canTrigger != false) {
+			$(document).trigger('timer:action:' + actions[actionIndex]);
+		}
 	}
 
-	function interval(cb, step) {
-		var t;
-		function _interval() {
-			t = setTimeout(_interval, 1000);
-			cb(step);
-		}
-
-		t = setTimeout(_interval, 1000);
+	function interval(callback) {
+		var timer = setInterval(callback, 1000);
 		return {
 			stop: function() {
-				clearTimeout(t);
+				clearInterval(timer);
 			}
 		}
 	}

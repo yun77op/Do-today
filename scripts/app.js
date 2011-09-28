@@ -18,14 +18,14 @@ define(function(require, exports, module) {
 
 	var mods = app.getMods();
 	var Task = mods.task,
-			Message = message.generate('main', {
+			messageMain = message.generate('main', {
 				className: 'notice'
 			});
 
-		Message.show = _.wrap(Message.show, function(show) {
+		messageMain.show = _.wrap(messageMain.show, function(show) {
 			if (Settings.get('notification', 'popup')) {
 				var args = Array.prototype.slice.call(arguments, 1);
-				show.apply(Message, args);
+				show.apply(messageMain, args);
 			}
 		});
 
@@ -50,26 +50,29 @@ define(function(require, exports, module) {
 		working = !working;
 		Timer.initialize(working ? 'work' : 'break');
 		if (!working) {
-			Message.option({
-				buttons: {},
+			messageMain.option({
+				actions: null,
 				text: '休息，休息一下！'
 			});
-			Message.show(true);
+			messageMain.show(true);
 		} else {
-			Message.option({
-				buttons: {
+			messageMain.option({
+				actions: {
 					'dismiss': {
-						'label': '清除',
+						'label': '知道了',
 						'click': function() {
-							this.el.slideUp('slow');
+							this.hide();
 						}
 					}
 				},
 				text: '开始工作了！'
 			});
-			Message.show();
+			messageMain.show();
 		}
+		if (!working) { Timer.run(); }
 	});
+
+	window.messageMain = messageMain;
 
 	$(document).bind('timer:settings:changed', function(e, key, value) {
 		if (key === 'work' && working && !Timer.isActive()) {

@@ -295,7 +295,6 @@ define(function(require, exports, module) {
 					};
 				}
 				
-
 				plugin.initAutocomplete = function(source) {
 					input.autocomplete({
 						source: source,

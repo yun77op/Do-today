@@ -1,124 +1,125 @@
 define(function(require, exports, module) {
-    var Instances = {};
+	var Instances = {};
 
-    var DEFAULTS = {
-        interval: 2000,
-        autoOpen: false,
-        autoHide: false
-    };
+	Message = function() {
+		this.initialize.apply(this, arguments);
+	}
 
+	Message.prototype = {
+		initialize: function(name, options) {
+			Instances[name] = this;
+			var el = $('<div id="message-' + name + '" class="message"><span class="message-text"></span></div>');
+			this.el = el.hide().appendTo('body');
+			this.options = $.extend({}, Message.defaults);
+			options && this.option(options);
 
-    var methodFunc = {
-        text: function(text) {
-            this.el.find('.message-text').text(text);
-        },
+			_.bindAll(this, 'hide', 'show');
+			if (this.option('autoOpen')) {
+				this.show();
+			}
+		},
 
-        buttons: function(buttons) {
-            var o = this;
-            this.el.find('.ui-buttonset').remove();
+		show: function(text, autoHide) {
+			if (typeof text == 'boolean') {
+				autoHide = text;
+				text = null;
+			}
+			autoHide === undefined && (autoHide = this.option('autoHide'));
+			text != null && this.option('text', text);
+			this.el.stop(true, false);
+			this.el.show();
+			if (autoHide) {
+				this.addTimer();
+			}
+		},
 
-            if ($.isEmptyObject(buttons)) {
-                return;
-            }
+		hide: function(text) {
+			this.el.slideUp('slow');
+		},
 
-            var buttonset = $('<div class="ui-buttonset"></div>').appendTo(this.el);
-            
-            _.each(buttons, function(el, key) {
-                var button = $('<button class="ui-button ui-state-default ui-corner-all ui-button-text-only" id="ui-button-' + key + '"><span class="ui-button-text">' + el.label + '</span></button>').appendTo(buttonset);
-                button.click(_.bind(el.click, o));
-            });
-        }, 
+		addTimer: function() {
+			this.timer = window.setTimeout(this.hide, this.option('interval'));
+		},
 
-        className: function() {
-            this.el.addClass(this.option('className'));
-        }
-    };
+		clearTimer: function () {
+			if (this.timer) {
+				window.clearTimeout(this.timer);
+			}
+		},
 
-    var Message = Class.extend({
-        init: function(name, opts) {
-            Instances[name] = this;
-            var el = $('<div id="message-' + name + '" class="message"><span class="message-text"></span></div>');
-            this.el = el.hide().appendTo('body');
-            this.options = $.extend({}, DEFAULTS);
-            opts && this.option(opts);
+		option: function( key, value ) {
+			var options = key;
+			if ( arguments.length === 0 ) {
+				// don't return a reference to the internal hash
+				return $.extend( {}, this.options );
+			}
+			if  (typeof key === "string" ) {
+				if ( value === undefined ) {
+					return this.options[ key ];
+				}
+				options = {};
+				options[ key ] = value;
+			}
+			this._setOptions( options );
+			return this;
+		},
+		
+		_setOptions: function( options ) {
+			var self = this;
+			$.each( options, function( key, value ) {
+				self._setOption( key, value );
+			});
+			return this;
+		},
+		
+		_setOption: function( key, value ) {
+			this.options[ key ] = value;
+			Message.fn[key] && Message.fn[key].call(this, value);
+			return this;
+		}
+	};
 
-            _.bindAll(this, 'hide', 'show');
+	$.extend(Message, {
+		defaults: {
+			interval: 2000,
+			autoOpen: false,
+			autoHide: false
+		},
 
-            if (this.option('autoOpen')) {
-                this.show();
-            }
-            
-        },
+		fn: {
+			text: function(text) {
+				this.el.find('.message-text').text(text);
+			},
 
-        show: function(autoHide) {
-            autoHide === undefined && (autoHide = this.option('autoHide'));
-            this.el.stop(true, false);
-            this.el.show();
-            if (autoHide) {
-                this.addTimer();
-            }
-        },
+			actions: function(obj) {
+				var self = this;
+				this.el.find('.actions').remove();
 
-        hide: function(text) {
-            this.el.slideUp('slow');
-        },
+				if (!obj || $.isEmptyObject(obj)) { return; }
 
-        addTimer: function() {
-            this.timer = window.setTimeout(this.hide, this.option('interval'));
-        },
+				var actions = $('<div class="actions"></div>');
+				$.each(obj, function(key, val) {
+					var action = $('<a href="#">' + val.label + '</a>').appendTo(actions);
+					action.click(function(e) {
+						e.preventDefault();
+						val.click.call(self);
+					});
+				});
+				actions.appendTo(this.el);
+			}, 
 
-        clearTimer: function () {
-            if (this.timer) {
-                window.clearTimeout(this.timer);
-            }
-        },
+			className: function(className) {
+				this.el.addClass(className);
+			}
+		} 
+	});
 
-        option: function( key, value ) {
-            var options = key;
-
-            if ( arguments.length === 0 ) {
-                // don't return a reference to the internal hash
-                return $.extend( {}, this.options );
-            }
-
-            if  (typeof key === "string" ) {
-                if ( value === undefined ) {
-                    return this.options[ key ];
-                }
-                options = {};
-                options[ key ] = value;
-            }
-
-            this._setOptions( options );
-
-            return this;
-        },
-        
-        _setOptions: function( options ) {
-            var self = this;
-            $.each( options, function( key, value ) {
-                self._setOption( key, value );
-            });
-
-            return this;
-        },
-        
-        _setOption: function( key, value ) {
-            this.options[ key ] = value;
-
-            methodFunc[key] && methodFunc[key].call(this, value);
-            return this;
-        }
-    });
-
-    return {
-        generate: function (name, options) {
-            var cur = Instances[name];
-            if(cur) return cur;
-            return new Message(name, options);
-        }
-    }
-        
-        
+	return {
+		generate: function (name, options) {
+			var cur = Instances[name];
+			if(cur) { return cur; }
+			return new Message(name, options);
+		}
+	}
 
 });

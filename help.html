@@ -1,67 +1,50 @@
 <!DOCTYPE html>
-<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
-<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
-<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if lt IE 7 ]> <html lang="zh-CN" class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="zh-CN" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="zh-CN" class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="zh-CN" class="ie9"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="zh-CN" class="no-js"> <!--<![endif]-->
 <head>
     <meta charset="utf-8">
-    <title>Do today</title>
-    <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+    <title>关于和帮助 | Do today</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="robots" content="index,follow"> 
     <meta name="robots" content="noodp">
-    <link href="stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <link href="stylesheets/tipsy.css" media="screen, projection" rel="stylesheet" type="text/css" />
-    <link href="stylesheets/print.css" media="print" rel="stylesheet" type="text/css" />
+    <link href="stylesheets/screen.css" media="screen, projection" rel="stylesheet">
+    <link href="stylesheets/tipsy.css" media="screen, projection" rel="stylesheet">
     <link type="image/x-icon" href="/favicon.ico" rel="shortcut icon">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <script>
-        function getPageParams() {
-            var s = location.search,
-                params = {};
-            if (s) {
-                s = s.slice(1);
-                _.each(s.split('&'), function(str) {
-                    var pair = str.split('=');
-                    params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-                }); 
-            }
-            return params;
-        }
-
-        //baidu iframe
-        if (window != parent) {
-            $('body').addClass('iframe');
-            var params = getPageParams();
-            if (params['canvas_pos'] === 'search') {
-                $('body').addClass('iframe-small');
-            }
-        }
-    </script>
 </head>
-<body class="two-col">
+<body class="page-intro">
     <div id="container">
-        <div id="header">
-            <div class="site-title"><a href="/">Do today</a></div>
+        <div id="header" class="clearfix">
+            <h1 class="site-title"><a href="/">Do today</a></h1>
             <div class="sub-title"></div>
-            <h1 class="page-title">帮助文档</h1>
+            <div id="nav">
+                
+            </div>
         </div>
         <div id="content">
-            <p>番茄工作法是一种时间管理方法。对许多人来说，时间是人类的大敌。时间的限制带来的焦虑，将导致工作和学习效率的降低，时间的延迟。用番茄工作法，和时间结为盟友。</p>
+            <div class="section">
+                <h2>关于</h2>
+                <p>番茄工作法是一种时间管理方法。对许多人来说，时间是人类的大敌。时间的限制带来的焦虑，将导致工作和学习效率的降低，时间的延迟。用番茄工作法，和时间结为盟友。</p>
 
-            <p>本应用Do today是番茄工作法的网络应用实现，同时还有任务管理的功能，一天工作各时间段所做的任务及完成比例都记录到本地存储，写日报就直接拷贝过来好了 :D</p>
+                <p>本应用Do today是番茄工作法的网络应用实现，同时还有任务管理的功能，一天工作各时间段所做的任务及完成比例都记录到本地存储，写日报就直接拷贝过来好了 :D</p>
 
-            <h2>番茄工作法的基本流程</h2>
-            <ol>
-                <li>添加任务</li>
-                <li>设置一个25分钟计时器
-                <li>工作到计时器响起来，检查任务完成情况</li>
-                <li>休息5分钟</li>
-                <li>如此循环，每完成四个西红柿进行一次长时间休息</li>
-            </ol>
+                <h3>番茄工作法的基本流程</h3>
+                <ol>
+                    <li>添加任务</li>
+                    <li>设置一个25分钟计时器
+                    <li>工作到计时器响起来，检查任务完成情况</li>
+                    <li>休息5分钟</li>
+                    <li>如此循环，每完成四个西红柿进行一次长时间休息</li>
+                </ol>
+            </div>
 
+            <hr>
            
+            <h2>使用</h2>
+
+
             <h3>初始画面</h3>
             <p>这是你看到的初始页面，开始吧！<img src="images/page-help/initial.png"></p>
             

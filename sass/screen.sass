@@ -44,212 +44,211 @@
 		background: url(../images/sprites.png) 0 -93px no-repeat
 		left: 68px
 		top: -10px
-		+hide-text()
-	.page-title
-		clear: both
+		+hide-text
 
 #nav
 	position: absolute
-	right: 0
-	top: 0
 	ul
-		+float-right()
-		margin-top: .5em
-		li
-			+float-right()
-			margin-right: 1em
-
-#mask
-	position: absolute
-	z-index: 2
-	left: 0
-	right: 0
-	bottom: 0
-	top: 72px
-	background: rgba($background-color, 1)
-	.mask-message
-		margin: 40px auto
-		text-align: center
+		+horizontal-list
 
 #content
 	position: relative
 	padding-top: 20px
 	margin: 0 auto
-	font-size: 1.1em
-			
-#timer
-	height: 66px
-	margin: 10px 0 30px
-	background: url(../images/sprites.png) -4px -6px
-	position: relative
-	.timer-time, .timer-progress
-		height: 36px
-		margin-top: 20px
-		float: left
-	.timer-time
-		width: 50px
-		margin-left: 18px
-		font-size: 18px
-		font-weight: bold 
-		line-height: 36px
-	.timer-progress
-		width: 20px
-		margin-left: 6px
-		+linear-gradient(color-stops(#B1AD3F, #A4A148), left)
-		+border-radius(5px)
-	.timer-start
-		margin: 9px 0 0 5px
-		+triangle
-	.timer-start.started
-		width: 8px
-		height: 14px
-		background: #FFF
-		border: none
-		margin: 11px 0 0 6px
-	.timer-start.stopped
-		+rotateZ(180deg)
 
-#task
-	background: transparent
-	font-size: 1em
-	.ui-widget-content
-		color: $font-color
-	.ui-tabs-nav a
-		color: $font-color
-	.task-list-container
+.page-do
+	#nav
+		right: .5em
+		top: .5em
+	#mask
+		position: absolute
+		z-index: 2
+		left: 0
+		right: 0
+		bottom: 0
+		top: 72px
+		background: rgba($background-color, 1)
+		.mask-message
+			margin: 40px auto
+			text-align: center
+
+	#timer
+		height: 66px
+		margin: 10px 0 30px
+		background: url(../images/sprites.png) -4px -6px
 		position: relative
-		> .actions .button
-			@extend .button-dt
-			&.active
-				background: $notice-color
-				+border-radius(4px)
-				color: $link-color
-	.task-default
-		display: none
-	.task-list-empty
-		ul
-			list-style: none
-		.task-default
-			display: list-item
-		.button-reorder
-			display: none
+		.timer-time, .timer-progress
+			height: 36px
+			margin-top: 20px
+			float: left
+		.timer-time
+			width: 50px
+			margin-left: 18px
+			font-size: 18px
+			font-weight: bold 
+			line-height: 36px
+		.timer-progress
+			width: 20px
+			margin-left: 6px
+			+linear-gradient(color-stops(#B1AD3F, #A4A148), left)
+			+border-radius(5px)
+		.timer-start
+			margin: 9px 0 0 5px
+			+triangle
+		.timer-start.started
+			width: 8px
+			height: 14px
+			background: #FFF
+			border: none
+			margin: 11px 0 0 6px
+		.timer-start.stopped
+			+rotateZ(180deg)
 
-	.task-add
-		position: relative
-		margin-bottom: 1.5em
-		input
-			font-size: 12px
-			padding: 4px
-			width: 498px
-			+border-radius(4px, 4px)
-			border: 2px inset threedface
-			&:focus
-				border-color: yellow
-		.ui-trigger
-			position: absolute
-			right: 2px
-			top: 4px
-			background: url(../images/sprites.png) -107px -174px
-			width: 10px
-			height: 12px
-			margin-top: 4px
-
-	.task-list
-		list-style: none
-		margin: 0 1em 1em
-		.task
-			border-bottom: 1px dotted #000
-			padding: .5em
+	#task
+		background: transparent
+		font-size: 1em
+		.ui-widget-content
+			color: $font-color
+		.ui-tabs-nav a
+			color: $font-color
+		.task-list-container
 			position: relative
-			.task
-				border: none
-				border-top: 1px dotted #000
-			&:hover
-				.actions
-					visibility: visible
-			.actions
-				+float-right()
-				*margin-top: -25px
-				.button
-					margin-top: 6px
-					width: 13px
-					height: 13px
-					+hide-text
-					background-image: url(../images/sprites.png)
-				.task-actions-trigger
-					background-position: -129px -173px
-				.task-actions-notes
-					background-position: -171px -173px
-			span
-				margin: 0 .5em 0 0
-
-				
-			.ui-icon-arrowthick-2-n-s
-				position: absolute
-				right: 0
-				top: 50%
-				margin-top: -8px
-				visibility: hidden
-			.task-progress-container
+			> .actions .button
+				@extend .button-dt
+				&.active
+					background: $notice-color
+					+border-radius(4px)
+					color: $link-color
+		.task-default
+			display: none
+		.task-list-empty
+			ul
+				list-style: none
+			.task-default
+				display: list-item
+			.button-reorder
 				display: none
-				height: 30px
-				line-height: 30px
-				padding: 10px 10px
-				position: absolute
-				top: -50px
-				left: -45px
-				background: rgba($background-color, 0.7)
-				+box-shadow()
-				+border-radius(5px)
-				*width: 109px
-				.task-progress
-					width: 60px
-					margin: 8px 0 0 10px
-				.triangle
-					+triangle(bottom, 10px, rgba($background-color, 0.7))
-					position: absolute
-					bottom: -10px
-					left: 50px
-			.task-check
-				cursor: pointer
-				width: 17px
-				height: 17px
-				margin: 0 1em 0 0
-				border: 1px solid rgba($background-color, 0.7)
-				+border-radius(5px)
-				+hide-text()
-				color: $dark-color
-				&:hover
-					+box-shadow()
-					text-indent: 4px
-					.task-progress-container
-						display: block
-	.task-session
-		list-style: upper-roman outside
-	.task-notes
-		list-style: disc inside
-	.sortable
-		cursor: move
-		.task
-			.ui-icon-arrowthick-2-n-s
-				visibility: visible !important
-			.actions
-				visibility: hidden !important
 
-.task-priority
-	border-bottom: none !important
-	li
-		+horizontal-list-item(2px)
-		cursor: pointer
-		border: 1px solid #222
-		line-height: 1.1
-		margin-right: .2em
-		color: darken(#FFF, 20%)
-.task-priority-0
-	color: #202020
-.task-priority-1
-	color: red
-.task-priority-2
-	color: #007700
-.task-priority-3
-	color: #006699
+		.task-add
+			position: relative
+			margin-bottom: 1.5em
+			input
+				font-size: 12px
+				padding: 4px
+				width: 498px
+				+border-radius(4px, 4px)
+				border: 2px inset threedface
+				&:focus
+					border-color: yellow
+			.ui-trigger
+				position: absolute
+				right: 2px
+				top: 4px
+				background: url(../images/sprites.png) -107px -174px
+				width: 10px
+				height: 12px
+				margin-top: 4px
+
+		.task-list
+			list-style: none
+			margin: 0 1em 1em
+			.task
+				border-bottom: 1px dotted #000
+				padding: .5em
+				position: relative
+				.task
+					border: none
+					border-top: 1px dotted #000
+				&:hover
+					.actions
+						visibility: visible
+				.actions
+					+float-right()
+					*margin-top: -25px
+					.button
+						margin-top: 6px
+						width: 13px
+						height: 13px
+						+hide-text
+						background-image: url(../images/sprites.png)
+					.task-actions-trigger
+						background-position: -129px -173px
+					.task-actions-notes
+						background-position: -171px -173px
+				span
+					margin: 0 .5em 0 0
+
+				.ui-icon-arrowthick-2-n-s
+					position: absolute
+					right: 0
+					top: 50%
+					margin-top: -8px
+					visibility: hidden
+				.task-progress-container
+					display: none
+					height: 30px
+					line-height: 30px
+					padding: 10px 10px
+					position: absolute
+					top: -50px
+					left: -45px
+					background: rgba($background-color, 0.7)
+					+box-shadow()
+					+border-radius(5px)
+					*width: 109px
+					.task-progress
+						width: 60px
+						margin: 8px 0 0 10px
+					.triangle
+						+triangle(bottom, 10px, rgba($background-color, 0.7))
+						position: absolute
+						bottom: -10px
+						left: 50px
+				.task-check
+					cursor: pointer
+					width: 17px
+					height: 17px
+					margin: 0 1em 0 0
+					border: 1px solid rgba($background-color, 0.7)
+					+border-radius(5px)
+					+hide-text()
+					color: $dark-color
+					&:hover
+						+box-shadow()
+						text-indent: 4px
+						.task-progress-container
+							display: block
+		.task-session
+			list-style: upper-roman outside
+		.task-notes
+			list-style: disc inside
+		.sortable
+			cursor: move
+			.task
+				.ui-icon-arrowthick-2-n-s
+					visibility: visible !important
+				.actions
+					visibility: hidden !important
+
+	.task-priority
+		border-bottom: none !important
+		li
+			+horizontal-list-item(2px)
+			cursor: pointer
+			border: 1px solid #222
+			line-height: 1.1
+			margin-right: .2em
+			color: darken(#FFF, 20%)
+	.task-priority-0
+		color: #202020
+	.task-priority-1
+		color: red
+	.task-priority-2
+		color: #007700
+	.task-priority-3
+		color: #006699
+
+
+.page-intro
+	#nav
+	
