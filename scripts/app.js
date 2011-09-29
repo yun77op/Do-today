@@ -210,6 +210,8 @@ define(function(require, exports, module) {
 
 	Task.util.removeTask = function(e, id) {
 		Task.storeCurrent.rm(id);
+		Task.storeCurrent.persist();
+		Storage.remove(id);
 	};
 
 	Task.util.makeSessionList = function(selector, date) {
@@ -272,12 +274,7 @@ define(function(require, exports, module) {
 		target == '#task-today-all' && Task.init.today();
 	});
 
-	$(document).bind('task:autocomplete:remove', function(e, id) {
-		Task.storeHidden.rm(id);
-		Task.storeHidden.persist();
-		Storage.remove(id);
-	});
-
+	$(document).bind('task:autocomplete:remove', Task.util.removeTask);
 
 	$(document).bind('init:domReady', function() {
 		Timer.initialize('work');
@@ -285,7 +282,7 @@ define(function(require, exports, module) {
 		$('#mask').fadeOut();
 	});
 
-	
+
 	function getDateHandle(date) {
 		if (date == undefined) {
 			date = Date.now();

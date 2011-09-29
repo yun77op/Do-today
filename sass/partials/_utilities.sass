@@ -1,4 +1,5 @@
 @import "compass/typography/text/force-wrap"
+@import "blueprint/link-icons"
 
 =triangle($direction: right, $w: 10px, $color: #FFF)
 	width: 0
@@ -144,3 +145,6 @@ $use-mozilla-ellipsis-binding: true
 	&:hover
 		color: $link-color
 		+box-shadow()
+
+.link-icon
+	+link-icon-base

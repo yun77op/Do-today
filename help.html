@@ -5,79 +5,79 @@
 <!--[if IE 9 ]>    <html lang="zh-CN" class="ie9"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="zh-CN" class="no-js"> <!--<![endif]-->
 <head>
-    <meta charset="utf-8">
-    <title>关于和帮助 | Do today</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="robots" content="index,follow"> 
-    <meta name="robots" content="noodp">
-    <link href="stylesheets/screen.css" media="screen, projection" rel="stylesheet">
-    <link href="stylesheets/tipsy.css" media="screen, projection" rel="stylesheet">
-    <link type="image/x-icon" href="/favicon.ico" rel="shortcut icon">
+	<meta charset="utf-8">
+	<title>关于和帮助 | Do today</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="robots" content="index,follow"> 
+	<meta name="robots" content="noodp">
+	<link href="stylesheets/screen.css" media="screen, projection" rel="stylesheet">
+	<link href="scripts/lib/fancybox/jquery.fancybox-1.3.4.css" media="screen, projection" rel="stylesheet">
+	<link type="image/x-icon" href="/favicon.ico" rel="shortcut icon">
 </head>
 <body class="page-intro">
-    <div id="container">
-        <div id="header" class="clearfix">
-            <h1 class="site-title"><a href="/">Do today</a></h1>
-            <div class="sub-title"></div>
-            <div id="nav">
-                <ul>
-                    <li><a href="#overview">简介</a></li>
-                    <li><a href="#howtouse">使用</a></li>
-                    <li><a href="#source">源码</a></li>
-                    <li><a href="#contact">联系</a></li>
-                </ul>
-            </div>
-        </div>
-        <div id="content">
-            <div class="section">
-                <h2>简介</h2>
-                <p>番茄工作法是一种时间管理方法。对许多人来说，时间是人类的大敌。时间的限制带来的焦虑，将导致工作和学习效率的降低，时间的延迟。用番茄工作法，和时间结为盟友。</p>
-
-                <p>本应用Do today是番茄工作法的网络应用实现，同时还有任务管理的功能，一天工作各时间段所做的任务及完成比例都记录到本地存储，写日报就直接拷贝过来好了 :D</p>
-
-                <h3>番茄工作法的基本流程</h3>
-                <ol>
-                    <li>添加任务</li>
-                    <li>设置一个25分钟计时器
-                    <li>工作到计时器响起来，检查任务完成情况</li>
-                    <li>休息5分钟</li>
-                    <li>如此循环，每完成四个西红柿进行一次长时间休息</li>
-                </ol>
-            </div>
-
-            <hr>
-           
-            <div class="section">
-                <h2>使用</h2>
-
-                <h3>基本使用</h3>
-                <span>添加任务</span>
-                点击添加任务输入框，输入要添加的任务，然后按键盘回车键就添加好了
-                <div>
-                    <img src="images/page-help/task-add.png">
-                </div>
-                <h3>计时器</h3>
-                <p>点击三角开始计时，然后你可以专心工作去了<img src="images/page-help/timer.png"></p>
-                
-
-                <h3>计时结束</h3>
-                <p>检查任务完成情况，如下图，比如说完成了48%<img src="images/page-help/session-done.png"></p>
-                
-
-                <h2>高级使用</h2>
-
-                <h3>对单个任务操作</h3>
-                <p>单击任务名编辑任务<img src="images/page-help/task-edit.png"></p>
-                <p>点击任务右边的小按钮会弹出更多操作任务的选项</p>
-                <p><img src="images/page-help/task-action.png"></p>
-                <p>假如隐藏了任务，任务会暂时从当前任务列表中消失，而当你添加任务时，会有自动补全的效果的哦，另外，点击任务添加输入框的右边的小按钮，可显示所有的隐藏的任务。</p>
-                <p><img src="images/page-help/task-hidden-add.png"></p>
-
-                <h3>历史记录</h3>
-                <p>点击查看全部按钮可以查看今日的工作记录，同样点击往日记录可查看往日的任务记录</p>
-                <p><img src="images/page-help/today.png"></p>
-            </div>
-        </div><!-- #content -->
-    </div> <!-- #container -->
+	<div id="container">
+		<div id="header" class="clearfix">
+			<h1 class="site-title"><a href="/">Do today</a></h1>
+			<div class="sub-title"></div>
+			<div id="nav">
+				<ul>
+					<li><a href="#overview">简介</a></li>
+					<li><a href="#howtouse">使用</a></li>
+					<li><a href="#get">源码</a></li>
+					<li><a href="#contact">联系</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="content">
+			<div class="section" id="overview">
+				<h2>简介</h2>
+				<p>番茄工作法是一种时间管理方法。对许多人来说，时间是人类的大敌。时间的限制带来的焦虑，将导致工作和学习效率的降低，时间的延迟。用番茄工作法，和时间结为盟友。</p>
+				<p>本应用Do today是番茄工作法的网络应用实现，同时还有任务管理的功能，一天工作各时间段所做的任务及完成比例都记录到本地存储，写日报就直接拷贝过来好了 :D</p>
+				<h3>番茄工作法的基本流程</h3>
+				<ol>
+					<li>添加任务</li>
+					<li>设置一个25分钟计时器
+					<li>工作到计时器响起来，检查任务完成情况</li>
+					<li>休息5分钟</li>
+					<li>如此循环，每完成四个周期进行一次长时间休息</li>
+				</ol>
+			</div>
+			<hr>
+			<div class="section" id="howtouse">
+				<h2>使用</h2>
+				<h3>基本使用</h3>
+				<ul class="thumbnail-list">
+					<li>
+						<div class="thumbnail">
+							<a href="images/page-help/task-add.png" title="点击添加任务输入框，输入要添加的任务，然后按键盘回车键就添加好了"><img src="images/page-help/thumbnail/task-add.png"></a>
+							<span class="thumbnail-desc">添加任务</span>
+						</div>
+					</li>
+				</ul>
+				<h3>高级操作</h3>
+				<ul class="thumbnail-list">
+					<li>
+						<div class="thumbnail">
+							<a href="images/page-help/task-add.png" title="点击添加任务输入框，输入要添加的任务，然后按键盘回车键就添加好了"><img src="images/page-help/thumbnail/task-add.png"></a>
+							<span class="thumbnail-desc">添加任务</span>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="section" id="get">
+				<h2>源码</h2>
+				<p>Respository(git): <a href="https://github.com/yun77op/Do-today" target="_blank">https://github.com/yun77op/Do-today</a></p>
+			</div>
+			<div class="section" id="contact">
+				<h2>联系</h2>
+				<p><a href="http://weibo.com/holohuhu" class="link-icon link-icon-weibo" target="_blank">@thislovess</a></p>
+			</div>
+		</div><!-- #content -->
+	</div> <!-- #container -->
+	<script src="scripts/lib/jquery-1.6.2.min.js"></script>
+	<script src="scripts/lib/fancybox/jquery.fancybox-1.3.4.pack.js"></script>
+	<script>
+		$('.thumbnail-list .thumbnail a').fancybox();
+	</script>
 </body>
 </html>
