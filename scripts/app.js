@@ -5,25 +5,23 @@ define(function(require, exports, module) {
 	};
 
 	var app = require('./base');
-	var initMods = require('./init-mods');
+	var initPlugins = require('./init_plugins');
 	var message = require('./message');
+	var settings = require('./settings.js'),
+			storage = require('./storage.js'),
+			timerPlugin = require('./timer.js');
 
-	var Settings = require('./settings.js'),
-			Storage = require('./storage.js'),
-			Timer = require('./timer.js');
-
-	app.use(initMods);
+	app.use(initPlugins, true);
 
 	//Connect timer with task with storage
 
-	var mods = app.getMods();
-	var Task = mods.task,
+	var taskPlugin = app.task,
 			messageMain = message.generate('main', {
 				className: 'notice'
 			});
 
 		messageMain.show = _.wrap(messageMain.show, function(show) {
-			if (Settings.get('notification', 'popup')) {
+			if (settings.get('notification', 'popup')) {
 				var args = Array.prototype.slice.call(arguments, 1);
 				show.apply(messageMain, args);
 			}
@@ -33,9 +31,9 @@ define(function(require, exports, module) {
 			initial = false;
 
 	$(document).bind('timer:beforeStart', function() {
-		if (!initial && !Storage.set('current')) {
+		if (!initial && !storage.set('current')) {
 			if(confirm('你不添加个任务先？')) {
-				$('input', Task.el)[0].focus();
+				$('input', taskPlugin.el)[0].focus();
 				return true;
 			}
 			initial = true;
@@ -43,12 +41,12 @@ define(function(require, exports, module) {
 	});
 
 	$(document).bind('timer:action:reset', function(e) {
-		Timer.initialize('work');
+		timerPlugin.initialize('work');
 	});
 
 	$(document).bind('timer:complete', function(e) {
 		working = !working;
-		Timer.initialize(working ? 'work' : 'break');
+		timerPlugin.initialize(working ? 'work' : 'break');
 		if (!working) {
 			messageMain.option({
 				actions: null,
@@ -69,14 +67,14 @@ define(function(require, exports, module) {
 			});
 			messageMain.show();
 		}
-		if (!working) { Timer.run(); }
+		if (!working) { timerPlugin.run(); }
 	});
 
 	window.messageMain = messageMain;
 
 	$(document).bind('timer:settings:changed', function(e, key, value) {
-		if (key === 'work' && working && !Timer.isActive()) {
-			Timer.initialize('work');
+		if (key === 'work' && working && !timerPlugin.isActive()) {
+			timerPlugin.initialize('work');
 		}
 	});
 
@@ -132,9 +130,9 @@ define(function(require, exports, module) {
 	/**
 	 *@namespace Task init functions
 	 */
-	Task.init = function() {
-		var taskInit = Task.init;
-		Task.store = new Store(Storage);
+	taskPlugin.init = function() {
+		var taskInit = taskPlugin.init;
+		taskPlugin.store = new Store(storage);
 		for (var i in taskInit) {
 			if (taskInit.hasOwnProperty(i)) {
 				taskInit[i]();
@@ -142,48 +140,48 @@ define(function(require, exports, module) {
 		}
 	};
 	
-	Task.init.current = function() {
-		Task.storeCurrent = Task.store.register('current');
- 		var currentArr = Storage.set('current');
+	taskPlugin.init.current = function() {
+		taskPlugin.storeCurrent = taskPlugin.store.register('current');
+		var currentArr = storage.set('current');
 		if (currentArr && currentArr.length > 0) {
 			_.each(currentArr, function(id) {
-				var task = Storage.set(id);
-				Task.addToCurrent(task);
-				Task.storeCurrent.set(id, task);
+				var task = storage.set(id);
+				taskPlugin.addToCurrent(task);
+				taskPlugin.storeCurrent.set(id, task);
 			});
 		}
 	};
 
-	Task.init.hidden = function() {
+	taskPlugin.init.hidden = function() {
 		var source = [],
-				hiddenArr = Storage.set('hidden');
-		Task.storeHidden = Task.store.register('hidden');
+				hiddenArr = storage.set('hidden');
+		taskPlugin.storeHidden = taskPlugin.store.register('hidden');
 		if (hiddenArr) {
 			_.each(hiddenArr, function(id) {
-				var task = Storage.set(id);
-				Task.storeHidden.set(id, task);
+				var task = storage.set(id);
+				taskPlugin.storeHidden.set(id, task);
 				source.push({
 					id: id,
-					value: task.content
+					value: taskPlugin.content
 				});
 			});
 		}
-		Task.initAutocomplete(source);
+		taskPlugin.initAutocomplete(source);
 	};
 
-	Task.init.today = function() {
-		Task.util.makeSessionList('#task-today-all', Date.now());
+	taskPlugin.init.today = function() {
+		taskPlugin.util.makeSessionList('#task-today-all', Date.now());
 	};
 
 
 	/**
 	 * @namespace Task attributes change handlers
 	 */
-	Task.fn = {};
+	taskPlugin.fn = {};
 
-	Task.fn.progress = function(id, key, val) {
+	taskPlugin.fn.progress = function(id, key, val) {
 		var dateHandle = getDateHandle();
-		Storage.modify([dateHandle, id], function(data) {
+		storage.modify([dateHandle, id], function(data) {
 			if (data == undefined) {
 				data = [0];
 			}
@@ -192,8 +190,8 @@ define(function(require, exports, module) {
 		});
 	};
 
-	Task.fn.notes = function (id, key, val) {
-		var task = Task.storeCurrent.get(id),
+	taskPlugin.fn.notes = function (id, key, val) {
+		var task = taskPlugin.storeCurrent.get(id),
 				data = task[key];
 		if (data == undefined) {
 			data = [val];
@@ -206,79 +204,79 @@ define(function(require, exports, module) {
 	/**
 	 * @namespace
 	 */
-	Task.util = {};
+	taskPlugin.util = {};
 
-	Task.util.removeTask = function(e, id) {
-		Task.storeCurrent.rm(id);
-		Task.storeCurrent.persist();
-		Storage.remove(id);
+	taskPlugin.util.removeTask = function(e, id) {
+		taskPlugin.storeCurrent.rm(id);
+		taskPlugin.storeCurrent.persist();
+		storage.remove(id);
 	};
 
-	Task.util.makeSessionList = function(selector, date) {
+	taskPlugin.util.makeSessionList = function(selector, date) {
 		var date = getDateHandle(date),
-				items = Storage.set(date);
+				items = storage.set(date);
 		if (items == null) {
 			items = [];
 		}
 		items = _.map(items, function(item, id) {
 			return {
 				progress: item,
-				task: Storage.set(id)
+				task: storage.set(id)
 			};
 		});
-		Task.makeSessionList(items, selector);
+		taskPlugin.makeSessionList(items, selector);
 	};
 
 	$(document).bind('task:add', function(e, task) {
-		var id = task.id;
-		Storage.set(id, task);
-		Task.storeCurrent.set(id, task);
-		Task.storeCurrent.persist();
+		var id = taskPlugin.id;
+		storage.set(id, task);
+		taskPlugin.storeCurrent.set(id, task);
+		taskPlugin.storeCurrent.persist();
 	});
 
-	$(document).bind('task:del', Task.util.removeTask);
-	$(document).bind('task:check', Task.util.removeTask);
+	$(document).bind('task:del', taskPlugin.util.removeTask);
+	$(document).bind('task:check', taskPlugin.util.removeTask);
 
 	$(document).bind('task:beforeAdd', function(e, id) {
-		var task = Task.storeHidden.get(id);
+		var task = taskPlugin.storeHidden.get(id);
 		if (task) {
-			Task.storeHidden.rm(id);
-			Task.storeHidden.persist();
+			taskPlugin.storeHidden.rm(id);
+			taskPlugin.storeHidden.persist();
 			return task;
 		}
 	});
 
 	$(document).bind('task:hide', function(e, id) {
-		var task = Task.storeCurrent.rm(id);
-		Task.storeCurrent.persist();
-		Task.storeHidden.set(id, task);
-		Task.storeHidden.persist();
+		var task = taskPlugin.storeCurrent.rm(id);
+		taskPlugin.storeCurrent.persist();
+		taskPlugin.storeHidden.set(id, task);
+		taskPlugin.storeHidden.persist();
 	});
 
 	$(document).bind('task:change', function(e, id, key, val) {
-		var task = Task.storeCurrent.get(id),
+		var task = taskPlugin.storeCurrent.get(id),
 				result;
-		if (typeof Task.fn[key] != 'undefined' &&
-				(result = Task.fn[key].call(null, id, key, val)) != undefined) {
+		if (typeof taskPlugin.fn[key] != 'undefined' &&
+				(result = taskPlugin.fn[key].call(null, id, key, val)) != undefined) {
 			val = result;
 		}
 		task[key] = val;
-		Storage.set(id, task);
+		storage.set(id, task);
 	});
 
 	$(document).bind('task:date:change', function(e, dateText) {
-		Task.util.makeSessionList('#task-past-content', dateText);
+		taskPlugin.util.makeSessionList('#task-past-content', dateText);
 	});
 
 	$(document).bind('task:containerToggle', function(e, target) {
-		target == '#task-today-all' && Task.init.today();
+		target == '#task-today-all' && taskPlugin.init.today();
 	});
 
-	$(document).bind('task:autocomplete:remove', Task.util.removeTask);
+	$(document).bind('task:autocomplete:remove', taskPlugin.util.removeTask);
 
-	$(document).bind('init:domReady', function() {
-		Timer.initialize('work');
-		Task.init();
+	$(function() {
+		timerPlugin.initialize('work');
+		taskPlugin.init();
 		$('#mask').fadeOut();
 	});
 

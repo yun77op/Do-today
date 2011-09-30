@@ -162,9 +162,9 @@
 					.actions
 						visibility: visible
 				.actions
+					visibility: hidden
 					+float-right()
 					*margin-top: -25px
-					visibility: hidden
 					.button
 						margin-top: 6px
 						width: 13px
@@ -211,11 +211,10 @@
 					margin: 0 1em 0 0
 					border: 1px solid rgba($background-color, 0.7)
 					+border-radius(5px)
-					+hide-text()
 					color: $dark-color
 					&:hover
 						+box-shadow()
-						text-indent: 4px
+						background: url(../images/sprites.png) -149px -173px
 						.task-progress-container
 							display: block
 		.task-session

@@ -1,125 +1,28 @@
 define(function(require, exports, module) {
+	var app = {
+		use: use
+	};
 
+	function use(plugins, DOMready) {
+		_.each(plugins, function(plugin, key) {
+			_use(key, plugin, DOMready);
+		});
+		
+		return this;
+	}
 
-    (function(){
-  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
+	function _use(key, plugin, DOMready) {
+		var fn = plugin.fn,
+				fnWrapper = function() {
+					fn.call(null, app, plugin);
+				};
+		app[key] = plugin;
+		if (DOMready) {
+			$(fnWrapper);
+		} else {
+			fnWrapper();
+		}
+	}
 
-  // The base Class implementation (does nothing)
-  this.Class = function(){};
- 
-  // Create a new Class that inherits from this class
-  Class.extend = function(prop) {
-    var _super = this.prototype;
-   
-    // Instantiate a base class (but only create the instance,
-    // don't run the init constructor)
-    initializing = true;
-    var prototype = new this();
-    initializing = false;
-   
-    // Copy the properties over onto the new prototype
-    for (var name in prop) {
-      // Check if we're overwriting an existing function
-      prototype[name] = typeof prop[name] == "function" &&
-        typeof _super[name] == "function" && fnTest.test(prop[name]) ?
-        (function(name, fn){
-          return function() {
-            var tmp = this._super;
-           
-            // Add a new ._super() method that is the same method
-            // but on the super-class
-            this._super = _super[name];
-           
-            // The method only need to be bound temporarily, so we
-            // remove it when we're done executing
-            var ret = fn.apply(this, arguments);       
-            this._super = tmp;
-           
-            return ret;
-          };
-        })(name, prop[name]) :
-        prop[name];
-    }
-   
-    // The dummy class constructor
-    function Class() {
-      // All construction is actually done in the init method
-      if ( !initializing && this.init )
-        this.init.apply(this, arguments);
-    }
-   
-    // Populate our constructed prototype object
-    Class.prototype = prototype;
-   
-    // Enforce the constructor to be what we expect
-    Class.constructor = Class;
-
-    // And make this class extendable
-    Class.extend = arguments.callee;
-   
-    return Class;
-  };
-})();
-
-
-    
-    return  {
-        _mods: {},
-                
-        initedMods: [],
-
-        getMods: function() {
-            return this._mods;
-        },
-
-        use: function(mod) {
-            var o = this;
-
-            if (!_.isArray(mod)) {
-                mod = [mod];
-            } else if (_.isString(mod) && arguments[1] !== undefined) {
-                mod = {
-                        mod: arguments[1]
-                };
-            }
-
-            _.each(mod, function(mod_) {
-                o._use(mod_);
-            });
-        },
-
-        _use: function(mod) {
-            _.extend(this._mods, mod);
-        },
-
-        _init: function() {
-            var o = this,
-                mods = o._mods,
-                handles = _.keys(mods);
-
-            (function next() {
-                var handle = handles.shift(),
-                    mod = mods[handle],
-                    err = null;
-                if (!mod) {
-                    return;    
-                }
-
-                mod.func(o, mod, next);
-                o.initedMods.push(handle);
-                $(document).trigger('init:mod:' + handle);
-                next();
-            })();
-        },
-
-        init: function() {
-            var o = this;
-            $(document).trigger('init');
-            $(document).ready(function() {
-                o._init();
-                $(document).trigger('init:domReady');
-            });
-            $(document).trigger('init:complete');
-        }
-    };
+	return app;
 });

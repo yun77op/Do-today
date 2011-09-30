@@ -98,7 +98,8 @@ define(function(require, exports, module) {
 		initialize: initialize,
 		isActive: function() {
 			return active;
-		}
+		},
+		run: run
 	};
 
 });

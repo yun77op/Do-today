@@ -1,39 +1,27 @@
 define(function(require, exports, module) {
-
-	var Util = require('./util.js'),
-		Settings = require('./settings.js'),
-		ObjectID = require('./lib/objectid').ObjectID;
-
-	$('.func-tipsy').tipsy();
+	var settings = require('./settings.js'),
+			ObjectID = require('./lib/objectid').ObjectID;
 
 	return {
-		detect: {
-			func: function() {
-				//baidu iframe
-				if (window != parent) {
-					$('body').addClass('iframe');
-					var params = Util.getPageParams();
-					if (params['canvas_pos'] === 'search') {
-						$('body').addClass('iframe-small');
-					}
-				}
+		base: {
+			fn: function() {
+				$('.func-tipsy').tipsy();
 			}
 		},
-
+		
 		settings: {
-			func: function(app, plugin) {
-				Settings.registerNamespace('timer', '计时器');
-				Settings.registerNamespace('notification', '提醒');
+			fn: function(app, plugin) {
+				settings.registerNamespace('timer', '计时器');
+				settings.registerNamespace('notification', '提醒');
 
-				Settings.registerKey('timer', 'work', '工作间隔', 25, []);
-				Settings.registerKey('timer', 'break', '休息间隔', 5, []);
+				settings.registerKey('timer', 'work', '工作间隔', 25, []);
+				settings.registerKey('timer', 'break', '休息间隔', 5, []);
 
-				Settings.registerKey('notification', 'popup', '弹出提示', true, []);
-				Settings.registerKey('notification', 'sound', '声音提示', true, []);
+				settings.registerKey('notification', 'popup', '弹出提示', true, []);
+				settings.registerKey('notification', 'sound', '声音提示', true, []);
 
 				var el = $('#settings');
-				
-				var data = Settings.data();
+				var data = settings.data();
 				var dialogSettings = new EJS({url: 'views/settings-dialog.ejs'}).render({settings: data});
 				dialogSettings = $(dialogSettings);
 				dialogSettings.hide().appendTo('body').dialog({
@@ -47,26 +35,24 @@ define(function(require, exports, module) {
 				});
 
 				el = $('#ui-dialog-settings');
-
 				el.delegate('input', 'change', function() {
 					var el = $(this);
 					var arr = el.attr('id').split('-');
 					var ns = arr[1], key = arr[2], value;
 
 					value = el.attr('type') == 'checkbox'? el.prop('checked') : el.val();
-					Settings.set(ns, key, value);
+					settings.set(ns, key, value);
 				});
 
-				Settings.subscribe('timer', 'work', function(value) {
+				settings.subscribe('timer', 'work', function(value) {
 					$(document).trigger('timer:settings:changed', ['work', value]);
 				});
 			}
 		},
 
 		task: {
-			func: function(app, plugin) {
+			fn: function(app, plugin) {
 				var el = plugin.el = $('#task');
-
 				el.tabs({
 					select: function(event, ui) {
 						if (ui.index == 1) {
@@ -76,7 +62,7 @@ define(function(require, exports, module) {
 						}
 					}
 				});
-				
+	
 				//sort
 				var sortable = true;
 				el.delegate('.actions .button-reorder', 'click', function(e) {
@@ -127,12 +113,13 @@ define(function(require, exports, module) {
 						this.taskNotes = $('.task-actions-notes', this.el).overlay({
 							srcNode: '#ui-overlay-notes',
 							visible: false,
+							offset: [10, 10],
 							show: function(e, ui) {
 								$(document).trigger('overlay:notes', self);
 								$(this).overlay('option', {
 									align: {
 										node: e.target,
-										points: ['RT', 'LB']
+										points: ['RT', 'RB']
 									}
 								});
 							}
@@ -160,7 +147,8 @@ define(function(require, exports, module) {
 						});
 
 						$('.task-content', this.el).tipsy();
-
+						$('.task-actions-notes', this.el).tipsy();
+						$('.task-actions-trigger', this.el).tipsy();
 						return this;
 					},
 
@@ -337,7 +325,7 @@ define(function(require, exports, module) {
 		},
 
 		overlay: {
-			func: function() {
+			fn: function() {
 				var OverlayTaskActions = Backbone.View.extend({
 					el: $('#ui-overlay-task'),
 					events: {
