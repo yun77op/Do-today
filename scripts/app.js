@@ -4,6 +4,7 @@ define(function(require, exports, module) {
 		return new Date().getTime();  
 	};
 
+
 	var app = require('./base');
 	var initPlugins = require('./init_plugins');
 	var message = require('./message');

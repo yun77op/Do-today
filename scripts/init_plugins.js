@@ -1,11 +1,25 @@
 define(function(require, exports, module) {
 	var settings = require('./settings.js'),
 			ObjectID = require('./lib/objectid').ObjectID;
+	require('soundmanager2-nodebug-jsmin.js');
 
 	return {
 		base: {
 			fn: function() {
 				$('.func-tipsy').tipsy();
+
+				soundManager.url = '../assets/';
+				soundManager.flashVersion = 9;
+				soundManager.onready(function(oStatus) {
+					if (!oStatus.success) { return false; }
+					var sound = soundManager.createSound({
+						id: 'soundNotify',
+						url: '../assets/'
+					});
+					$(document).bind('timer:complete', function(e) {
+						sound.play({loop: 3});
+					});
+				});
 			}
 		},
 		
