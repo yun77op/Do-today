@@ -4,25 +4,6 @@ define(function(require, exports, module) {
 	require('soundmanager2-nodebug-jsmin.js');
 
 	return {
-		base: {
-			fn: function() {
-				$('.func-tipsy').tipsy();
-
-				soundManager.url = '../assets/';
-				soundManager.flashVersion = 9;
-				soundManager.onready(function(oStatus) {
-					if (!oStatus.success) { return false; }
-					var sound = soundManager.createSound({
-						id: 'soundNotify',
-						url: '../assets/'
-					});
-					$(document).bind('timer:complete', function(e) {
-						sound.play({loop: 3});
-					});
-				});
-			}
-		},
-		
 		settings: {
 			fn: function(app, plugin) {
 				settings.registerNamespace('timer', '计时器');
@@ -60,6 +41,25 @@ define(function(require, exports, module) {
 
 				settings.subscribe('timer', 'work', function(value) {
 					$(document).trigger('timer:settings:changed', ['work', value]);
+				});
+			}
+		},
+
+		soundNotify: {
+			fn: function() {
+				if (!settings.get('notification', 'sound')) { return; }
+
+				soundManager.url = '../assets/';
+				soundManager.flashVersion = 9;
+				soundManager.onready(function(oStatus) {
+					if (!oStatus.success) { return false; }
+					var sound = soundManager.createSound({
+						id: 'soundNotify',
+						url: '../assets/notify.mp3'
+					});
+					$(document).bind('timer:complete', function(e) {
+						sound.play({loop: 3});
+					});
 				});
 			}
 		},
@@ -112,7 +112,6 @@ define(function(require, exports, module) {
 						
 						this.taskActions = $('.task-actions-trigger', this.el).overlay({
 							srcNode: '#ui-overlay-task',
-							visible: false,
 							show: function(e, ui) {
 								$(document).trigger('overlay:task', self);
 								$(this).overlay('option', {
@@ -126,16 +125,13 @@ define(function(require, exports, module) {
 
 						this.taskNotes = $('.task-actions-notes', this.el).overlay({
 							srcNode: '#ui-overlay-notes',
-							visible: false,
-							offset: [10, 10],
+							position: {
+								offset: '10',
+								at: 'right top',
+								my: 'right bottom'
+							},
 							show: function(e, ui) {
 								$(document).trigger('overlay:notes', self);
-								$(this).overlay('option', {
-									align: {
-										node: e.target,
-										points: ['RT', 'RB']
-									}
-								});
 							}
 						});
 
@@ -160,6 +156,13 @@ define(function(require, exports, module) {
 							value: self.model.get('progress')
 						});
 
+						var taskContentEl = $('.task-content', this.el).hotedit({
+							callback: function(text) {
+								taskContentEl.text(text);
+								$(document).trigger('task:change', [self.model.get('id'), 'content', text]);
+							}
+						});
+
 						$('.task-content', this.el).tipsy();
 						$('.task-actions-notes', this.el).tipsy();
 						$('.task-actions-trigger', this.el).tipsy();
@@ -167,19 +170,9 @@ define(function(require, exports, module) {
 					},
 
 					events: {
-						'click .task-content': 'edit',
 						'click .task-check': 'check'
 					},
-
-					edit: function(e) {
-						var self = this;
-						var contentEl = $('.task-content', this.el);
-						contentEl.hotedit('edit', function(text) {
-							contentEl.text(text);
-							$(document).trigger('task:change', [self.model.get('id'), 'content', text]);
-						});
-					},
-
+			
 					check: function(e) {
 						var id = this.model.get('id');
 						if(e.target != e.currentTarget) { return; }

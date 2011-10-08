@@ -99,7 +99,8 @@ define(function(require, exports, module) {
 		isActive: function() {
 			return active;
 		},
-		run: run
+		run: run,
+		nativeNotity: (typeof webkitNotifications != 'undefined')
 	};
 
 });

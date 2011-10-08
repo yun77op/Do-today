@@ -4,6 +4,15 @@ define(function(require, exports, module) {
 		return new Date().getTime();  
 	};
 
+	function getDateHandle(date) {
+		if (date == undefined) {
+			date = Date.now();
+		}
+		if (!(typeof date == 'object' && date instanceof Date)) {
+			date = new Date(date);
+		}
+		return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
+	}
 
 	var app = require('./base');
 	var initPlugins = require('./init_plugins');
@@ -16,17 +25,12 @@ define(function(require, exports, module) {
 
 	//Connect timer with task with storage
 
-	var taskPlugin = app.task,
-			messageMain = message.generate('main', {
-				className: 'notice'
-			});
-
-		messageMain.show = _.wrap(messageMain.show, function(show) {
-			if (settings.get('notification', 'popup')) {
-				var args = Array.prototype.slice.call(arguments, 1);
-				show.apply(messageMain, args);
-			}
+	var taskPlugin = app.task;
+	if (!timerPlugin.nativeNotity) {
+		var messageMain = message.generate('main', {
+			className: 'notice'
 		});
+	}
 
 	var working = true,
 			initial = false;
@@ -48,30 +52,41 @@ define(function(require, exports, module) {
 	$(document).bind('timer:complete', function(e) {
 		working = !working;
 		timerPlugin.initialize(working ? 'work' : 'break');
-		if (!working) {
-			messageMain.option({
-				actions: null,
-				text: '休息，休息一下！'
-			});
-			messageMain.show(true);
+
+		if (!settings.get('notification', 'popup')) { return; }
+
+		var text = !working ? '休息，休息一下！' : '开始工作了！';
+		if (timerPlugin.nativeNotity) {
+			webkitNotifications.createNotification(
+				'/webstore/logo-48.png',
+				'时间到了',
+				text
+			).show();
 		} else {
-			messageMain.option({
-				actions: {
-					'dismiss': {
-						'label': '知道了',
-						'click': function() {
-							this.hide();
+			if (!working) {
+				messageMain.option({
+					actions: null,
+					text: text
+				});
+				messageMain.show(true);
+			} else {
+				messageMain.option({
+					actions: {
+						'dismiss': {
+							'label': '知道了',
+							'click': function() {
+								this.hide();
+							}
 						}
-					}
-				},
-				text: '开始工作了！'
-			});
-			messageMain.show();
+					},
+					text: text
+				});
+				messageMain.show();
+			}
 		}
+
 		if (!working) { timerPlugin.run(); }
 	});
-
-	window.messageMain = messageMain;
 
 	$(document).bind('timer:settings:changed', function(e, key, value) {
 		if (key === 'work' && working && !timerPlugin.isActive()) {
@@ -278,19 +293,9 @@ define(function(require, exports, module) {
 	$(function() {
 		timerPlugin.initialize('work');
 		taskPlugin.init();
+		$('.func-tipsy').tipsy();
 		$('#mask').fadeOut();
 	});
-
-
-	function getDateHandle(date) {
-		if (date == undefined) {
-			date = Date.now();
-		}
-		if (!(typeof date == 'object' && date instanceof Date)) {
-			date = new Date(date);
-		}
-		return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
-	}
 
 	window.app = app;
 	return app;
