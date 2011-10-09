@@ -1,7 +1,10 @@
 define(function(require, exports, module) {
 	var settings = require('./settings.js'),
 			ObjectID = require('./lib/objectid').ObjectID;
-	require('soundmanager2-nodebug-jsmin.js');
+	require('./lib/soundmanager2-nodebug-jsmin.js');
+	require('./jquery.hotedit.js');
+	require('./jquery.overlay.js');
+	require('./lib/jquery.tipsy.js');
 
 	return {
 		settings: {

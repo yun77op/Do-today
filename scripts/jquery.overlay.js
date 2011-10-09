@@ -36,13 +36,13 @@
 
 		_setOption: function(key, value) {
 			switch (key) {
-				'event':
+				case 'event':
 					this._setupEvents(value);
 					break;
-				'visible': 
+				case 'visible': 
 					this.options.srcNode[!value ? 'addClass' : 'removeClass']('ui-helper-hidden');
 					break;
-				'position':
+				case 'position':
 					$.extend(this.options.position, value);
 
 					return;
