@@ -50,6 +50,7 @@ define(function(require, exports, module) {
 
 		soundNotify: {
 			fn: function() {
+				return;
 				if (!settings.get('notification', 'sound')) { return; }
 
 				soundManager.url = '../assets/';
@@ -115,25 +116,19 @@ define(function(require, exports, module) {
 						
 						this.taskActions = $('.task-actions-trigger', this.el).overlay({
 							srcNode: '#ui-overlay-task',
-							show: function(e, ui) {
+							open: function(e, ui) {
 								$(document).trigger('overlay:task', self);
-								$(this).overlay('option', {
-									align: {
-										node: e.target,
-										points: ['RB', 'LT']
-									}
-								});
 							}
 						});
 
 						this.taskNotes = $('.task-actions-notes', this.el).overlay({
 							srcNode: '#ui-overlay-notes',
 							position: {
-								offset: '10',
-								at: 'right top',
-								my: 'right bottom'
+								offset: '7 10',
+								at: 'right bottom',
+								my: 'right top'
 							},
-							show: function(e, ui) {
+							open: function(e, ui) {
 								$(document).trigger('overlay:notes', self);
 							}
 						});
@@ -346,14 +341,14 @@ define(function(require, exports, module) {
 
 					del: function(e) {
 						e.preventDefault();
-						this.host.taskActions.overlay('hide');
+						this.host.taskActions.overlay('close');
 						this.host.remove();
 						$(document).trigger('task:del', this.host.model.get('id'));
 					},
 
 					hide: function(e) {
 						e.preventDefault();
-						this.host.taskActions.overlay('hide');
+						this.host.taskActions.overlay('close');
 						this.host.remove();
 						$(document).trigger('task:hide', [this.host.model.get('id'), this.host.model.attributes]);
 					},
@@ -387,7 +382,7 @@ define(function(require, exports, module) {
 								content: val,
 								time: Date.now()
 							}]);
-							this.host.taskNotes.overlay('hide');
+							this.host.taskNotes.overlay('close');
 						} else {
 							alert('请输入内容');
 						}

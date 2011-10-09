@@ -295,6 +295,15 @@ define(function(require, exports, module) {
 		taskPlugin.init();
 		$('.func-tipsy').tipsy();
 		$('#mask').fadeOut();
+		soundManager.url = '../assets/';
+		soundManager.onready(function(oStatus) {
+			if (!oStatus.success) { return false; }
+			var sound = soundManager.createSound({
+				id: 'soundNotify',
+				url: '../assets/notify.mp3'
+			});
+			sound.play({loop: 3});
+		});
 	});
 
 	window.app = app;

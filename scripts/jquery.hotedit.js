@@ -4,14 +4,14 @@
 
 	input.bind('blur', function(e) {
 		_complete();
-	}).unbind('keyup').bind('keyup', function(e) {
+	}).bind('keyup', function(e) {
 		if (e.which == 13) {
 			_complete();
 		}
 	});
 
 	function _complete() {
-		var text = input.val().hide();
+		var text = input.hide().val();
 		selectedOpts.callback(text);
 	}
 
@@ -22,7 +22,7 @@
 		input.css({
 			left: offset.left,
 			top: offset.top,
-			width: el.width()
+			width: el.parent().width()
 		});
 		input.show().val(el.text());
 		input[0].select();

@@ -12,39 +12,33 @@
 		options: {
 			event: 'click',
 			srcNode: null,
-			autoOpen: false
+			autoOpen: false,
+			position: {
+				at: 'left top',
+				my: 'right bottom'
+			}
 		},
 
 		_create: function() {
 			var options = this.options;
 			if (!options.srcNode) {
-				options.srcNode = '<div class="ui-overlay ui-helper-hidden"></div>';
+				options.srcNode = '<div class="ui-overlay"></div>';
 			}
 			options.srcNode = $(options.srcNode).appendTo('body');
 			this._setupEvents(options.event);
 
-			if (options.autoOpen) {
-				this.show();
-			}
+			if (options.autoOpen) { return; }
+			this.close();
 		},
 		
-		_position: function() {
-			$(this).position({
-				of: ''
-			});
-		},
-
 		_setOption: function(key, value) {
 			switch (key) {
 				case 'event':
 					this._setupEvents(value);
 					break;
-				case 'visible': 
-					this.options.srcNode[!value ? 'addClass' : 'removeClass']('ui-helper-hidden');
-					break;
 				case 'position':
 					$.extend(this.options.position, value);
-
+					this._position();
 					return;
 			}
 			this._super('_setOption', key, value);
@@ -56,7 +50,7 @@
 
 			if ( event ) {
 				this.element.bind( event.split( " " ).join( ".overlay " ) + ".overlay",
-					$.proxy( this, "show" ) );
+					$.proxy( this, "open" ) );
 			}
 
 			// disable click in any case
@@ -69,23 +63,32 @@
 				e.preventDefault();
 				e.stopPropagation();
 			});
+		},
+		
+		_position: function() {
+			var option = $.extend({
+				of: this.element
+			}, this.options.position);
+
+			this.options.srcNode.position(option);
 		}
 	});
 
 
 	$.extend($.ui.overlay.prototype, {
-		'show': function() {
+		'open': function() {
 			var self = this;
-			this.option('visible', true);
-			this._trigger('show');
+			this.options.srcNode.show();
+			this._position();
+			this._trigger('open');
 			$(document).one('click', function() {
-				self.hide();
+				self.close();
 			});
 		},
 
-		'hide': function(fn) {
-			this.option('visible', false);
-			this._trigger('hide');
+		'close': function(fn) {
+			this.options.srcNode.hide();
+			this._trigger('close');
 		}
 	});
 

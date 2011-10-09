@@ -845,8 +845,7 @@ seajs._fn = {};
 
       if (data.pendingMods) {
         
-        util.forEach(data.pendingMods, function(pendingMod) {
-        console.log(uri);      
+        util.forEach(data.pendingMods, function(pendingMod) {   
           util.memoize(pendingMod.id, uri, pendingMod);
         });
 
