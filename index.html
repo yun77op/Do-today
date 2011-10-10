@@ -97,7 +97,7 @@
 			</div>
 		</div>
 	</div> <!-- #container -->
-	<div id="ui-overlay-task" class="ui-overlay ui-widget-content">
+	<div id="ui-overlay-task" class="ui-overlay ui-widget-content ui-helper-hidden">
 		<ul class="ui-menu">
 			<li class="ui-menu-item"><a class="button-del button" href="#">删除</a></li>
 			<li class="ui-menu-item"><a class="button-hide button" href="#">隐藏</a></li>
@@ -113,7 +113,7 @@
 		</ul>
 	</div>
 
-	<div id="ui-overlay-notes" class="ui-overlay ui-widget-content">
+	<div id="ui-overlay-notes" class="ui-overlay ui-widget-content ui-helper-hidden">
 		<div class="triangle"></div>
 		<h3>添加笔记</h3>
 		<textarea></textarea>
@@ -132,7 +132,10 @@
 			<% if (typeof task.notes != 'undefined') { %>
 				<ul class="task-notes">
 					<% task.notes.forEach(function(note) { %>
-						<li><%= note.content %><em class="time right"><%= new Date(note.time).toLocaleString() %></em></li>
+						<li>
+							<%= note.content %>
+							<em class="time right"><%= new Date(note.time).toLocaleString() %></em>
+						</li>
 					<% }); %>
 				</ul>
 			<% } %>

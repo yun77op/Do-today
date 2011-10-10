@@ -1,7 +1,6 @@
 define(function(require, exports, module) {
 	var settings = require('./settings.js'),
 			ObjectID = require('./lib/objectid').ObjectID;
-	require('./lib/soundmanager2-nodebug-jsmin.js');
 	require('./jquery.hotedit.js');
 	require('./jquery.overlay.js');
 	require('./lib/jquery.tipsy.js');
@@ -50,20 +49,20 @@ define(function(require, exports, module) {
 
 		soundNotify: {
 			fn: function() {
-				return;
 				if (!settings.get('notification', 'sound')) { return; }
-
-				soundManager.url = '../assets/';
-				soundManager.flashVersion = 9;
-				soundManager.onready(function(oStatus) {
-					if (!oStatus.success) { return false; }
-					var sound = soundManager.createSound({
-						id: 'soundNotify',
-						url: '../assets/notify.mp3'
+				require.async('lib/soundmanager2-nodebug-jsmin.js', function() {
+					soundManager.url = '../assets/';
+					soundManager.onready(function(oStatus) {
+						if (!oStatus.success) { return false; }
+						var sound = soundManager.createSound({
+							id: 'soundNotify',
+							url: '../assets/notify.mp3'
+						});
+						$(document).bind('timer:complete', function(e) {
+							sound.play();
+						});
 					});
-					$(document).bind('timer:complete', function(e) {
-						sound.play({loop: 3});
-					});
+					soundManager.beginDelayedInit();
 				});
 			}
 		},
