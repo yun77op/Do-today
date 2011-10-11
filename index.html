@@ -22,7 +22,7 @@
 			.script('lib/sea.js')
 			.script('lib/underscore.js').wait()
 			.script('lib/backbone.js')
-			.script('lib/jquery-ui.js')
+			.script('lib/jquery-ui.min.js')
 			.wait(function() {
 				seajs.config({
 					base: '/scripts'
@@ -131,7 +131,7 @@
 			<% } %>
 			<% if (typeof task.notes != 'undefined') { %>
 				<ul class="task-notes">
-					<% task.notes.forEach(function(note) { %>
+					<% _.each(task.notes, function(note) { %>
 						<li>
 							<%= note.content %>
 							<em class="time right"><%= new Date(note.time).toLocaleString() %></em>
@@ -141,6 +141,5 @@
 			<% } %>
 		</li>
 	</script>
-</audio>
 </body>
 </html>

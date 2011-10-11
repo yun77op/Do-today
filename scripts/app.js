@@ -294,7 +294,13 @@ define(function(require, exports, module) {
 		timerPlugin.initialize('work');
 		taskPlugin.init();
 		$('.func-tipsy').tipsy();
-		$('#mask').fadeOut();
+		
+		var mask = $('#mask');
+		if ($.browser.msie && parseInt($.browser.version) < 8) {
+			mask.find('.mask-message').html('<p><span style="display: inline-block; vertical-align: middle; margin-right: .3em;" class="ui-icon ui-icon-info"></span>请换用现代浏览器浏览本站，以获得更优越的用户体验</p><p>下载：<a href="http://www.mozilla.com/firefox/">Firefox</a>、<a href="http://www.google.com/chrome/">Chrome</a>、<a href="http://www.apple.com.cn/safari/">Safari</a></p>');		
+		} else {
+			mask.fadeOut();
+		}
 	});
 
 	window.app = app;

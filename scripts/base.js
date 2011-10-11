@@ -23,6 +23,5 @@ define(function(require, exports, module) {
 			fnWrapper();
 		}
 	}
-
 	return app;
 });

@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<!--
-	jQuery UI Release!
-
-	Call task called 'deploy-release' to build a full release.
-	The release built will be stored on 'dist' dir.
-
--->
-
 <project name="do-today" default="deploy-release" basedir=".">
 	
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
@@ -42,19 +34,9 @@
 		<concat encoding="utf-8" outputencoding="utf-8" destfile="${dist.dir}/scripts/base.js">  
 			<filelist dir="${src.dir}/scripts/">
 				<file name="lib/sea.js" />
-				<file name="lib/json2.js" />
-				<file name="lib/modernizr.js" />
 				<file name="lib/ejs.js" />
 				<file name="lib/underscore.js" />
 				<file name="lib/backbone.js" />
-			</filelist>
-		</concat>
-
-		<concat encoding="utf-8" outputencoding="utf-8" destfile="${dist.dir}/scripts/common.js">  
-			<filelist dir="${src.dir}/scripts/">
-				<file name="lib/jquery-ui.js" />
-				<file name="ui.js" />
-				<file name="lib/jquery.tipsy.js" />
 			</filelist>
 		</concat>
 
@@ -86,9 +68,8 @@
 		
 		<echo message="Minified ui/ built." />
 	</target>
-		
+
 	 <target name="clean">
-		<delete dir="dist" />
+		<delete dir="${dist.dir}" />
 	</target>
-	
 </project>

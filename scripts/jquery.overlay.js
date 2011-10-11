@@ -7,6 +7,7 @@
  */
 
 (function($) {
+
 	$.widget( 'ui.overlay', {
 		version: '@VERSION',
 		options: {
@@ -36,6 +37,8 @@
 				case 'event':
 					this._setupEvents(value);
 					break;
+				case 'zIndex':
+					this.element.css('z-index', value);
 				case 'position':
 					$.extend(this.options.position, value);
 					this._position();
