@@ -27,8 +27,8 @@ define(function(require, exports, module) {
 				});
 
 				el.delegate('a', 'click', function(e) {
-					e.preventDefault();
 					dialogSettings.dialog('open');
+					e.preventDefault();
 				});
 
 				el = $('#ui-dialog-settings');

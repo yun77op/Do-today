@@ -163,14 +163,11 @@ define(function(require, exports, module) {
           });
 
           return data;
-
       },
 
       // debugging only. Direct access to all settings
       _data: function () {
         return settings;
       }
-
-
     };
 });

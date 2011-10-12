@@ -24,6 +24,10 @@
 			.script('lib/backbone.js')
 			.script('lib/jquery-ui.min.js')
 			.wait(function() {
+				if ($.browser.msie && parseInt($.browser.version) < 8) {
+					$('#mask').find('.mask-message').html('<p class="left" style="margin-left: 180px;"><span style="float: left;" class="ui-icon ui-icon-info"></span>请换用现代浏览器浏览本站，以获得更优越的用户体验</p><p class="clear" style="*margin-top: -90px;">下载：<a href="http://www.mozilla.com/firefox/">Firefox</a>、<a href="http://www.google.com/chrome/">Chrome</a>、<a href="http://www.apple.com.cn/safari/">Safari</a></p>');
+					return;	
+				}
 				seajs.config({
 					base: '/scripts'
 				});
