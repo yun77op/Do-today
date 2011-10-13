@@ -48,21 +48,11 @@
 		},
 
 		_setupEvents: function(event) {
-			// attach tab event handler, unbind to avoid duplicates from former tabifying...
-			this.element.unbind( ".overlay" );
-
-			if ( event ) {
-				this.element.bind( event.split( " " ).join( ".overlay " ) + ".overlay",
+			this.element.unbind( ".overlay" ).bind( event.split( " " ).join( ".overlay " ) + ".overlay",
 					$.proxy( this, "open" ) );
-			}
 
 			// disable click in any case
 			this.element.bind( "click.overlay", function( e ) {
-				e.preventDefault();
-				e.stopPropagation();
-			});
-
-			this.options.srcNode.bind( "click.overlay", function( e ) {
 				e.preventDefault();
 				e.stopPropagation();
 			});
@@ -80,12 +70,16 @@
 
 	$.extend($.ui.overlay.prototype, {
 		'open': function() {
-			var self = this;
-			this.options.srcNode.show();
+			var self = this,
+					srcNode = this.options.srcNode;
+			srcNode.show();
 			this._position();
 			this._trigger('open');
-			$(document).one('click', function() {
-				self.close();
+			$(document).bind('click.overlay', function(e) {
+				if ($(e.target).closest(srcNode).length == 0) {
+					$(this).unbind(e);
+					self.close();
+				}
 			});
 		},
 
