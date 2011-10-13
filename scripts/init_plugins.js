@@ -132,11 +132,14 @@ define(function(require, exports, module) {
 							}
 						});
 
+						var slideStartVal;
 						$('.task-progress', this.el).slider({
+							start: function(e, ui) {
+								slideStartVal = $(this).slider('value');
+							},
+
 							slide: function(e, ui) {
-								var currentVal = ui.value,
-									val = $(this).slider('value');
-								if (currentVal <= val) {
+								if (ui.value <= slideStartVal) {
 									e.preventDefault();
 								} else {
 									$(this).siblings('.task-process-val').text(ui.value + '%');
