@@ -138,12 +138,12 @@ define(function(require, exports, module) {
 									val = $(this).slider('value');
 								if (currentVal <= val) {
 									e.preventDefault();
+								} else {
+									$(this).siblings('.task-process-val').text(ui.value + '%');
 								}
 							},
 
 							stop: function(e, ui) {
-								var valEl = $(this).siblings('.task-process-val');
-								valEl.text(ui.value + '%');
 								if (ui.value == 100) {
 									self.check();
 								}
@@ -196,6 +196,7 @@ define(function(require, exports, module) {
 						var hiddenId = el.data('hiddenId'), task;
 						if (hiddenId) {
 							task = $(document).triggerHandler('task:beforeAdd', hiddenId);
+							$(document).trigger('task:autocomplete:remove', hiddenId);
 							el.removeData('hiddenId');
 							task.content = content;
 							addToCurrent(task);
@@ -242,7 +243,7 @@ define(function(require, exports, module) {
 							list = container.find('.task-list').empty();
 					if (!items || items.length == 0) {
 						container.addClass('task-list-empty');
-						list.append('<li>没有记录哦</li>');
+						list.append('<li class="task-default">没有记录哦</li>');
 					} else {
 						_.each(items, function(item, id) {
 							addToList(id, item, selector);
@@ -258,8 +259,22 @@ define(function(require, exports, module) {
 					list.append(el);
 				}
 
+				function initAcSource(source) {
+					input.data('autocomplete').options.source = source;
+					input.data('autocomplete').source = function( request, response ) {
+						response( $.ui.autocomplete.filter(source, request.term) );
+					};
+				}
+
 				plugin.addToCurrent = addToCurrent;
 				plugin.makeSessionList = makeSessionList;
+
+				$(document).bind('task:rm task:hide', function() {
+					var container = $('#task-today-current', el);
+					if (container.find('li:visible').length == 0) {
+						container.addClass('task-list-empty');
+					}
+				});
 
 				var input = $('#task-today-current input', el);
 				
@@ -270,22 +285,15 @@ define(function(require, exports, module) {
 						id: id,
 						value: task.content
 					});
-					initSource(source);
+					initAcSource(source);
 				});
 
 				$(document).bind('task:autocomplete:remove', function(e, id) {
 					var source = _.select(input.data('autocomplete').options.source, function(item) {
 						return item.id != id;
 					});
-					initSource(source);
+					initAcSource(source);
 				});
-
-				function initSource(source) {
-					input.data('autocomplete').options.source = source;
-					input.data('autocomplete').source = function( request, response ) {
-						response( $.ui.autocomplete.filter(source, request.term) );
-					};
-				}
 				
 				plugin.initAutocomplete = function(source) {
 					input.autocomplete({
@@ -342,7 +350,7 @@ define(function(require, exports, module) {
 						e.preventDefault();
 						this.host.taskActions.overlay('close');
 						this.host.remove();
-						$(document).trigger('task:del', this.host.model.get('id'));
+						$(document).trigger('task:rm', this.host.model.get('id'));
 					},
 
 					hide: function(e) {

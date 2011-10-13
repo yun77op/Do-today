@@ -246,13 +246,13 @@ define(function(require, exports, module) {
 	};
 
 	$(document).bind('task:add', function(e, task) {
-		var id = taskPlugin.id;
+		var id = task.id;
 		storage.set(id, task);
 		taskPlugin.storeCurrent.set(id, task);
 		taskPlugin.storeCurrent.persist();
 	});
 
-	$(document).bind('task:del', taskPlugin.util.removeTask);
+	$(document).bind('task:rm', taskPlugin.util.removeTask);
 	$(document).bind('task:check', taskPlugin.util.removeTask);
 
 	$(document).bind('task:beforeAdd', function(e, id) {
@@ -279,6 +279,7 @@ define(function(require, exports, module) {
 			val = result;
 		}
 		task[key] = val;
+		storage.set(id, task);
 		taskPlugin.storeCurrent.set(id, task);
 		taskPlugin.storeCurrent.persist();
 	});
