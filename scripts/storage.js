@@ -1,71 +1,11 @@
 define(function(require, exports, module) {
-
-	if (typeof localStorage == 'undefined') {
-		
-		localStorage = {
-			userData : null,
-			name : location.hostname,
-
-			init:function(){
-				if (!localStorage.userData) {
-					try {
-						localStorage.userData = document.createElement('INPUT');
-						localStorage.userData.type = "hidden";
-						localStorage.userData.style.display = "none";
-						localStorage.userData.addBehavior ("#default#userData");
-						document.body.appendChild(localStorage.userData);
-						var expires = new Date();
-						expires.setDate(expires.getDate()+365);
-						localStorage.userData.expires = expires.toUTCString();
-					} catch(e) {
-						return false;
-					}
-				}
-				return true;
-			},
-
-			setItem : function(key, value) {
-				if(localStorage.init()){
-					localStorage.userData.load(localStorage.name);
-					localStorage.userData.setAttribute(key, value);
-					localStorage.userData.save(localStorage.name);
-				}
-			},
-
-			getItem : function(key) {
-				if(localStorage.init()) {
-					localStorage.userData.load(localStorage.name);
-					return localStorage.userData.getAttribute(key);
-				}
-			},
-
-			removeItem : function(key) {
-				if(localStorage.init()){
-					localStorage.userData.load(localStorage.name);
-					localStorage.userData.removeAttribute(key);
-					localStorage.userData.save(localStorage.name);
-				}
-
-			}
-		};
-
-	}
-
-
 	function _get(key) {
-		var val = localStorage.getItem(key);
-		try {
-			val = JSON.parse(val);
-			return val;
-		} catch (e) {
-			
-		}
+		return JSON.parse(localStorage.getItem(key));
 	}
 
 	function _set(key, val) {
 		localStorage.setItem(key, JSON.stringify(val));
 	}
-
 
 	function set(path, val) {
 		if (!_.isArray(path)) {
@@ -123,7 +63,6 @@ define(function(require, exports, module) {
 		val = callback(val);
 		set(key, val);
 	}
-
 
 	function remove(key) {
 		localStorage.removeItem(key);
