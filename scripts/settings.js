@@ -2,8 +2,7 @@
  * Steal from Streamie
  */
 
-
-define(function(require, exports, module) {
+app.define('app.settings', function() {
 
     var defaultSettings = {};
     var settings;
@@ -98,7 +97,6 @@ define(function(require, exports, module) {
     init();
 
   return {
-      
       // register a namespace and give it a label (for the UI)
       registerNamespace: function (name, label) {
         if(defaultSettings[name]) {
