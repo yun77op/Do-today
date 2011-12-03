@@ -24,12 +24,9 @@
 			.script('lib/backbone.js')
 			.script('lib/jquery-ui.min.js')
 			.wait(function() {
-				if ($.browser.msie && parseInt($.browser.version) < 8) {
-					$('#mask').find('.mask-message').html('<p class="left" style="margin-left: 180px;"><span style="float: left;" class="ui-icon ui-icon-info"></span>请换用现代浏览器浏览本站，以获得更优越的用户体验</p><p class="clear" style="*margin-top: -90px;">下载：<a href="http://www.mozilla.com/firefox/">Firefox</a>、<a href="http://www.google.com/chrome/">Chrome</a>、<a href="http://www.apple.com.cn/safari/">Safari</a></p>');
-					return;	
-				}
 				seajs.config({
-					base: '/scripts'
+					base: '/scripts',
+					debug: false
 				});
 				seajs.use('app');
 			});
@@ -53,7 +50,7 @@
 					<span class="button timer-start"></span>
 				</div>
 				<div id="settings">
-					<a href="#" class="ui-button func-tipsy" title="设置">i</a>
+					<a href="#" class="ui-button tipsy" title="设置">i</a>
 				</div>
 			</div>
 			<div id="task" class="tabs">
@@ -65,7 +62,7 @@
 					<div id="task-today-current" class="task-list-container task-list-empty">
 						<div class="task-add">
 							<input placeholder="添加任务">
-							<a class="ui-trigger ui-button func-tipsy" title="查看全部隐藏任务"></a>
+							<a class="ui-trigger ui-button tipsy" title="查看全部隐藏任务"></a>
 						</div>
 						<ul class="task-list">
 							<li class="task-default">没有记录哦!</li>
@@ -129,20 +126,20 @@
 
 	<script id="template-task-session" type="x-ejs-tmpl">
 		<li class="task">
-			<strong class="task-content"><%= task.content %></strong>
-			<% if (progress[0] != 0 || progress[1] != 100) { %>
-				<em class="right">完成从<%= progress[0] %>%到<%= progress[1] %>%</em>
-			<% } %>
-			<% if (typeof task.notes != 'undefined') { %>
+			<strong class="task-content">[%= task.content %]</strong>
+			[% if (progress[0] != 0 || progress[1] != 100) { %]
+				<em class="right">完成从[%= progress[0] %]%到[%= progress[1] %]%</em>
+			[% } %]
+			[% if (typeof task.notes != 'undefined') { %]
 				<ul class="task-notes">
-					<% _.each(task.notes, function(note) { %>
+					[% _.each(task.notes, function(note) { %]
 						<li>
-							<%= note.content %>
-							<em class="time right"><%= new Date(note.time).toLocaleString() %></em>
+							[%= note.content %]
+							<em class="time right">[%= new Date(note.time).toLocaleString() %]</em>
 						</li>
-					<% }); %>
+					[% }); %]
 				</ul>
-			<% } %>
+			[% } %]
 		</li>
 	</script>
 </body>

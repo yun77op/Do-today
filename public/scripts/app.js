@@ -297,7 +297,7 @@ define(function(require, exports, module) {
 	$(function() {
 		timerPlugin.initialize('work');
 		taskPlugin.init();
-		$('.func-tipsy').tipsy();
+		$('.tipsy').tipsy();
 		$('#mask').fadeOut();
 	});
 
