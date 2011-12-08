@@ -28,12 +28,13 @@
 	background: $background-light-color
 
 #header
+	+clearfix
 	background: $background-light-color url(../images/header.png) repeat-x
 	position: relative
 	.site-title
 		background: url(../images/logo.png)
 		margin: 16px 0 0 230px
-		float: left
+		+float-left
 		a
 			display: block
 			height: 88px

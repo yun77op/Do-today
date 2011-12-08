@@ -1,0 +1,9 @@
+{
+  "oauth": {
+    "client_id": "3608081270",
+    "client_secret": "40447618c0eb49d818f58c91803f9196"
+  },
+  "server": {
+    "cookie_maxAge": 86400000
+  }
+}
