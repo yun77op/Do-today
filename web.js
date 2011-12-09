@@ -1,17 +1,26 @@
 var express = require('express'),
         ejs = require('ejs'),
-        url = require('url'),
      Oauth2 = require('./lib/oauth2'),
      config = require('./lib/config').config;
 
 var app = express.createServer();
+
+
+app.name = 'dotoday';
+app.version = '0.1';
 
 app.configure(function () {
   app.use(express.logger());
   app.use(express.static(__dirname + '/public'));
   app.set('view engine', 'ejs');
   app.set('views', __dirname + '/views');
-
+  app.use(express.session({
+    store: mongoStore(),
+    secret: app.name + '_secret',
+    cookie: {
+      maxAge : config.server.cookie_maxAge
+    }
+  }));
 });
 
 
@@ -44,14 +53,21 @@ function initRouter() {
   }
 }
 
-
 app.get('/authorize', function (req, res) {
   oauth2.redirectUri = res.headers.protocol + res.headers.host + '/callback';
-  res.redirect(oauth2.getRequestURL());
+  res.redirect(oauth2.getAuthorizeURL());
 });
 
 app.get('/callback', function (req, res) {
-  var url = url.parse(req.url, true);
+  var url = require('url').parse(req.url, true);
+  var code = url.query.code;
+  oauth2.getAccessToken(code, function (data) {
+    req.session.userToken = JSON.stringify(data);
+    res.redirect('/app');
+  });
+});
+
+app.get('/logout', function (req, res) {
   
 });
 

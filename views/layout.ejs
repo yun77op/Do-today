@@ -20,6 +20,10 @@
 			<h2 class="sub-title">开始计时吧！</h2>
 			<div id="nav" class="nav">
 				<ul>
+					<% if (typeof currentUser != 'undefined') { %>
+						<li><%= currentUser.name %></li>
+						<li><a href="/logout">退出</a></li>
+					<% } %>
 					<li><a href="/help.html">帮助</a></li>
 				</ul>
 			</div>
