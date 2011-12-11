@@ -20,7 +20,6 @@
 @import partials/ui
 @import partials/utilities
 @import partials/ext
-@import partials/pie
 
 +typography
 
@@ -49,13 +48,14 @@
 		top: -10px
 		+hide-text
 
+#global-nav
+	right: .5em
+	top: .5em
+	position: absolute
+	ul
+		+horizontal-list
+
 .page-do
-	#nav
-		right: .5em
-		top: .5em
-		position: absolute
-		ul
-			+horizontal-list
 	#mask
 		position: absolute
 		z-index: 2
@@ -95,7 +95,6 @@
 			margin-left: 6px
 			+background(linear-gradient(left, #B1AD3F, #A4A148))
 			+border-radius(5px)
-			+pie
 		.timer-start
 			margin: 9px 0 0 5px
 			+triangle
@@ -298,3 +297,7 @@
 			margin-top: .5em
 	.link-icon-weibo
 		background-image: url(../images/weibo-logo.png)
+
+.loginArea
+	text-align: center
+	padding: 40px 2em
