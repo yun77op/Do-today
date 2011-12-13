@@ -88,8 +88,6 @@ app.listen(port, function () {
 
 function loadUser(req, res, next) {
   var user = req.session.userToken;
-  console.log('loadUser');
-  console.log(req.url);
   if (user) {
     req.currentUser = user;
     next();

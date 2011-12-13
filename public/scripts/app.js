@@ -1,306 +1,231 @@
 define(function(require, exports, module) {
 
-	Date.now = Date.now || function() {
-		return new Date().getTime();  
-	};
+  Date.now = Date.now || function() {
+    return new Date().getTime();  
+  };
 
-	function getDateHandle(date) {
-		if (date == undefined) {
-			date = Date.now();
-		}
-		if (!(typeof date == 'object' && date instanceof Date)) {
-			date = new Date(date);
-		}
-		return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
-	}
+  function getDateHandle(date) {
+    if (date == undefined) {
+      date = Date.now();
+    }
+    if (!(typeof date == 'object' && date instanceof Date)) {
+      date = new Date(date);
+    }
+    return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
+  }
 
-	var app = require('./base');
+     
+  var initPlugins = require('./init_plugins'),
+         settings = require('./settings.js'),
+          storage = require('./storage.js'),
+         ObjectID = require('./lib/objectid').ObjectID;
+      timerPlugin = require('./timer.js'),
+          message = require('./message'),
+              app = require('./base');
 
-	var initPlugins = require('./init_plugins');
-	var message = require('./message');
+  app.use(initPlugins, true);
 
-	var settings = require('./settings.js'),
-			storage = require('./storage.js'),
-			timerPlugin = require('./timer.js');
+  //Connect timer with task with storage
 
-	app.use(initPlugins, true);
+  var taskPlugin = app.task;
+  if (!timerPlugin.nativeNotity) {
+    var messageMain = message.generate('main', {
+      className: 'notice'
+    });
+  }
 
-	//Connect timer with task with storage
+  var working = true,
+      initial = false;
 
-	var taskPlugin = app.task;
-	if (!timerPlugin.nativeNotity) {
-		var messageMain = message.generate('main', {
-			className: 'notice'
-		});
-	}
+  $(document).bind('timer:beforeStart', function() {
+    if (!initial && !storage.set('current')) {
+      if(confirm('你不添加个任务先？')) {
+        $('input', taskPlugin.el)[0].focus();
+        return true;
+      }
+      initial = true;
+    }
+  });
 
-	var working = true,
-			initial = false;
+  $(document).bind('timer:action:reset', function(e) {
+    timerPlugin.initialize('work');
+  });
 
-	$(document).bind('timer:beforeStart', function() {
-		if (!initial && !storage.set('current')) {
-			if(confirm('你不添加个任务先？')) {
-				$('input', taskPlugin.el)[0].focus();
-				return true;
-			}
-			initial = true;
-		}
-	});
+  $(document).bind('timer:complete', function(e) {
+    working = !working;
+    timerPlugin.initialize(working ? 'work' : 'break');
 
-	$(document).bind('timer:action:reset', function(e) {
-		timerPlugin.initialize('work');
-	});
+    if (!settings.get('notification', 'popup')) { return; }
 
-	$(document).bind('timer:complete', function(e) {
-		working = !working;
-		timerPlugin.initialize(working ? 'work' : 'break');
+    var text = !working ? '休息，休息一下！' : '开始工作了！';
+    if (timerPlugin.nativeNotity) {
+      webkitNotifications.createNotification(
+        '/webstore/logo-48.png',
+        '时间到了',
+        text
+      ).show();
+    } else {
+      if (!working) {
+        messageMain.option({
+          actions: null,
+          text: text
+        });
+        messageMain.show(true);
+      } else {
+        messageMain.option({
+          actions: {
+            'dismiss': {
+              'label': '知道了',
+              'click': function() {
+                this.hide();
+              }
+            }
+          },
+          text: text
+        });
+        messageMain.show();
+      }
+    }
 
-		if (!settings.get('notification', 'popup')) { return; }
+    if (!working) { timerPlugin.run(); }
+  });
 
-		var text = !working ? '休息，休息一下！' : '开始工作了！';
-		if (timerPlugin.nativeNotity) {
-			webkitNotifications.createNotification(
-				'/webstore/logo-48.png',
-				'时间到了',
-				text
-			).show();
-		} else {
-			if (!working) {
-				messageMain.option({
-					actions: null,
-					text: text
-				});
-				messageMain.show(true);
-			} else {
-				messageMain.option({
-					actions: {
-						'dismiss': {
-							'label': '知道了',
-							'click': function() {
-								this.hide();
-							}
-						}
-					},
-					text: text
-				});
-				messageMain.show();
-			}
-		}
+  $(document).bind('timer:settings:changed', function(e, key, value) {
+    if (key === 'work' && working && !timerPlugin.isActive()) {
+      timerPlugin.initialize('work');
+    }
+  });
 
-		if (!working) { timerPlugin.run(); }
-	});
+  function Connect(task) {
+    var self = this;
+    this.task = task;
+    $.ajax('/tasks', {
+      contentType: 'json',
+      success: function (data) {
+        $.extend(self, data);
+        this.initUi();
+      }
+    });
+  }
 
-	$(document).bind('timer:settings:changed', function(e, key, value) {
-		if (key === 'work' && working && !timerPlugin.isActive()) {
-			timerPlugin.initialize('work');
-		}
-	});
+  Connect.prototype = {
+    initUi: function() {
+      var self = this;
+      var taskId, task;
+      var source = [], hiddenTasksArr = [];
+      for (taskId in this.store) {
+        task = this.store[taskId];
+        if (task.hidden) {
+          hiddenTaskArr.push(task);
+        } else {
+          self.task.addToCurrent(task);
+        }
+      }
 
-	function Store(storage) {
-		this.storage = storage;
-		this.stores = {};
-	}
+      if (hiddenTasksArr.length > 0) {
+        _.each(hiddenTasksArr, function(task, taskId) {
+          source.push({
+            id: id,
+            value: task.content
+          });
+        });
+      }
+      this.task.initAutocomplete(source);
+    },
 
-	Store.prototype.register = function(ns) {
-		var self = this;
-		this.stores[ns] = {};
+    sync: function () {
+      $.ajax('/tasks', {
+        type: 'post',
+        data: this.store
+      })
+    },
 
-		var actions = ['get', 'set', 'rm', 'persist'], ret = {};
-		_.each(actions, function(action) {
-			ret[action] = function () {
-				var args = Array.prototype.slice.call(arguments);
-				args.unshift(ns);
-				return self[action].apply(self, args);
-			};
-		});
-		return ret;
-	};
+    addTask: function(task) {
+      var self = this;
+      var id = task.id;
+      $.ajax('/task', {
+        type: 'post',
+        data: task,
+        success: function () {
+          self.store[id] = task;
+        }
+      });
+    },
 
-	Store.prototype.get = function(ns, key) {
-		var store = this.stores[ns];
-		if (store != undefined) {
-			return store[key];
-		}
-	};
+    removeTask: function(id) {
+      var self = this;
+      $.ajax('/task', {
+        type: 'delete',
+        data: { id: id },
+        success: function () {
+          delete self.store[id];
+        }
+      });
+    },
 
-	Store.prototype.set = function(ns, key, val) {
-		var store = this.stores[ns];
-		if (store != undefined) {
-			store[key] = val;
-		}
-	};
+    hideTask: function(id) {
+      this.store[id].hidden = true;
+    },
 
-	Store.prototype.rm = function(ns, key) {
-		var store = this.stores[ns];
-		if (store != undefined) {
-			var ret = _.clone(store[key]);
-			delete store[key];
-			return ret;
-		}
-	};
+    makeSessionList: function(selector, date) {
+      var date = getDateHandle(date),
+          items = this.archives[date];
+      if (items == null) {
+        items = [];
+      }
+      items = _.map(items, function(item, taskId) {
+        item.task = this.storage[taskId];
+        return item;
+      });
+      this.task.makeSessionList(selector, items);
+    },
 
-	Store.prototype.persist = function(ns) {
-		if (typeof this.stores[ns] != 'undefined') {
-			this.storage.set(ns, _.keys(this.stores[ns]));
-		}
-	};
+    taskAttrChange: function(taskId, key, val) {
+      var task = this.store[taskId];
+      task[key] = val;
+    },
 
-	/**
-	 *@namespace Task init functions
-	 */
-	taskPlugin.init = function() {
-		var taskInit = taskPlugin.init;
-		taskPlugin.store = new Store(storage);
-		for (var i in taskInit) {
-			if (taskInit.hasOwnProperty(i)) {
-				taskInit[i]();
-			}
-		}
-	};
-	
-	taskPlugin.init.current = function() {
-		taskPlugin.storeCurrent = taskPlugin.store.register('current');
-		var currentArr = storage.set('current');
-		if (currentArr && currentArr.length > 0) {
-			_.each(currentArr, function(id) {
-				var task = storage.set(id);
-				taskPlugin.addToCurrent(task);
-				taskPlugin.storeCurrent.set(id, task);
-			});
-		}
-	};
+    progressChange: function (taskId) {
+      
+    },
 
-	taskPlugin.init.hidden = function() {
-		var source = [],
-				hiddenArr = storage.set('hidden');
-		taskPlugin.storeHidden = taskPlugin.store.register('hidden');
-		if (hiddenArr) {
-			_.each(hiddenArr, function(id) {
-				var task = storage.set(id);
-				taskPlugin.storeHidden.set(id, task);
-				source.push({
-					id: id,
-					value: taskPlugin.content
-				});
-			});
-		}
-		taskPlugin.initAutocomplete(source);
-	};
+    addNote: function (taskId, value) {
+      var id = new ObjectID().toHexString();
+      var note = {
+        id: id,
+        time: Date.now(),
+        content: value
+      };
+      this.store[taskId].notes.id = note;
+    },
 
-	taskPlugin.init.today = function() {
-		taskPlugin.util.makeSessionList('#task-today-all', Date.now());
-	};
+    rmNote: function (taskId, id) {
+      delete this.store[taskId].notes.id;
+    },
 
+    checkHidden: function (taskId) {
+      var task = this.store[taskId];
+      if (task.hidden) {
+        task.hidden = false;
+        return task;
+      }
+    }
+  };
 
-	/**
-	 * @namespace Task attributes change handlers
-	 */
-	taskPlugin.fn = {};
+  $(document).bind('task:containerToggle', function(e, target) {
+    if (target == '#task-today-all') {
+      connect.makeSessionList('#task-today-all', Date.now());
+    }
+  });
 
-	taskPlugin.fn.progress = function(id, key, val) {
-		var dateHandle = getDateHandle();
-		storage.modify([dateHandle, id], function(data) {
-			if (data == undefined) {
-				data = [0];
-			}
-			data[1] = val;
-			return data;
-		});
-	};
+  var connect = new Connect();
 
-	taskPlugin.fn.notes = function (id, key, val) {
-		var task = taskPlugin.storeCurrent.get(id),
-				data = task[key];
-		if (data == undefined) {
-			data = [val];
-		} else {
-			data.push(val);
-		}
-		return data;
-	};
+  $(function() {
+    timerPlugin.initialize('work');
+    $('.tipsy').tipsy();
+    $('#mask').fadeOut();
+  });
 
-	/**
-	 * @namespace
-	 */
-	taskPlugin.util = {};
-
-	taskPlugin.util.removeTask = function(e, id) {
-		taskPlugin.storeCurrent.rm(id);
-		taskPlugin.storeCurrent.persist();
-		storage.remove(id);
-	};
-
-	taskPlugin.util.makeSessionList = function(selector, date) {
-		var date = getDateHandle(date),
-				items = storage.set(date);
-		if (items == null) {
-			items = [];
-		}
-		items = _.map(items, function(item, id) {
-			return {
-				progress: item,
-				task: storage.set(id)
-			};
-		});
-		taskPlugin.makeSessionList(items, selector);
-	};
-
-	$(document).bind('task:add', function(e, task) {
-		var id = task.id;
-		storage.set(id, task);
-		taskPlugin.storeCurrent.set(id, task);
-		taskPlugin.storeCurrent.persist();
-	});
-
-	$(document).bind('task:rm', taskPlugin.util.removeTask);
-	$(document).bind('task:check', taskPlugin.util.removeTask);
-
-	$(document).bind('task:beforeAdd', function(e, id) {
-		var task = taskPlugin.storeHidden.get(id);
-		if (task) {
-			taskPlugin.storeHidden.rm(id);
-			taskPlugin.storeHidden.persist();
-			return task;
-		}
-	});
-
-	$(document).bind('task:hide', function(e, id) {
-		var task = taskPlugin.storeCurrent.rm(id);
-		taskPlugin.storeCurrent.persist();
-		taskPlugin.storeHidden.set(id, task);
-		taskPlugin.storeHidden.persist();
-	});
-
-	$(document).bind('task:change', function(e, id, key, val) {
-		var task = taskPlugin.storeCurrent.get(id),
-				result;
-		if (typeof taskPlugin.fn[key] != 'undefined' &&
-				(result = taskPlugin.fn[key].call(null, id, key, val)) != undefined) {
-			val = result;
-		}
-		task[key] = val;
-		storage.set(id, task);
-		taskPlugin.storeCurrent.set(id, task);
-		taskPlugin.storeCurrent.persist();
-	});
-
-	$(document).bind('task:date:change', function(e, dateText) {
-		taskPlugin.util.makeSessionList('#task-past-content', dateText);
-	});
-
-	$(document).bind('task:containerToggle', function(e, target) {
-		target == '#task-today-all' && taskPlugin.init.today();
-	});
-
-	$(document).bind('task:autocomplete:remove', taskPlugin.util.removeTask);
-
-	$(function() {
-		timerPlugin.initialize('work');
-		taskPlugin.init();
-		$('.tipsy').tipsy();
-		$('#mask').fadeOut();
-	});
-
-	window.app = app;
-	return app;
+  window.app = app;
+  return app;
 });
