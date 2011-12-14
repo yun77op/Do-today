@@ -1,14 +1,24 @@
 define(function(require, exports, module) {
+  var connect = require('./app').connect;
+
   var el = $('#task');
+
   el.tabs({
     select: function(event, ui) {
       if (ui.index == 1) {
         var yesterday = new Date().valueOf() -  24 * 60 * 60 * 1000;
         $('#task-datepicker').val($.datepicker.formatDate('mm/dd/yy', new Date(yesterday)));
-        $(document).trigger('task:date:change', yesterday);
+        connect.makeSessionList('#task-past', yesterday);
       }
     }
   });
+
+  $('#task-datepicker', el).datepicker({
+    onClose: function(dateText, inst) {
+      connect.makeSessionList('#task-past', dateText);
+    }
+  });
+
 
   //sort
   var sortable = true;
@@ -62,14 +72,14 @@ define(function(require, exports, module) {
         }
       });
 
-      var slideStartVal;
+      var slideStartValue;
       $('.task-progress', this.el).slider({
         start: function(e, ui) {
-          slideStartVal = $(this).slider('value');
+          slideStartValue = $(this).slider('value');
         },
 
         slide: function(e, ui) {
-          if (ui.value <= slideStartVal) {
+          if (ui.value <= slideStartValue) {
             e.preventDefault();
           } else {
             $(this).siblings('.task-process-val').text(ui.value + '%');
@@ -80,7 +90,7 @@ define(function(require, exports, module) {
           if (ui.value == 100) {
             self.check();
           }
-          $(document).trigger('task:change', [self.model.get('id'), 'progress', ui.value]);  
+          connect.progressChange(self.model.get('id'), slideStartValue, ui.value);
         },
 
         value: self.model.get('progress')
@@ -240,7 +250,8 @@ define(function(require, exports, module) {
         if ($(this).parents('ul').find('li').length == 0) {
           input.autocomplete('close');
         }
-        $(document).trigger('task:autocomplete:remove', item.id);
+
+        connect.removeTask(item.id);
       });
       a.append(span);
       return $( '<li></li>' )
@@ -252,12 +263,6 @@ define(function(require, exports, module) {
 
   $('.ui-trigger', el).click(function() {
     input.autocomplete('search', '');
-  });
-
-  $('#task-datepicker', el).datepicker({
-    onClose: function(dateText, inst) {
-      $(document).trigger('task:date:change', dateText);
-    }
   });
 
   return {

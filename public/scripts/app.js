@@ -21,13 +21,11 @@ define(function(require, exports, module) {
          ObjectID = require('./lib/objectid').ObjectID;
       timerPlugin = require('./timer.js'),
           message = require('./message'),
+             task = require('./task'),
               app = require('./base');
 
   app.use(initPlugins, true);
 
-  //Connect timer with task with storage
-
-  var taskPlugin = app.task;
   if (!timerPlugin.nativeNotity) {
     var messageMain = message.generate('main', {
       className: 'notice'
@@ -96,13 +94,14 @@ define(function(require, exports, module) {
     }
   });
 
-  function Connect(task) {
+  function Connect() {
     var self = this;
-    this.task = task;
     $.ajax('/tasks', {
       contentType: 'json',
       success: function (data) {
         $.extend(self, data);
+        var dateHandle = getDateHandle();
+        self.todayData = self.archives[dateHandle];
         this.initUi();
       }
     });
@@ -171,13 +170,16 @@ define(function(require, exports, module) {
       var date = getDateHandle(date),
           items = this.archives[date];
       if (items == null) {
-        items = [];
+        $.ajax('/archive/' + date, {
+          contentType: 'json',
+          success: function (data) {
+            self.archives[date] = data;
+            task.makeSessionList(selector, data);
+          }
+        });
+      } else {
+        task.makeSessionList(selector, items);
       }
-      items = _.map(items, function(item, taskId) {
-        item.task = this.storage[taskId];
-        return item;
-      });
-      this.task.makeSessionList(selector, items);
     },
 
     taskAttrChange: function(taskId, key, val) {
@@ -185,8 +187,12 @@ define(function(require, exports, module) {
       task[key] = val;
     },
 
-    progressChange: function (taskId) {
-      
+    progressChange: function (taskId, startValue, endValue) {
+      var todayData = this.todayData;
+      todayData[taskId] = {
+        start: startValue,
+        end: endValue
+      };
     },
 
     addNote: function (taskId, value) {
@@ -199,7 +205,7 @@ define(function(require, exports, module) {
       this.store[taskId].notes.id = note;
     },
 
-    rmNote: function (taskId, id) {
+    removeNote: function (taskId, id) {
       delete this.store[taskId].notes.id;
     },
 
@@ -220,12 +226,15 @@ define(function(require, exports, module) {
 
   var connect = new Connect();
 
-  $(function() {
+  function start() {
     timerPlugin.initialize('work');
     $('.tipsy').tipsy();
-    $('#mask').fadeOut();
-  });
+    $('#mask').fadeOut(); 
+  }
 
-  window.app = app;
-  return app;
+  return {
+    connect: connect,
+    start: start
+  };
+
 });
