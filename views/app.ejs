@@ -100,8 +100,8 @@
 <script id="template-task-session" type="x-ejs-tmpl">
 	<li class="task">
 		<strong class="task-content">[%= task.content %]</strong>
-		[% if (progress[0] != 0 || progress[1] != 100) { %]
-			<em class="right">完成从[%= progress[0] %]%到[%= progress[1] %]%</em>
+		[% if (start != 0 || end != 100) { %]
+			<em class="right">完成从[%= start %]%到[%= end %]%</em>
 		[% } %]
 		[% if (typeof task.notes != 'undefined') { %]
 			<ul class="task-notes">

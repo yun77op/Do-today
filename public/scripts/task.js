@@ -132,18 +132,18 @@ define(function(require, exports, module) {
       
       var hiddenId = el.data('hiddenId'), task;
       if (hiddenId) {
-        task = $(document).triggerHandler('task:beforeAdd', hiddenId);
-        $(document).trigger('task:autocomplete:remove', hiddenId);
+        task = connect = checkHidden(hiddenId);
+        acRemove(hiddenId);
         el.removeData('hiddenId');
         task.content = content;
         addToCurrent(task);
       } else {
-        var taskModel = addToCurrent({
+        connect.addTask({
           content: content
+        }, function (task) {
+          addToCurrent(task);
         });
-        task = taskModel.attributes;
       }
-      $(document).trigger('task:add', task);
     }
   });
 
@@ -168,11 +168,10 @@ define(function(require, exports, module) {
     });
 
     var container = $('#task-today-current', el),
-        list = container.find('.task-list');
+             list = container.find('.task-list');
       
     container.removeClass('task-list-empty');
     list.append(taskView.render().el);
-    return taskModel;
   }
 
   function makeSessionList(items, selector) {
@@ -203,14 +202,19 @@ define(function(require, exports, module) {
     };
   }
 
+  function acRemove(id) {
+    var source = _.select(input.data('autocomplete').options.source, function(item) {
+      return item.id != id;
+    });
+    initAcSource(source);
+  }
 
-
-  $(document).bind('task:rm task:hide', function() {
+  function checkTaskListStatus() {
     var container = $('#task-today-current', el);
     if (container.find('li:visible').length == 0) {
       container.addClass('task-list-empty');
     }
-  });
+  }
 
   var input = $('#task-today-current input', el);
   
@@ -224,14 +228,9 @@ define(function(require, exports, module) {
     initAcSource(source);
   });
 
-  $(document).bind('task:autocomplete:remove', function(e, id) {
-    var source = _.select(input.data('autocomplete').options.source, function(item) {
-      return item.id != id;
-    });
-    initAcSource(source);
-  });
+ 
   
-  function initAutocomplete = function(source) {
+  function initAutocomplete(source) {
     input.autocomplete({
       source: source,
       minLength: 0,
@@ -259,7 +258,7 @@ define(function(require, exports, module) {
         .append( a )
         .appendTo( ul );
     };
-  };
+  }
 
   $('.ui-trigger', el).click(function() {
     input.autocomplete('search', '');

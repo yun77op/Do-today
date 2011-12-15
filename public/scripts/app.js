@@ -117,7 +117,7 @@ define(function(require, exports, module) {
         if (task.hidden) {
           hiddenTaskArr.push(task);
         } else {
-          self.task.addToCurrent(task);
+          task.addToCurrent(task);
         }
       }
 
@@ -139,14 +139,14 @@ define(function(require, exports, module) {
       })
     },
 
-    addTask: function(task) {
+    addTask: function(task, callback) {
       var self = this;
-      var id = task.id;
       $.ajax('/task', {
         type: 'post',
         data: task,
-        success: function () {
+        success: function (task) {
           self.store[id] = task;
+          callback(task);
         }
       });
     },
@@ -167,10 +167,10 @@ define(function(require, exports, module) {
     },
 
     makeSessionList: function(selector, date) {
-      var date = getDateHandle(date),
+      var dateText = getDateHandle(date),
           items = this.archives[date];
       if (items == null) {
-        $.ajax('/archive/' + date, {
+        $.ajax('/archive/' + dateText, {
           contentType: 'json',
           success: function (data) {
             self.archives[date] = data;
