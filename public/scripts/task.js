@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var connect = require('./app').connect;
+  var connect = require('./connect');
 
   var el = $('#task');
 
@@ -34,7 +34,9 @@ define(function(require, exports, module) {
     e.preventDefault();
     var o = $(this);
     var target = $(o.attr('href'));
-    $(document).trigger('task:containerToggle', o.attr('href'));
+    if (target == '#task-today-all') {
+      connect.makeSessionList('#task-today-all', Date.now());
+    }
     target.siblings().fadeOut(function() {
       target.fadeIn();
     });
@@ -195,6 +197,12 @@ define(function(require, exports, module) {
     list.append(el);
   }
 
+  var input = $('#task-today-current input', el);
+  
+  function focusInput() {
+    input.get(0).focus();
+  }
+
   function initAcSource(source) {
     input.data('autocomplete').options.source = source;
     input.data('autocomplete').source = function( request, response ) {
@@ -216,8 +224,6 @@ define(function(require, exports, module) {
     }
   }
 
-  var input = $('#task-today-current input', el);
-  
   $(document).bind('task:hide', function(e, id, task) {
     var source = _.clone(input.data('autocomplete').options.source);
     if (!source) { source = []; }
@@ -227,8 +233,6 @@ define(function(require, exports, module) {
     });
     initAcSource(source);
   });
-
- 
   
   function initAutocomplete(source) {
     input.autocomplete({
@@ -267,7 +271,9 @@ define(function(require, exports, module) {
   return {
     initAutocomplete: initAutocomplete,
     addToCurrent: addToCurrent,
-    makeSessionList: makeSessionList
+    makeSessionList: makeSessionList,
+
+    focusInput: focusInput
   };
   
 });

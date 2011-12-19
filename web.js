@@ -40,7 +40,7 @@ app.configure('development', function() {
 
 models.defineModels(mongoose, function() {
   app.TaskModel = mongoose.model('Task');
-  app.TasksArchive = mongoose.model('TasksArchive');
+  app.TasksArchiveModel = mongoose.model('TasksArchive');
   app.db = mongoose.connect(app.set('db_uri'));
 });
 
@@ -99,13 +99,18 @@ app.post('/task', loadUser, function (req, res, next) {
 
 app.get('/archive/:dateText', loadUser, function (req, res, next) {
   var dateText = req.params.dateText;
-  app.TasksArchive.find({ dateText: dateText, user_id: req.currentUser.id }, function (err, data) {
+  app.TasksArchiveModel.find({ dateText: dateText, user_id: req.currentUser.id }, function (err, data) {
     res.send(data.toObject().sessions);
   });
 });
 
-
-
+app.post('/archive/:dateText', loadUser, function (req, res, next) {
+  var tasksArchive = app.TasksArchiveModel(req.body);
+  tasksArchive.dateText = req.params.dateText;
+  tasksArchive.save(function () {
+    res.send(data.toObject().sessions);
+  });
+});
 
 var port = process.env.PORT || 3000;
 app.listen(port, function () {
