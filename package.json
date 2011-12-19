@@ -2,6 +2,9 @@
   "name": "dotoday",
   "version": "0.0.1",
   "dependencies": {
-    "express": "2.5.1"
+    "express": "2.5.1",
+    "ejs": "0.6.1",
+    "mongoose": "2.4.7",
+    "connect-mongodb": "1.1.1"
   }
 }

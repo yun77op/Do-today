@@ -44,7 +44,7 @@ models.defineModels(mongoose, function() {
   app.db = mongoose.connect(app.set('db_uri'));
 });
 
-var oauth = new Oauth2(config.oauth.client_id, config.oauth.client_secret);
+var oauth2 = new Oauth2(config.oauth.client_id, config.oauth.client_secret);
 
 app.get('/', loadUser, function (req, res) {
   if (req.currentUser) {
@@ -69,7 +69,7 @@ app.get('/app', loadUser, function (req, res) {
 });
 
 app.get('/authorize', function (req, res) {
-  oauth2.redirectUri = res.headers.protocol + res.headers.host + '/callback';
+  oauth2.redirectURI = req.headers.protocol + req.headers.host + '/callback';
   res.redirect(oauth2.getAuthorizeURL());
 });
 
@@ -77,7 +77,8 @@ app.get('/callback', function (req, res) {
   var url = require('url').parse(req.url, true);
   var code = url.query.code;
   oauth2.getAccessToken(code, function (data) {
-    req.session.userToken = JSON.stringify(data);
+    console.log(data);
+    //req.session.userToken = JSON.stringify(data);
     res.redirect('/app');
   });
 });
