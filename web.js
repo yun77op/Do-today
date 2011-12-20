@@ -1,7 +1,7 @@
 var express = require('express'),
         ejs = require('ejs'),
  mongoStore = require('connect-mongodb'),
-     Oauth2 = require('./lib/oauth2').Oauth2,
+     OAuth2 = require('node-oauth').OAuth2,
      config = require('./lib/config').config,
      models = require('./lib/models'),
    mongoose = require('mongoose');
@@ -41,10 +41,12 @@ app.configure('development', function() {
 models.defineModels(mongoose, function() {
   app.TaskModel = mongoose.model('Task');
   app.TasksArchiveModel = mongoose.model('TasksArchive');
+  app.UserModel = mongoose.model('User');
   app.db = mongoose.connect(app.set('db_uri'));
 });
 
-var oauth2 = new Oauth2(config.oauth.client_id, config.oauth.client_secret);
+var oauth2 = new OAuth2(config.oauth.client_id, config.oauth.client_secret,
+    config.server.baseUri, '/oauth2/authorize', '/oauth2/access_token');
 
 app.get('/', loadUser, function (req, res) {
   if (req.currentUser) {
@@ -69,17 +71,30 @@ app.get('/app', loadUser, function (req, res) {
 });
 
 app.get('/authorize', function (req, res) {
-  oauth2.redirectURI = req.headers.protocol + req.headers.host + '/callback';
-  res.redirect(oauth2.getAuthorizeURL());
+  res.redirect(oauth2.getAuthorizeUrl());
 });
 
 app.get('/callback', function (req, res) {
   var url = require('url').parse(req.url, true);
   var code = url.query.code;
   oauth2.getAccessToken(code, function (data) {
-    console.log(data);
-    //req.session.userToken = JSON.stringify(data);
-    res.redirect('/app');
+    var access_token = data.access_token;
+    oauth2.request('/account/get_uid.json', access_token,
+      function (data) {
+        oauth2.request('/users/show.json', {}, {uid: data.uid}, access_token,
+          function (data) {
+            var user = new app.UserModel();
+            user.name = data.name;
+            user.profile_image_url = data.profile_image_url;
+            user.access_token = access_token;
+            user.save(function () {
+              req.session.userToken = JSON.stringify(user);
+              res.redirect('/app');
+            });
+          }
+        );
+      }
+    );
   });
 });
 
