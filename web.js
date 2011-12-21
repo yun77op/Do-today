@@ -88,7 +88,7 @@ app.get('/callback', function (req, res) {
             user.profile_image_url = data.profile_image_url;
             user.access_token = access_token;
             user.save(function () {
-              req.session.userToken = JSON.stringify(user);
+              req.session.userToken = user.toObject();
               res.redirect('/app');
             });
           }
@@ -109,24 +109,79 @@ app.post('/task', loadUser, function (req, res, next) {
   var task = new app.TaskModel(req.body);
   task.user_id = req.currentUser.id;
   task.save(function() {
-    res.send(task.toObject());
+    var taskData = task.toObject();
+    syncCurrent(taskData._id, function() {
+      res.send(taskData);
+    });
   });
 });
 
-app.get('/archive/:dateText', loadUser, function (req, res, next) {
+app.del('/task/:id', loadUser, function (req, res, next) {
+  app.TaskModel.findOne({ _id: req.params.id, user_id: req.currentUser.id },
+    function (err, task) {
+      task.remove(function() {
+        res.send('ok');
+      });
+    }
+  );
+});
+
+app.get('/tasks/:dateText', loadUser, function (req, res, next) {
   var dateText = req.params.dateText;
-  app.TasksArchiveModel.find({ dateText: dateText, user_id: req.currentUser.id }, function (err, data) {
-    res.send(data.toObject().sessions);
-  });
+  app.TasksArchiveModel.find({ dateText: dateText, user_id: req.currentUser.id },
+    function (err, data) {
+      res.send(data.toObject().sessions);
+    }
+  );
 });
 
-app.post('/archive/:dateText', loadUser, function (req, res, next) {
+app.post('/tasks/:dateText', loadUser, function (req, res, next) {
   var tasksArchive = app.TasksArchiveModel(req.body);
   tasksArchive.dateText = req.params.dateText;
   tasksArchive.save(function () {
     res.send(data.toObject().sessions);
   });
 });
+
+
+//Feed init data
+app.get('/init/:dateText', loadUser, function (req, res, next) {
+  var result = {};
+  var dateText = req.params.dateText;
+  app.TasksArchiveModel.find({ dateText: dateText, user_id: req.currentUser.id },
+    function (err, data) {
+      result.todayData = data.toObject().sessions;
+      getCurrent(req.currentUser.id, function(tasks) {
+        result.currentTasks = tasks;
+        res.send(result);
+      });
+    }
+  );
+});
+
+function syncCurrent(id, fn) {
+  app.TasksCurrent.findOne({}, function(err, d) {
+    d.tasks.push(id);
+    d.save(function() {
+      fn();
+    });
+  });
+}
+
+function getCurrent(user_id, fn) {
+  app.TasksCurrent.findOne({}, function(err, d) {
+    var data = d.toObject();
+    var tasks = [], taskNum = data.tasks.length;
+    data.tasks.forEach(function(taskID) {
+      app.TaskModel.findOne({ _id: taskID, user_id: user_id },
+        function (err, task) {
+          tasks.push(task.toObject());
+          --taskNum || fn(tasks);
+        }
+      );
+    });
+  });
+}
 
 var port = process.env.PORT || 3000;
 app.listen(port, function () {

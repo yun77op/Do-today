@@ -1,59 +1,53 @@
 define(function(require, exports, module) {
-  var taskManager = require('./task');
 
-  function Connect() {
+  function Connect(host) {
     var self = this;
-    $.ajax('/tasks', {
+    //TODO 零点情况，请求的还是当天的数据，返回数据时却是明天了
+    var dateHandle = getDateHandle();
+    $.ajax('/init/' + dateHandle, {
       contentType: 'json',
       success: function (data) {
-        $.extend(self, data);
-        var dateHandle = getDateHandle();
-        self.todayData = self.archives[dateHandle];
+        self.currentTasks = data.currentTasks;
+        self.archiveData[dateHandle] = data.todayData;
         this.initUI();
       }
     });
+    this.host = host;
   }
 
   Connect.prototype = {
     initUI: function() {
       var self = this;
       var taskId, task;
-      var source = [], hiddenTasksArr = [];
-      for (taskId in this.store) {
-        task = this.store[taskId];
+      var source = [], hiddenTasks = [];
+      for (taskId in this.currentTasks) {
+        task = this.currentTasks[taskId];
         if (task.hidden) {
-          hiddenTaskArr.push(task);
+          hiddenTasks.push(task);
         } else {
-          taskManager.addToCurrent(task);
+          this.host.addToCurrent(task);
         }
       }
 
-      if (hiddenTasksArr.length > 0) {
-        _.each(hiddenTasksArr, function(task, taskId) {
+      if (hiddenTasks.length > 0) {
+        _.each(hiddenTasks, function(task, taskId) {
           source.push({
             id: id,
             value: task.content
           });
         });
       }
-      taskManager.initAutocomplete(source);
+      this.host.initAutocomplete(source);
     },
 
-    sync: function () {
-      $.ajax('/tasks', {
-        type: 'post',
-        data: this.store
-      })
-    },
-
-    addTask: function(task, callback) {
+    addTask: function(task, fn) {
       var self = this;
       $.ajax('/task', {
         type: 'post',
         data: task,
         success: function (task) {
-          self.store[id] = task;
-          callback(task);
+          self.currentTasks[task._id] = task;
+          fn(task);
         }
       });
     },
@@ -64,37 +58,37 @@ define(function(require, exports, module) {
         type: 'delete',
         data: { id: id },
         success: function () {
-          delete self.store[id];
+          delete self.currentTasks[id];
         }
       });
     },
 
     hideTask: function(id) {
-      this.store[id].hidden = true;
+      this.currentTasks[id].hidden = true;
     },
 
-    makeSessionList: function(selector, date) {
+    getArchiveData: function(date, fn) {
       var dateText = getDateHandle(date),
-          items = this.archives[date];
-      if (items == null) {
+      var data = this.archiveData[dateText];
+      if (!data) {
         $.ajax('/archive/' + dateText, {
           contentType: 'json',
-          success: function (data) {
-            self.archives[date] = data;
-            taskManager.makeSessionList(selector, data);
+          success: function(data) {
+            self.archiveData[dateText] = data;
+            fn(data);
           }
         });
       } else {
-        taskManager.makeSessionList(selector, items);
+        fn(data);
       }
     },
 
     taskAttrChange: function(taskId, key, val) {
-      var task = this.store[taskId];
+      var task = this.currentTasks[taskId];
       task[key] = val;
     },
 
-    progressChange: function (taskId, startValue, endValue) {
+    progressChange: function(taskId, startValue, endValue) {
       var todayData = this.todayData;
       todayData[taskId] = {
         start: startValue,
@@ -109,15 +103,15 @@ define(function(require, exports, module) {
         time: Date.now(),
         content: value
       };
-      this.store[taskId].notes.id = note;
+      this.currentTasks[taskId].notes.id = note;
     },
 
     removeNote: function (taskId, id) {
-      delete this.store[taskId].notes.id;
+      delete this.currentTasks[taskId].notes.id;
     },
 
     checkHidden: function (taskId) {
-      var task = this.store[taskId];
+      var task = this.currentTasks[taskId];
       if (task.hidden) {
         task.hidden = false;
         return task;
@@ -135,10 +129,8 @@ define(function(require, exports, module) {
     return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
   }
 
-  var connect = new Connect();
-
   return {
-    connect: connect
+    Connect: Connect
   };
 
 });

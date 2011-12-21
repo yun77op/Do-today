@@ -1,6 +1,5 @@
 define(function(require, exports, module) {
-  var connect = require('./connect');
-
+  var connect = new require('./connect').Connect();
   var el = $('#task');
 
   el.tabs({
@@ -8,14 +7,14 @@ define(function(require, exports, module) {
       if (ui.index == 1) {
         var yesterday = new Date().valueOf() -  24 * 60 * 60 * 1000;
         $('#task-datepicker').val($.datepicker.formatDate('mm/dd/yy', new Date(yesterday)));
-        connect.makeSessionList('#task-past', yesterday);
+        makeSessionList('task-past', yesterday);
       }
     }
   });
 
   $('#task-datepicker', el).datepicker({
     onClose: function(dateText, inst) {
-      connect.makeSessionList('#task-past', dateText);
+      makeSessionList('task-past', dateText);
     }
   });
 
@@ -32,15 +31,16 @@ define(function(require, exports, module) {
       .toggleClass('sortable');
   }).delegate('.actions .button-viewall, .actions .button-return', 'click', function(e) {
     e.preventDefault();
-    var o = $(this);
-    var target = $(o.attr('href'));
-    if (target == '#task-today-all') {
-      connect.makeSessionList('#task-today-all', Date.now());
+    var targetID = this.href.slice(1);
+    if (targetID == 'task-today-all') {
+      makeSessionList(targetID, Date.now());
     }
+    var target = $(this.href);
     target.siblings().fadeOut(function() {
       target.fadeIn();
     });
   });
+
 
   var TaskView = Backbone.View.extend({
     tagName: 'li',
@@ -92,7 +92,7 @@ define(function(require, exports, module) {
           if (ui.value == 100) {
             self.check();
           }
-          connect.progressChange(self.model.get('id'), slideStartValue, ui.value);
+          connect.progressChange(self.model.get('_id'), slideStartValue, ui.value);
         },
 
         value: self.model.get('progress')
@@ -101,7 +101,7 @@ define(function(require, exports, module) {
       var taskContentEl = $('.task-content', this.el).hotedit({
         callback: function(text) {
           taskContentEl.text(text);
-          $(document).trigger('task:change', [self.model.get('id'), 'content', text]);
+          $(document).trigger('task:change', [self.model.get('_id'), 'content', text]);
         }
       });
 
@@ -116,12 +116,11 @@ define(function(require, exports, module) {
     },
 
     check: function(e) {
-      var id = this.model.get('id');
+      var id = this.model.get('_id');
       if(e.target != e.currentTarget) { return; }
 
       this.remove();
-      $(document).trigger('task:change', [id, 'progress', 100]);
-      $(document).trigger('task:check', id);
+      connect.progressChange(id, this.model.get('progress'), 100);
     }
   });
 
@@ -141,60 +140,46 @@ define(function(require, exports, module) {
         addToCurrent(task);
       } else {
         connect.addTask({
-          content: content
-        }, function (task) {
-          addToCurrent(task);
-        });
+            content: content
+          }, function (task) {
+            addToCurrent(task);
+          }
+        );
       }
-    }
-  });
-
-  var TaskModel = Backbone.Model.extend({
-    defaults: {
-      priority: 0,
-      progress: 0
-    },
-
-    initialize: function(attrs) {
-      attrs['id'] || (this.attributes['id'] = new ObjectID().toHexString());
-      attrs['created_at'] || (this.attributes['created_at'] = Date.now());
     }
   });
 
   var templateTaskSession = new EJS({element: 'template-task-session'});
 
   function addToCurrent(task) {
-    var taskModel = task instanceof Backbone.Model ? task : new TaskModel(task);
+    var taskModel = new Backbone.Model(task);
     var taskView = new TaskView({
       model: taskModel
     });
 
     var container = $('#task-today-current', el),
-             list = container.find('.task-list');
+        list = container.find('.task-list');
       
     container.removeClass('task-list-empty');
     list.append(taskView.render().el);
   }
 
-  function makeSessionList(items, selector) {
-    var container = $(selector),
-        list = container.find('.task-list').empty();
-    if (!items || items.length == 0) {
-      container.addClass('task-list-empty');
-      list.append('<li class="task-default">没有记录哦</li>');
-    } else {
-      _.each(items, function(item, id) {
-        addToList(id, item, selector);
-      });
-    }
-  }
-  
-  function addToList(id, item, selector) {
-    var container = $(selector),
-        list = container.find('.task-list');
-    container.removeClass('task-list-empty');
-    var el = templateTaskSession.render(item);
-    list.append(el);
+  function makeSessionList(id, date) {
+    connect.getArchiveData(date, function (data) {
+      var container = $('#' + id),
+          list = container.find('.task-list').empty();
+      container.removeClass('task-list-empty');
+
+      if (!data || data.length == 0) {
+        container.addClass('task-list-empty');
+        list.append('<li class="task-default">没有记录哦</li>');
+      } else {
+        _.each(data, function(item) {
+          var el = templateTaskSession.render(item);
+          list.append(el);
+        });
+      }
+    });
   }
 
   var input = $('#task-today-current input', el);
@@ -254,7 +239,7 @@ define(function(require, exports, module) {
           input.autocomplete('close');
         }
 
-        connect.removeTask(item.id);
+        connect.removeTask(item._id);
       });
       a.append(span);
       return $( '<li></li>' )
@@ -271,7 +256,6 @@ define(function(require, exports, module) {
   return {
     initAutocomplete: initAutocomplete,
     addToCurrent: addToCurrent,
-    makeSessionList: makeSessionList,
 
     focusInput: focusInput
   };
