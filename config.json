@@ -1,7 +1,8 @@
 {
   "oauth": {
-    "client_id": "3608081270",
-    "client_secret": "40447618c0eb49d818f58c91803f9196"
+    "client_id": "2316304576",
+    "client_secret": "27632f40604729efb03599200bfe28b6",
+    "base_uri": "https://api.weibo.com/2"
   },
   "server": {
     "cookie_maxAge": 86400000

@@ -1,7 +1,7 @@
 var express = require('express'),
         ejs = require('ejs'),
  mongoStore = require('connect-mongodb'),
-     OAuth2 = require('node-oauth').OAuth2,
+     OAuth2 = require('./lib/oauth2').OAuth2,
      config = require('./lib/config').config,
      models = require('./lib/models'),
    mongoose = require('mongoose');
@@ -46,7 +46,7 @@ models.defineModels(mongoose, function() {
 });
 
 var oauth2 = new OAuth2(config.oauth.client_id, config.oauth.client_secret,
-    config.server.baseUri, '/oauth2/authorize', '/oauth2/access_token');
+    config.oauth.base_uri, '/oauth2/authorize', '/oauth2/access_token');
 
 app.get('/', loadUser, function (req, res) {
   if (req.currentUser) {
@@ -71,7 +71,7 @@ app.get('/app', loadUser, function (req, res) {
 });
 
 app.get('/authorize', function (req, res) {
-  res.redirect(oauth2.getAuthorizeUrl());
+  res.redirect(oauth2.getAuthorizeURL());
 });
 
 app.get('/callback', function (req, res) {
