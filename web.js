@@ -46,7 +46,8 @@ models.defineModels(mongoose, function() {
 });
 
 var oauth2 = new OAuth2(config.oauth.client_id, config.oauth.client_secret,
-    config.oauth.base_uri, '/oauth2/authorize', '/oauth2/access_token');
+      config.oauth.base_uri, config.server.base_uri + '/callback',
+      '/oauth2/authorize', '/oauth2/access_token');
 
 app.get('/', loadUser, function (req, res) {
   if (req.currentUser) {
@@ -87,8 +88,8 @@ app.get('/callback', function (req, res) {
             user.name = data.name;
             user.profile_image_url = data.profile_image_url;
             user.access_token = access_token;
-            user.save(function () {
-              req.session.userToken = user.toObject();
+                    user.save(function () {
+                        req.session.userToken = user.toObject();
               res.redirect('/app');
             });
           }

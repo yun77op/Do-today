@@ -5,6 +5,7 @@
     "base_uri": "https://api.weibo.com/2"
   },
   "server": {
-    "cookie_maxAge": 86400000
+    "cookie_maxAge": 86400000,
+    "base_uri": "http://localhost"
   }
 }
