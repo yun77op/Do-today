@@ -6,6 +6,6 @@
   },
   "server": {
     "cookie_maxAge": 86400000,
-    "base_uri": "http://localhost"
+    "base_uri": "http://dev.com:8888"
   }
 }

@@ -76,13 +76,13 @@ app.get('/authorize', function (req, res) {
 });
 
 app.get('/callback', function (req, res) {
-  var url = require('url').parse(req.url, true);
-  var code = url.query.code;
+  var parsedUrl = require('url').parse(req.url, true);
+  var code = parsedUrl.query.code;
   oauth2.getAccessToken(code, function (data) {
     var access_token = data.access_token;
-    oauth2.request('/account/get_uid.json', access_token,
+    oauth2.request({ path: '/account/get_uid.json' }, access_token,
       function (data) {
-        oauth2.request('/users/show.json', {}, {uid: data.uid}, access_token,
+        oauth2.request({ path: '/users/show.json' }, {uid: data.uid}, access_token,
           function (data) {
             var user = new app.UserModel();
             user.name = data.name;
@@ -184,7 +184,7 @@ function getCurrent(user_id, fn) {
   });
 }
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 8888;
 app.listen(port, function () {
   console.log("Listening on " + port);
 });
