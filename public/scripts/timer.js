@@ -1,8 +1,8 @@
 define(function(require, exports, module) {
   var settings = require('./settings'),
-       connect = require('./connect');
-       message = require('./message'),
-          task = require('./task');
+      connect = require('./connect');
+      message = require('./message'),
+      task = require('./task');
 
   var el = $('#timer');
   var timeEl = $('.timer-time', el),

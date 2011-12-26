@@ -75,21 +75,24 @@ app.get('/authorize', function (req, res) {
   res.redirect(oauth2.getAuthorizeURL());
 });
 
-app.get('/callback', function (req, res) {
+app.get('/callback', function (req, res, next) {
   var parsedUrl = require('url').parse(req.url, true);
   var code = parsedUrl.query.code;
-  oauth2.getAccessToken(code, function (data) {
-    var access_token = data.access_token;
-    oauth2.request({ path: '/account/get_uid.json' }, access_token,
-      function (data) {
-        oauth2.request({ path: '/users/show.json' }, {uid: data.uid}, access_token,
-          function (data) {
+  oauth2.getAccessToken(code, function (err, data) {
+    if (err) next(err);
+    var accessToken = data.access_token;
+    oauth2.request({ path: '/2/account/get_uid.json' }, accessToken,
+      function (err, data) {
+        if (err) next(err);
+        oauth2.request({ path: '/2/users/show.json' }, {uid: data.uid}, accessToken,
+          function (err, data) {
+            if (err) next(err);
             var user = new app.UserModel();
             user.name = data.name;
             user.profile_image_url = data.profile_image_url;
-            user.access_token = access_token;
-                    user.save(function () {
-                        req.session.userToken = user.toObject();
+            user.access_token = accessToken;
+            user.save(function () {
+              req.session.userToken = user.toObject();
               res.redirect('/app');
             });
           }
