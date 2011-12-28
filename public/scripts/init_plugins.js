@@ -3,8 +3,7 @@ define(function(require, exports, module) {
 	require('./jquery.overlay.js');
 	require('./lib/jquery.tipsy.js');
 
-	var settings = require('./settings.js'),
-			ObjectID = require('./lib/objectid').ObjectID;
+	var settings = require('./settings.js');
 	
 	return {
 		settings: {

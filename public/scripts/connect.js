@@ -2,6 +2,7 @@ define(function(require, exports, module) {
 
   function Connect(host) {
     var self = this;
+    this.archiveData = {};
     //TODO 零点情况，请求的还是当天的数据，返回数据时却是明天了
     var dateHandle = getDateHandle();
     $.ajax('/init/' + dateHandle, {
@@ -68,7 +69,7 @@ define(function(require, exports, module) {
     },
 
     getArchiveData: function(date, fn) {
-      var dateText = getDateHandle(date),
+      var dateText = getDateHandle(date);
       var data = this.archiveData[dateText];
       if (!data) {
         $.ajax('/archive/' + dateText, {
