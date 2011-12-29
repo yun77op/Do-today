@@ -1,5 +1,6 @@
-function defineModels(mongoose, fn) {
-  var Schema = mongoose.Schema;
+
+module.exports = function(db, modelName) {
+  var Schema = db.Schema;
   var ObjectId = Schema.ObjectId;
 
   /**
@@ -66,12 +67,10 @@ function defineModels(mongoose, fn) {
     'task_id': ObjectId
   });
 
-  mongoose.model('Task', Task);
-  mongoose.model('TasksArchive', TasksArchive);
-  mongoose.model('TasksCurrent', TasksCurrent);
-  mongoose.model('User', User);
+  db.model('Task', Task);
+  db.model('TasksArchive', TasksArchive);
+  db.model('TasksCurrent', TasksCurrent);
+  db.model('User', User);
 
-  fn();
+  return db.model(modelName);
 }
-
-exports.defineModels = defineModels;

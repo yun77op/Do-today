@@ -7,5 +7,24 @@
   "server": {
     "cookie_maxAge": 86400000,
     "base_uri": "http://dev.com:8888"
+  },
+
+  "environment": {
+    "development": {
+      "port": 8888,
+      "db": {
+        "host": "localhost",
+        "database": "dotoday_development",
+        "port": 27017
+      }
+    },
+    "production": {
+      "port": 80,
+      "db": {
+        "host": "localhost",
+        "database": "dotoday_production",
+        "port": 27017
+      }
+    }
   }
 }
