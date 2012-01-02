@@ -8,16 +8,16 @@ var oauth2 = new OAuth2(config.oauth.client_id, config.oauth.client_secret,
 var models = require('../models');
 
 module.exports = function(app, db) {
-  app.get('/authorize', function (req, res) {
+  app.get('/authorize', function(req, res) {
     res.redirect(oauth2.getAuthorizeURL());
   });
 
-  app.get('/callback', function (req, res, next) {
-    var UserModel = models('User');
+  app.get('/callback', function(req, res, next) {
+    var UserModel = models(db, 'User');
     var parsedUrl = require('url').parse(req.url, true);
     var code = parsedUrl.query.code;
     var accessToken;
-    oauth2.getAccessToken(code, function (err, data) {
+    oauth2.getAccessToken(code, function(err, data) {
       if (err) next(err);
       accessToken = data.access_token;
       getUid(function(uid) {
@@ -53,6 +53,7 @@ module.exports = function(app, db) {
 
     function checkExistUser(uid, fn) {
       UserModel.findById(uid, function(err, user) {
+        console.log(err);
         if (err) next(err);
         fn(user);
        });

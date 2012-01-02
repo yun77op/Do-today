@@ -1,0 +1,269 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import blueprint/reset
+
+// To configure blueprint, edit the partials/base.sass file.
+@import partials/base
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import blueprint
+
+
+@import compass/css3
+@import compass/typography
+
+
+// Combine the partials into a single screen stylesheet.
+
+@import partials/typography
+@import partials/form
+@import partials/layout
+@import partials/ui
+@import partials/utilities
+@import partials/ext
+
++typography
+
+#header
+  +clearfix
+  background: $background-light-color url(../images/header.png) repeat-x
+  position: relative
+  .logo
+    a
+      background: url(../images/logo.png)
+      margin: 16px 0 0 230px
+      display: block
+      height: 88px
+      width: 224px
+      +hide-text
+
+#global-nav
+  right: .5em
+  top: .5em
+  position: absolute
+  ul
+    +horizontal-list
+
+#main
+  background: #443C2B
+  padding: 10px
+
+.page-do
+  #mask
+    position: absolute
+    z-index: 2
+    left: 0
+    right: 0
+    bottom: 0
+    top: 72px
+    background: rgba($background-color, 1)
+    .mask-message
+      margin: 80px auto
+      text-align: center
+  #content
+    position: relative
+    padding-top: 20px
+    margin: 0 auto
+    width: 550px
+
+  #timer
+    height: 66px
+    margin: 10px 0 30px
+    background: url(../images/sprites.png) -4px -6px
+    position: relative
+    .timer-time, .timer-progress
+      height: 36px
+      margin-top: 20px
+      float: left
+    .timer-time
+      width: 50px
+      margin-left: 18px
+      font-size: 18px
+      font-weight: bold 
+      line-height: 36px
+    .timer-progress
+      width: 20px
+      margin-left: 6px
+      +background(linear-gradient(left, #B1AD3F, #A4A148))
+      +border-radius(5px)
+    .timer-start
+      margin: 9px 0 0 5px
+      +triangle
+    .timer-start.started
+      width: 8px
+      height: 14px
+      background: #FFF
+      border: none
+      margin: 11px 0 0 6px
+    .timer-start.stopped
+      +triangle(left)
+
+  #task
+    background: transparent
+    font-size: 1em
+    .ui-widget-content
+      color: $font-color
+    .ui-tabs-nav a
+      color: $font-color
+    .task-list-container
+      position: relative
+      > .actions .button
+        @extend .button-dt
+        &.active
+          background: $notice-color
+          +border-radius(4px)
+          color: $link-color
+    .task-default
+      display: none
+    .task-list-empty
+      ul
+        list-style: none
+      .task-default
+        display: list-item
+      .button-reorder
+        display: none
+
+    .task-add
+      position: relative
+      margin-bottom: 1.5em
+      input
+        font-size: 12px
+        padding: 4px
+        width: 498px
+        +border-radius(4px, 4px)
+        border: 2px inset threedface
+        &:focus
+          border-color: yellow
+      .ui-trigger
+        position: absolute
+        right: .5em
+        top: 50%
+        background: url(../images/sprites.png) -107px -174px
+        width: 10px
+        height: 12px
+        margin-top: -6px
+
+    .task-list
+      list-style: none
+      margin: 0 1em 1em
+      .task
+        border-bottom: 1px dotted #000
+        padding: .5em
+        position: relative
+        .task
+          border: none
+          border-top: 1px dotted #000
+        &:hover
+          .actions
+            visibility: visible
+        .actions
+          visibility: hidden
+          +float-right()
+          *margin-top: -25px
+          .button
+            margin-top: 6px
+            width: 13px
+            height: 13px
+            +hide-text
+            background-image: url(../images/sprites.png)
+          .task-actions-trigger
+            background-position: -129px -173px
+          .task-actions-notes
+            background-position: -171px -173px
+        span
+          margin: 0 .5em 0 0
+
+        .ui-icon-arrowthick-2-n-s
+          position: absolute
+          right: 0
+          top: 50%
+          margin-top: -8px
+          visibility: hidden
+        .task-progress-container
+          display: none
+          height: 30px
+          line-height: 30px
+          padding: 10px 10px
+          position: absolute
+          top: -50px
+          left: -45px
+          +background($background-color)
+          +background(rgba($background-color, 0.7))
+          +box-shadow
+          +border-radius(5px)
+          .task-progress
+            width: 60px
+            margin: 8px 0 0 10px
+          .triangle
+            +triangle(bottom, 10px, $background-color)
+            +triangle(bottom, 10px, rgba($background-color, 0.7))
+            position: absolute
+            bottom: -10px
+            left: 50px
+        .task-check
+          cursor: pointer
+          width: 17px
+          height: 17px
+          margin: 0 1em 0 0
+          border: 1px solid $background-color
+          border: 1px solid rgba($background-color, 0.7)
+          +border-radius(5px)
+          color: $dark-color
+          &:hover
+            +box-shadow()
+            background: url(../images/sprites.png) -149px -173px
+            .task-progress-container
+              display: block
+    .task-session
+      list-style: upper-roman outside
+    .task-notes
+      list-style: disc inside
+    .sortable
+      cursor: move
+      .task
+        .ui-icon-arrowthick-2-n-s
+          visibility: visible !important
+        .actions
+          visibility: hidden !important
+
+  .task-priority
+    border-bottom: none !important
+    li
+      +horizontal-list-item(2px)
+      cursor: pointer
+      border: 1px solid #222
+      line-height: 1.1
+      margin-right: .2em
+      color: darken(#FFF, 20%)
+  .task-priority-0
+    color: #202020
+  .task-priority-1
+    color: red
+  .task-priority-2
+    color: #007700
+  .task-priority-3
+    color: #006699
+
+
+
+#loginArea
+  text-align: center
+  padding: 40px 2em
+
+.thumb-list
+  +pie-clearfix
+  margin-bottom: 20px
+  li.thumb
+    +float-left
+    margin: 0 10px 10px 0
+    a
+      line-height: 0
+      display: block
+      border: 4px solid $background-color
+      border-bottom-width: 8px
+      +single-box-shadow($background-color, 0, 0, 3px)
+    .thumb-desc
+      display: block
+      text-align: center
+      background: $background-color
+      +border-radius(3px)
+      margin-top: .5em
