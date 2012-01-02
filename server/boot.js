@@ -17,9 +17,10 @@ function mongoStoreConnectionArgs(db) {
 }
 
 exports.bootApplication = function(app, db) {
-  var publicDir = __dirname + '../public';
+  var publicDir = __dirname + '/../public';
+  var maxAge = config.server.cookie_maxAge;
   app.configure(function () {
-    app.set('view engine', 'ejs');
+    app.set('view engine', 'jade');
     app.set('views', __dirname + '/views');
 
     app.use(express.bodyParser());
@@ -28,17 +29,17 @@ exports.bootApplication = function(app, db) {
     app.use(express.session({
       store: mongoStore(mongoStoreConnectionArgs(db)),
       secret: 'topsecret',
-      maxAge : config.server.cookie_maxAge
+      maxAge : maxAge
     }));
 
     app.use(express.csrf());
-    app.use(express.favicon(__dirname + '../public/favicon.ico'));
+    app.use(express.favicon(__dirname + '/../public/favicon.ico'));
 
     app.use(app.router);
   });
 
   app.configure('development', function() {
-    app.use(express.static(publicDir, {maxAge: config.server.cookie_maxAge}));
+    app.use(express.static(publicDir, {maxAge: 0}));
     app.set('showStackError', true);
     //Colorful logger
     app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
@@ -46,14 +47,14 @@ exports.bootApplication = function(app, db) {
 
   app.configure('production', function() {
     // Enable gzip compression is for production mode only
-    app.use(gzippo.staticGzip(publicDir, {maxAge: config.server.cookie_maxAge}));
+    app.use(gzippo.staticGzip(publicDir, {maxAge: maxAge}));
 
     app.enable('view cache');
     app.set('showStackError', false);
   });
 
   app.dynamicHelpers({
-    isLogged: function(req, res) {
+    isLoggedIn: function(req, res) {
       return !!req.currentUser;
     },
 

@@ -5,7 +5,7 @@
   "keywords": ["GTD"],
   "dependencies": {
     "express": ">=2.5.1",
-    "ejs": ">=0.6.1",
+    "jade": ">=0.20.0",
     "mongoose": ">=2.4.7",
     "connect-mongodb": ">=1.1.1",
     "gzippo": ">=0.1.2",

@@ -1,11 +1,11 @@
-var config = require('./lib/config').config;
+var config = require('../config');
 
-var OAuth2 = require('./lib/oauth2').OAuth2;
+var OAuth2 = require('../lib/oauth2').OAuth2;
 var oauth2 = new OAuth2(config.oauth.client_id, config.oauth.client_secret,
                         config.oauth.base_uri, config.server.base_uri + '/callback',
                         '/oauth2/authorize', '/oauth2/access_token');
 
-var models = require('./models');
+var models = require('../models');
 
 module.exports = function(app, db) {
   app.get('/authorize', function (req, res) {
