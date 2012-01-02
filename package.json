@@ -1,10 +1,20 @@
 {
   "name": "dotoday",
   "version": "0.0.1",
+  "author": "Yun77op <yun77op@gmail.com>",
+  "keywords": ["GTD"],
   "dependencies": {
-    "express": "2.5.1",
-    "ejs": "0.6.1",
-    "mongoose": "2.4.7",
-    "connect-mongodb": "1.1.1"
+    "express": ">=2.5.1",
+    "ejs": ">=0.6.1",
+    "mongoose": ">=2.4.7",
+    "connect-mongodb": ">=1.1.1",
+    "gzippo": ">=0.1.2",
+    "walk": ">=2.0.2"
+  },
+  "main": "./server/web.js",
+  "engines": { "node": ">= 0.6.3" },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/yun77op/Do-today.git"
   }
 }

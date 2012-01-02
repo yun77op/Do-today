@@ -11,8 +11,8 @@ module.exports = function(db, modelName) {
     'priority': Number,
     'notes': [{
       'time': {
-        type: Date,
-        default: Date.now
+        'type': Date,
+        'default': Date.now
       },
       'content': String
     }],
@@ -32,18 +32,10 @@ module.exports = function(db, modelName) {
       'start': Number,
       'end': Number,
       'created_at': {
-        type: Date,
-        default: Date.now
+        'type': Date,
+        'default': Date.now
       }
     }]
-  });
-
-  /**
-    * Model: TasksCurrent
-    */
-  var TasksCurrent = new Schema({
-    'user_id': String,
-    'tasks': [ObjectId]
   });
 
   /**
@@ -54,8 +46,8 @@ module.exports = function(db, modelName) {
     'name': String,
     'profile_image_url': String,
     'created_time': {
-      type: Date,
-      default: Date.now
+      'type': Date,
+      'default': Date.now
     },
     'access_token': String
   });
@@ -64,6 +56,7 @@ module.exports = function(db, modelName) {
     * Model: TasksCurrent
     */
   var TasksCurrent = new Schema({
+    'user_id': String,
     'task_id': ObjectId
   });
 
@@ -73,4 +66,4 @@ module.exports = function(db, modelName) {
   db.model('User', User);
 
   return db.model(modelName);
-}
+};

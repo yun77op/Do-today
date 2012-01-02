@@ -5,8 +5,7 @@ module.exports = function(app, db) {
     var currentUser = req.currentUser;
     res.render('app', {
       locals: {
-        title: currentUser.name + ' - Dotoday',
-        currentUser: currentUser
+        title: currentUser.name + ' - Dotoday'
       }
     });
   });
