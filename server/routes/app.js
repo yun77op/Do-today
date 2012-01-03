@@ -1,11 +1,11 @@
-var models = require('./models');
+var models = require('../models');
 
 module.exports = function(app, db) {
   app.get('/app', loadUser, function (req, res) {
     var currentUser = req.currentUser;
     res.render('app', {
       locals: {
-        title: currentUser.name + ' - Dotoday'
+        title: currentUser.name
       }
     });
   });

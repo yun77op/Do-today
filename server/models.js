@@ -42,7 +42,11 @@ module.exports = function(db, modelName) {
     * Model: User
     */
   var User = new Schema({
-    '_id': {type: String, index: true},
+    '_id': {
+      type: String,
+      index: true,
+      unique: true
+    },
     'name': String,
     'profile_image_url': String,
     'created_time': {
@@ -57,7 +61,10 @@ module.exports = function(db, modelName) {
     */
   var TasksCurrent = new Schema({
     'user_id': String,
-    'task_id': ObjectId
+    'task_id': {
+      type: ObjectId,
+      ref: 'Task'
+    }
   });
 
   db.model('Task', Task);

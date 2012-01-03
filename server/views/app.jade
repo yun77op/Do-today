@@ -1,101 +1,60 @@
-<script src="scripts/lib/LAB.min.js"></script>
-<script>
-	$LAB.setOptions({BasePath: '/scripts/'})
-		.script('lib/jquery.min.js')
-		.script('lib/ejs.js')
-		.script('lib/sea.js')
-		.script('lib/underscore.js').wait()
-		.script('lib/backbone.js')
-		.script('lib/jquery-ui.min.js')
-		.wait(function() {
-			seajs.config({
-				base: '/scripts',
-				debug: false
-			});
-			seajs.use('app');
-		});
-</script>
 
-<div id="content" class="page-do">
-	<div id="timer">
-		<div class="timer-time">25:00</div>
-		<div class="timer-progress">
-			<span class="button timer-start"></span>
-		</div>
-		<div id="settings">
-			<a href="#" class="ui-button tipsy" title="设置">i</a>
-		</div>
-	</div>
-	<div id="task" class="tabs">
-		<ul>
-			<li><a href="#task-today">今日任务</a></li>
-			<li><a href="#task-past">往日记录</a></li> 
-		</ul>
-		<div id="task-today">
-			<div id="task-today-current" class="task-list-container task-list-empty">
-				<div class="task-add">
-					<input placeholder="添加任务">
-					<a class="ui-trigger ui-button tipsy" title="查看全部隐藏任务"></a>
-				</div>
-				<ul class="task-list">
-					<li class="task-default">没有记录哦!</li>
-				</ul>
-				<div class="actions">
-					<a class="button button-viewall" href="#task-today-all">查看全部</a>
-					<a class="button button-reorder" href="#">重排</a>
-				</div>
-			</div>
-			<div id="task-today-all" class="task-list-container hidden">
-				<ul class="task-list task-session">
-				</ul>
-				<div class="actions">
-					<a class="button-return button" href="#task-today-current">返回</a>
-				</div>
-			</div>
-		</div>
-		<div id="task-past" class="task-list-container">
-			<p>
-				<input id="task-datepicker">
-			</p>
-			<div id="task-past-content">
-				<ul class="task-list task-session">
-				</ul>
-			</div>
-		</div>
-	</div>
-</div><!-- #content -->
-<div id="mask" class="mask">
-	<div class="mask-message">
-		<strong class="mask-text">载入中...</strong>
-		<p><img src="images/loading.gif"></p>
-	</div>
-</div>
 
-<div id="ui-overlay-task" class="ui-overlay ui-widget-content ui-helper-hidden">
-	<ul class="ui-menu">
-		<li class="ui-menu-item"><a class="button-del button" href="#">删除</a></li>
-		<li class="ui-menu-item"><a class="button-hide button" href="#">隐藏</a></li>
-		<li class="ui-menu-item task-priority">
-			<span class="text">优先级</span>
-			<ul>
-				<li data-priority="1" style="background: red">1</li>
-				<li data-priority="2" style="background: #007700">2</li>
-				<li data-priority="3" style="background: #006699">3</li>
-				<li data-priority="0" style="background: #202020">无</li>
-			</ul>
-		</li>
-	</ul>
-</div>
+	#timer
+		.timer-time 25:00
+		.timer-progress
+			.button.timer-start
+		#settings
+			a.ui-button.tipsy(href="#", title="设置") i
+	#task.tabs
+		ul
+			li: a(href="#task-today") 今日任务
+			li: a(href="#task-past") 往日记录
+		#task-today
+			#task-today-current.task-list-container task-list-empty
+				.task-add
+					input(placeholder="添加任务")
+					a.ui-button.tipsy(title="查看全部隐藏任务")
+				ul.task-list
+					li.task-default 没有记录哦!
+				.action-area
+					a.button.button-viewall(href="#task-today-all") 查看全部
+					a.button.button-reorder(href="#") 重排
+			#task-today-all.task-list-container.hidden
+				ul.task-list.task-session
+				.action-area
+					a.button-return.button(href="#task-today-current") 返回
+		#task-past.task-list-container
+			p: input#task-datepicker
+			.content
+				ul.task-list.task-session
 
-<div id="ui-overlay-notes" class="ui-overlay ui-widget-content ui-helper-hidden">
-	<div class="triangle"></div>
-	<h3>添加笔记</h3>
-	<textarea></textarea>
-	<div class="action-area cr">
-		<button class="button button-ok">确定</button>
-		<button class="button button-discard">取消</button>
-	</div>
-</div>
+#mask
+	.mask-message
+		strong.mask-text 载入中...
+		p: img(src="images/loading.gif")
+
+
+#ui-overlay-task.ui-overlay.ui-widget-content.ui-helper-hidden
+	ul.ui-menu
+		li.ui-menu-item: a.button-del.button(href="#") 删除
+		li.ui-menu-item: a.button-hide.button"(href="#") 隐藏
+		li.ui-menu-item.task-priority
+			span.text 优先级
+			ul
+				li(data-priority="1", style="background: red") 1
+				li(data-priority="2", style="background: #007700") 2
+				li(data-priority="3", style="background: #006699") 3
+				li(data-priority="0", style="background: #202020") 无
+
+
+#ui-overlay-notes.ui-overlay.ui-widget-content.ui-helper-hidden
+	.triangle
+	h3 添加笔记
+	textarea
+	.action-area.cr
+		button.button.button-ok 确定
+		button.button.button-discard 取消
 
 <script id="template-task-session" type="x-ejs-tmpl">
 	<li class="task">

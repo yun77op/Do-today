@@ -1,18 +1,18 @@
 define(function(require, exports, module) {
-  var settings = require('./settings'),
-      connect = require('./connect');
-      message = require('./message'),
-      task = require('./task');
+  var settings = require('./settings');
+  var connect = require('./connect');
+  var message = require('./message');
+  var task = require('./task');
 
   var el = $('#timer');
-  var timeEl = $('.timer-time', el),
-      progressEl = $('.timer-progress', el),
-      startButton = $('.timer-start', el).click(run);
+  var timeEl = $('.timer-time', el);
+  var progressEl = $('.timer-progress', el);
+  var startButton = $('.timer-start', el).click(run);
 
   var count, step, instance, active;
-      initial = true,
-      working = true,
-      notify;
+  var initial = true;
+  var working = true;
+  var notify;
 
   var progressWidth,
       totalWidth = 432,
@@ -35,7 +35,7 @@ define(function(require, exports, module) {
           progressWidth += step;
           progressEl.width(progressWidth);
           updateTime(--count);
-          if (count == 0) {
+          if (count === 0) {
             run();
             run(false);
             complete();
@@ -70,7 +70,7 @@ define(function(require, exports, module) {
     }
     startButton.removeClass(prevActionHandler.className)
       .addClass(actionHandler.className);
-    if (canTrigger != false) {
+    if (canTrigger !== false) {
       $(document).trigger('timer:action:' + actions[actionIndex]);
     }
     actionIndex = (++actionIndex) % 3;
@@ -112,7 +112,7 @@ define(function(require, exports, module) {
       stop: function() {
         clearInterval(timer);
       }
-    }
+    };
   }
   
   if (window.webkitNotifications) {
@@ -149,7 +149,7 @@ define(function(require, exports, module) {
         });
         messageMain.show();
       }
-    }
+    };
   }
 
   function updateTime(num) {

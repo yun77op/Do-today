@@ -53,7 +53,6 @@ module.exports = function(app, db) {
 
     function checkExistUser(uid, fn) {
       UserModel.findById(uid, function(err, user) {
-        console.log(err);
         if (err) next(err);
         fn(user);
        });
