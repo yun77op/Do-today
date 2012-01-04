@@ -1,21 +1,23 @@
 var models = require('../models');
 
 module.exports = function(app, db) {
-  app.get('/app', loadUser, function (req, res) {
-    var currentUser = req.currentUser;
+  var access = app.access;
+
+  app.get('/app', access, function (req, res) {
+    var user = req.user;
     res.render('app', {
       locals: {
-        title: currentUser.name
+        title: user.name
       }
     });
   });
 
 
-  app.post('/task', loadUser, function (req, res, next) {
+  app.post('/task', access, function (req, res, next) {
     var TaskModel = models('Task');
     var TasksCurrentModel = models('TasksCurrent');
     var task = new TaskModel(req.body);
-    task.user_id = req.currentUser.id;
+    task.user_id = req.user._id;
     task.save(function() {
       var taskData = task.toObject();
       syncCurrentTasks(taskData._id, function() {
@@ -34,9 +36,9 @@ module.exports = function(app, db) {
 
   });
 
-  app.del('/task/:id', loadUser, function (req, res, next) {
+  app.del('/task/:id', access, function (req, res, next) {
     var TaskModel = models('Task');
-    TaskModel.findOne({ _id: req.params.id, user_id: req.currentUser.id },
+    TaskModel.findOne({ _id: req.params.id, user_id: req.user._id },
       function (err, task) {
         task.remove(function() {
           res.send('ok');
@@ -45,17 +47,17 @@ module.exports = function(app, db) {
     );
   });
 
-  app.get('/tasks/:dateText', loadUser, function (req, res, next) {
+  app.get('/tasks/:dateText', access, function (req, res, next) {
     var TasksArchiveModel = models('TasksArchive');
     var dateText = req.params.dateText;
-    TasksArchiveModel.find({ dateText: dateText, user_id: req.currentUser.id },
+    TasksArchiveModel.find({ dateText: dateText, user_id: req.user._id },
       function (err, data) {
         res.send(data.toObject().sessions);
       }
     );
   });
 
-  app.post('/tasks/:dateText', loadUser, function (req, res, next) {
+  app.post('/tasks/:dateText', access, function (req, res, next) {
     var TasksArchiveModel = models('TasksArchive');
     var tasksArchive = TasksArchiveModel(req.body);
     tasksArchive.dateText = req.params.dateText;
@@ -66,15 +68,15 @@ module.exports = function(app, db) {
 
 
   //Feed init data
-  app.get('/init/:dateText', loadUser, function (req, res, next) {
+  app.get('/init/:dateText', access, function (req, res, next) {
     var TasksArchiveModel = models('TasksArchive');
     var result = {};
     var dateText = req.params.dateText;
-    var ueserId = req.currentUser._id;
+    var ueserId = req.user._id;
     TasksArchiveModel.findOne({ dateText: dateText, user_id: ueserId },
       function (err, tasksArchive) {
         result.todayData = tasksArchive ? tasksArchive.toObject().sessions : [];
-        getCurrentTasks(req.currentUser.id, function(tasks) {
+        getCurrentTasks(req.user._id, function(tasks) {
           result.currentTasks = tasks;
           res.send(result);
         });
@@ -105,14 +107,3 @@ module.exports = function(app, db) {
   });
 }
 
-function loadUser(req, res, next) {
-  var user = req.session.userToken;
-  if (user) {
-    req.currentUser = user;
-    next();
-  } else {
-    if (req.url == '/')
-      return next();
-    res.redirect('home');
-  }
-}

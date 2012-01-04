@@ -36,7 +36,7 @@ module.exports = function(app, db) {
     });
           
     function doFinalAction(userData) {
-      req.session.userToken = userData;
+      req.session.user = userData;
       res.redirect('/app');
     }
 

@@ -1,5 +1,9 @@
 module.exports = function(app, db) {
   app.get('/', function (req, res) {
-    res.render('index');
+    if (req.isLoggedIn) {
+      res.redirect('/app');
+    } else {
+      res.render('index');
+    }
   });
 };

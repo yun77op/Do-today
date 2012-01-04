@@ -1,10 +1,6 @@
 define(function(require, exports, module) {
-	require('./jquery.hotedit.js');
-	require('./jquery.overlay.js');
-	require('./lib/jquery.tipsy.js');
-
 	var settings = require('./settings.js');
-	
+
 	return {
 		settings: {
 			fn: function(app) {

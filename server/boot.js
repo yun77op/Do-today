@@ -16,6 +16,23 @@ function mongoStoreConnectionArgs(db) {
   };
 }
 
+// Login middleware helper
+function loginHelper(req, res, next) {
+  req.isLoggedIn = req.session.user ? true : false;
+  next();
+}
+
+function access(req, res, next) {
+  if (req.isLoggedIn) {
+    req.user = req.session.user;
+    next();
+  } else {
+    if (req.route.path == '/')
+      return next();
+    res.redirect('home');
+  }
+}
+
 exports.bootApplication = function(app, db) {
   var publicDir = __dirname + '/../public';
   var maxAge = config.server.cookie_maxAge;
@@ -35,6 +52,7 @@ exports.bootApplication = function(app, db) {
     app.use(express.csrf());
     app.use(express.favicon(__dirname + '/../public/favicon.ico'));
 
+    app.use(loginHelper);
     app.use(app.router);
   });
 
@@ -55,11 +73,11 @@ exports.bootApplication = function(app, db) {
 
   app.dynamicHelpers({
     isLoggedIn: function(req, res) {
-      return !!req.currentUser;
+      return !!req.user;
     },
 
     user: function(req, res) {
-      return req.currentUser;
+      return req.user;
     },
 
     dateformat: function(req, res) {
@@ -75,6 +93,7 @@ exports.bootApplication = function(app, db) {
 
   });
 
+  app.access = access;
 };
 
 // ## Load Routes
