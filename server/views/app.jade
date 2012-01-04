@@ -1,3 +1,4 @@
+link(href='stylesheets/Aristo/jquery-ui-1.8.7.custom.css', media='screen, projection', rel='stylesheet')
 .page-app
   #timer
     .timer-time 25:00
@@ -33,51 +34,13 @@
         strong.mask-text 载入中...
         p: img(src="images/loading.gif")
 
-
-  #ui-overlay-task.ui-overlay.ui-widget-content.hidden
-    ul.ui-menu
-      li.ui-menu-item: a.button-del.button(href="#") 删除
-      li.ui-menu-item: a.button-hide.button(href="#") 隐藏
-      li.ui-menu-item.task-priority
-        span.text 优先级
-        ul
-          li(data-priority="0", style="background: #202020") 无
-          li(data-priority="1", style="background: red") 1
-          li(data-priority="2", style="background: #007700") 2
-          li(data-priority="3", style="background: #006699") 3
-
-
-  #ui-overlay-notes.ui-overlay.ui-widget-content.hidden
-    .triangle
-    h3 添加笔记
-    textarea
-    .action-area.cr
-      button.button.button-ok 确定
-      button.button.button-discard 取消
-
-  
-  script#template-task-session(type="x-ejs-tmpl")
-    |<li class="task">
-    |  <strong class="task-content">[%= task.content %]</strong>
-    |  [% if (start != 0 || end != 100) { %]
-    |    <em class="right">完成从[%= start %]%到[%= end %]%</em>
-    |  [% } %]
-    |  [% if (typeof task.notes != 'undefined') { %]
-    |    <ul class="task-notes">
-    |      [% _.each(task.notes, function(note) { %]
-    |        <li>
-    |          [%= note.content %]
-    |          <em class="time right">[%= new Date(note.time).toLocaleString() %]</em>
-    |        </li>
-    |      [% }); %]
-    |    </ul>
-    |  [% } %]
-    |</li>
-
+  include partials/overlay-notes
+  include partials/overlay-task
 
   script(src="scripts/lib/LAB.min.js")
   script
-    $LAB.setOptions({BasePath: '/scripts/'})
+    $LAB.setGlobalDefaults({BasePath: '/scripts/'});
+    $LAB
       .script('lib/jquery.min.js')
       .script('lib/ejs.js')
       .script('lib/sea.js')
@@ -88,5 +51,7 @@
         seajs.config({
           base: '/scripts'
         });
-        seajs.use('app');
+        seajs.use('app', function(app) {
+          app.start();
+        });
       });

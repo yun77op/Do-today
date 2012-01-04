@@ -1,0 +1,11 @@
+#ui-overlay-task.ui-overlay.ui-widget-content.hidden
+  ul.ui-menu
+    li.ui-menu-item: a.button-del.button(href="#") 删除
+    li.ui-menu-item: a.button-hide.button(href="#") 隐藏
+    li.ui-menu-item.task-priority
+      span.text 优先级
+      ul
+        li(data-priority="0", style="background: #202020") 无
+        li(data-priority="1", style="background: red") 1
+        li(data-priority="2", style="background: #007700") 2
+        li(data-priority="3", style="background: #006699") 3

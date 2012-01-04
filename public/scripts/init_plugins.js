@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-	var settings = require('./settings.js');
+	var settings = require('./settings');
 
 	return {
 		settings: {
@@ -39,26 +39,6 @@ define(function(require, exports, module) {
 
 				settings.subscribe('timer', 'work', function(value) {
 					$(document).trigger('timer:settings:changed', ['work', value]);
-				});
-			}
-		},
-
-		soundNotify: {
-			fn: function() {
-				if (!settings.get('notification', 'sound')) { return; }
-				require.async('lib/soundmanager2-nodebug-jsmin.js', function() {
-					soundManager.url = '../assets/';
-					soundManager.onready(function(oStatus) {
-						if (!oStatus.success) { return false; }
-						var sound = soundManager.createSound({
-							id: 'soundNotify',
-							url: '../assets/notify.mp3'
-						});
-						$(document).bind('timer:complete', function(e) {
-							sound.play();
-						});
-					});
-					soundManager.beginDelayedInit();
 				});
 			}
 		},

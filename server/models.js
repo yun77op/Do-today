@@ -28,7 +28,7 @@ module.exports = function(db, modelName) {
     'dateText': String,
     'user_id': String,
     'sessions': [{
-      'taskId': ObjectId,
+      'task_id': ObjectId,
       'start': Number,
       'end': Number,
       'created_at': {
@@ -62,8 +62,8 @@ module.exports = function(db, modelName) {
   var TasksCurrent = new Schema({
     'user_id': String,
     'task_id': {
-      type: ObjectId,
-      ref: 'Task'
+      'type': ObjectId,
+      'ref': 'Task'
     }
   });
 

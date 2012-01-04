@@ -1,46 +1,5 @@
 define(function(require, exports, module) {
   var connect = new require('./connect').Connect();
-  var el = $('#task');
-
-  el.tabs({
-    select: function(event, ui) {
-      if (ui.index == 1) {
-        var yesterday = new Date().valueOf() -  24 * 60 * 60 * 1000;
-        $('#task-datepicker').val($.datepicker.formatDate('mm/dd/yy', new Date(yesterday)));
-        makeSessionList('task-past', yesterday);
-      }
-    }
-  });
-
-  $('#task-datepicker', el).datepicker({
-    onClose: function(dateText, inst) {
-      makeSessionList('task-past', dateText);
-    }
-  });
-
-
-  //sort
-  var sortable = true;
-  el.delegate('.actions .button-reorder', 'click', function(e) {
-    e.preventDefault();
-    $(this).toggleClass('active');
-    $(this).text((sortable ? '完成': '') + '重排');
-    sortable = !sortable;
-    var container = $('#task-today-current');
-    $('.task-list', container).sortable({ disabled: sortable })
-      .toggleClass('sortable');
-  }).delegate('.actions .button-viewall, .actions .button-return', 'click', function(e) {
-    e.preventDefault();
-    var targetID = this.href.slice(1);
-    if (targetID == 'task-today-all') {
-      makeSessionList(targetID, Date.now());
-    }
-    var target = $(this.href);
-    target.siblings().fadeOut(function() {
-      target.fadeIn();
-    });
-  });
-
 
   var TaskView = Backbone.View.extend({
     tagName: 'li',
@@ -124,32 +83,7 @@ define(function(require, exports, module) {
     }
   });
 
-  el.delegate('input', 'keyup', function(e) {
-    var el = $(this);
-    if (e.which == 13) {
-      var content = $.trim(el.val());
-      el.val('');
-      if (content === '') { return; }
-      
-      var hiddenId = el.data('hiddenId'), task;
-      if (hiddenId) {
-        task = connect = checkHidden(hiddenId);
-        acRemove(hiddenId);
-        el.removeData('hiddenId');
-        task.content = content;
-        addToCurrent(task);
-      } else {
-        connect.addTask({
-            content: content
-          }, function (task) {
-            addToCurrent(task);
-          }
-        );
-      }
-    }
-  });
-
-  var templateTaskSession = new EJS({element: 'template-task-session'});
+  var templateTaskSession = new EJS({url: 'views/task-session.ejs'});
 
   function addToCurrent(task) {
     var taskModel = new Backbone.Model(task);
@@ -157,7 +91,7 @@ define(function(require, exports, module) {
       model: taskModel
     });
 
-    var container = $('#task-today-current', el),
+    var container = $('#task-today-current'),
         list = container.find('.task-list');
       
     container.removeClass('task-list-empty');
@@ -182,7 +116,7 @@ define(function(require, exports, module) {
     });
   }
 
-  var input = $('#task-today-current input', el);
+  var input = $('#task-today-current input');
   
   function focusInput() {
     input.get(0).focus();
@@ -203,7 +137,7 @@ define(function(require, exports, module) {
   }
 
   function checkTaskListStatus() {
-    var container = $('#task-today-current', el);
+    var container = $('#task-today-current');
     if (container.find('li:visible').length == 0) {
       container.addClass('task-list-empty');
     }
@@ -249,15 +183,86 @@ define(function(require, exports, module) {
     };
   }
 
-  $('.ui-trigger', el).click(function() {
-    input.autocomplete('search', '');
-  });
+  function start() {
+    var el = $('#task');
+
+    el.delegate('input', 'keyup', function(e) {
+      var input = $(this);
+      if (e.which == 13) {
+        var content = $.trim(input.val());
+        input.val('');
+        if (content === '') { return; }
+        
+        var hiddenId = input.data('hiddenId'), task;
+        if (hiddenId) {
+          task = connect.checkHidden(hiddenId);
+          acRemove(hiddenId);
+          input.removeData('hiddenId');
+          task.content = content;
+          addToCurrent(task);
+        } else {
+          connect.addTask({
+              content: content
+            }, function (task) {
+              addToCurrent(task);
+            }
+          );
+        }
+      }
+    });
+
+    //sort
+    var sortable = true;
+    el.delegate('.actions .button-reorder', 'click', function(e) {
+      e.preventDefault();
+      $(this).toggleClass('active');
+      $(this).text((sortable ? '完成': '') + '重排');
+      sortable = !sortable;
+      var container = $('#task-today-current');
+      $('.task-list', container).sortable({ disabled: sortable })
+        .toggleClass('sortable');
+    }).delegate('.actions .button-viewall, .actions .button-return', 'click', function(e) {
+      e.preventDefault();
+      var targetID = this.href.slice(1);
+      if (targetID == 'task-today-all') {
+        makeSessionList(targetID, Date.now());
+      }
+      var target = $(this.href);
+      target.siblings().fadeOut(function() {
+        target.fadeIn();
+      });
+    });
+
+
+    $('.button', el).click(function() {
+      input.autocomplete('search', '');
+    });
+
+
+    el.tabs({
+      select: function(event, ui) {
+        if (ui.index == 1) {
+          var yesterday = new Date().valueOf() -  24 * 60 * 60 * 1000;
+          $('#task-datepicker').val($.datepicker.formatDate('mm/dd/yy', new Date(yesterday)));
+          makeSessionList('task-past', yesterday);
+        }
+      }
+    });
+
+    $('#task-datepicker', el).datepicker({
+      onClose: function(dateText, inst) {
+        makeSessionList('task-past', dateText);
+      }
+    });
+  }
+  
 
   return {
     initAutocomplete: initAutocomplete,
     addToCurrent: addToCurrent,
 
-    focusInput: focusInput
+    focusInput: focusInput,
+    start: start
   };
   
 });
