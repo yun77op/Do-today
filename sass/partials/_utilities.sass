@@ -17,16 +17,6 @@
 	@else
 		border-color: $color transparent
 
-
-.clear
-	clear: both
-
-.force-wrap
-	+force-wrap
-
-.nowrap
-	+nowrap
-
 .clearfix
 	+pie-clearfix
 
@@ -37,6 +27,7 @@
 	font-size: 0.8em
 	margin-bottom: 1.875em
 	line-height: 1.875em
+
 .large
 	font-size: 1.2em
 	line-height: 2.5em
@@ -73,16 +64,6 @@ $use-mozilla-ellipsis-binding: true
 		left: auto
 		right: auto
 
-.tc
-	text-align: center
-
-.tr
-	text-align: right
-
-.tl
-	text-align: left
-
-
 .tc-relative
 	position: relative
 	left: 50%
@@ -116,37 +97,6 @@ $use-mozilla-ellipsis-binding: true
 	background-repeat: no-repeat
 	text-align: left
 	direction: ltr
-
-.hr-dashed
-	border-top-style: dashed
-
-.hr-texture
-	border-top-color: #31045e
-	border-bottom: 1px solid rgba(255, 255, 255, 0.2)
-	border-radius: 3px
-
-.button
-	display: inline-block
-	padding: 0
-	text-decoration: none !important
-	cursor: pointer
-	text-align: center
-	zoom: 1
-	overflow: visible
-	+experimental(user-select, none, -moz, -webkit, not -o, not -ms, not -khtml, official)
-
-.button-dt
-	+border-radius(2px)
-	padding: 0.2em 0.5em
-	font-size: 12px
-	color: $link-hover-color
-	font-size: .9em
-	background: $background-color
-	background: rgba($background-color, 0.7)
-	+linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
-	&:hover
-		color: $link-color
-		+box-shadow()
 
 .link-icon
 	+link-icon-base

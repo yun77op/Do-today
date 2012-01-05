@@ -1,19 +1,28 @@
 define(function(require, exports, module) {
+  
+  function getDateHandle(date) {
+    if (date == undefined) {
+      date = Date.now();
+    }
+    if (!(typeof date == 'object' && date instanceof Date)) {
+      date = new Date(date);
+    }
+    return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
+  }
 
-  function Connect(host) {
+  function Connect() {
     var self = this;
     this.archiveData = {};
     //TODO 零点情况，请求的还是当天的数据，返回数据时却是明天了
-    var dateHandle = getDateHandle();
-    $.ajax('/init/' + dateHandle, {
+    var dateText = getDateHandle();
+    $.ajax('/init/' + dateText, {
       contentType: 'json',
       success: function (data) {
-        self.currentTasks = data.currentTasks;
-        self.archiveData[dateHandle] = data.todayData;
+        self.currentTasks = data.current;
+        self.archiveData[dateText] = data.today;
         this.initUI();
       }
     });
-    this.host = host;
   }
 
   Connect.prototype = {
@@ -71,8 +80,9 @@ define(function(require, exports, module) {
     getArchiveData: function(date, fn) {
       var dateText = getDateHandle(date);
       var data = this.archiveData[dateText];
+      var self = this;
       if (!data) {
-        $.ajax('/archive/' + dateText, {
+        $.ajax('/tasks/' + dateText, {
           contentType: 'json',
           success: function(data) {
             self.archiveData[dateText] = data;
@@ -120,18 +130,9 @@ define(function(require, exports, module) {
     }
   };
 
-  function getDateHandle(date) {
-    if (date == undefined) {
-      date = Date.now();
-    }
-    if (!(typeof date == 'object' && date instanceof Date)) {
-      date = new Date(date);
-    }
-    return 'd' + [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('');
-  }
-
+  var connect = new Connect();
   return {
-    Connect: Connect
+    connect: connect
   };
 
 });

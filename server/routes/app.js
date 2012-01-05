@@ -15,7 +15,6 @@ module.exports = function(app, db) {
 
   app.post('/task', access, function (req, res, next) {
     var TaskModel = models(db, 'Task');
-    var TasksCurrentModel = models(db, 'TasksCurrent');
     var task = new TaskModel(req.body);
     task.user_id = req.user._id;
     task.save(function() {
@@ -25,11 +24,12 @@ module.exports = function(app, db) {
       });
     });
 
-    function syncCurrentTasks(id, fn) {
-      var tasksCurrent = new TasksCurrentModel({
-        task_id: id
+    function syncCurrentTasks(taskId, fn) {
+      var TasksCurrentModel = models(db, 'TasksCurrent');
+      var doc = new TasksCurrentModel({
+        task_id: taskId
       });
-      tasksCurrent.save(function() {
+      doc.save(function() {
         fn();
       });
     }
@@ -50,19 +50,20 @@ module.exports = function(app, db) {
   app.get('/tasks/:dateText', access, function (req, res, next) {
     var TasksArchiveModel = models(db, 'TasksArchive');
     var dateText = req.params.dateText;
-    TasksArchiveModel.find({ dateText: dateText, user_id: req.user._id },
-      function (err, data) {
-        res.send(data.toObject().sessions);
+    TasksArchiveModel.findOne({ dateText: dateText, user_id: req.user._id },
+      function (err, doc) {
+        var data = doc ? doc.toObject().sessions : [];
+        res.send(data);
       }
     );
   });
 
   app.post('/tasks/:dateText', access, function (req, res, next) {
     var TasksArchiveModel = models(db, 'TasksArchive');
-    var tasksArchive = TasksArchiveModel(req.body);
-    tasksArchive.dateText = req.params.dateText;
-    tasksArchive.save(function () {
-      res.send(data.toObject().sessions);
+    var doc = TasksArchiveModel(req.body);
+    doc.dateText = req.params.dateText;
+    doc.save(function () {
+      res.send(doc.toObject().sessions);
     });
   });
 

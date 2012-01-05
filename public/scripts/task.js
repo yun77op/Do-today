@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  var connect = new require('./connect').Connect();
+  var connect = require('./connect').connect;
 
   var TaskView = Backbone.View.extend({
     tagName: 'li',
@@ -100,8 +100,8 @@ define(function(require, exports, module) {
 
   function makeSessionList(id, date) {
     connect.getArchiveData(date, function (data) {
-      var container = $('#' + id),
-          list = container.find('.task-list').empty();
+      var container = $('#' + id);
+      var list = container.find('.task-list').empty();
       container.removeClass('task-list-empty');
 
       if (!data || data.length == 0) {

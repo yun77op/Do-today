@@ -12,10 +12,10 @@ html(class='no-js', lang='en')
   //<![endif]
   head
     meta(charset='utf-8')
-      - if ('undefined' !== typeof title)
-        title #{title} - Dotoday
-      - else
-        title Dotoday
+    - if (typeof title !== 'undefined')
+      title #{title} - Dotoday
+    - else
+      title Dotoday
     meta(name='viewport', content='width=device-width,initial-scale=1')
     link(href='stylesheets/screen.css', media='screen, projection', rel='stylesheet')
 

@@ -1,0 +1,30 @@
+.hr-dashed
+  border-top-style: dashed
+
+.hr-texture
+  border-top-color: #31045e
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2)
+  border-radius: 3px
+
+.button
+  display: inline-block
+  padding: 0
+  text-decoration: none !important
+  cursor: pointer
+  text-align: center
+  zoom: 1
+  overflow: visible
+  +experimental(user-select, none, -moz, -webkit, not -o, not -ms, not -khtml, official)
+
+.button-dt
+  +border-radius(2px)
+  padding: 0.2em 0.5em
+  font-size: 12px
+  color: $link-hover-color
+  font-size: .9em
+  background: $background-color
+  background: rgba($background-color, 0.7)
+  +linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
+  &:hover
+    color: $link-color
+    +box-shadow()
