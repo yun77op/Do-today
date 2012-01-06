@@ -49,18 +49,19 @@ exports.bootApplication = function(app, db) {
       maxAge : maxAge
     }));
 
-    app.use(express.csrf());
-    app.use(express.favicon(__dirname + '/../public/favicon.ico'));
+    // app.use(express.csrf());
 
     app.use(loginHelper);
     app.use(app.router);
+    app.use(express.favicon(__dirname + '/../public/favicon.ico'));
   });
 
   app.configure('development', function() {
-    app.use(express.static(publicDir, {maxAge: 0}));
-    app.set('showStackError', true);
     //Colorful logger
     app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
+    
+    app.use(express.static(publicDir, {maxAge: 0}));
+    app.set('showStackError', true);
   });
 
   app.configure('production', function() {

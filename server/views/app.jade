@@ -10,22 +10,22 @@ link(href='stylesheets/tipsy.css', media='screen, projection', rel='stylesheet')
   #task.tabs
     ul
       li: a(href="#task-today") 今日任务
-      li: a(href="#task-past") 往日记录
+      li: a(href="#task-archives") 往日记录
     #task-today
       #task-today-current.task-list-container.task-list-empty
         .task-add
           input(placeholder="添加任务")
           a.task-add-button.button.tipsy(title="查看全部隐藏任务")
         ul.task-list
-          li.task-default 没有记录哦!
+          li.task-empty 没有记录哦!
         .actionArea
-          a.button.button-viewall(href="#task-today-all") 查看全部
+          a.button.button-viewall(href="#task-today-archive") 查看全部
           a.button.button-reorder(href="#") 重排
-      #task-today-all.task-list-container.hidden
+      #task-today-archive.task-list-container.hidden
         ul.task-list.task-session
         .actionArea
           a.button-return.button(href="#task-today-current") 返回
-    #task-past.task-list-container
+    #task-archives.task-list-container
       p: input#task-datepicker
       .content
         ul.task-list.task-session

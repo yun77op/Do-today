@@ -12,23 +12,24 @@ module.exports = function(app, db) {
     });
   });
 
-
-  app.post('/task', access, function (req, res, next) {
+  app.post('/task', access, function (req, res) {
     var TaskModel = models(db, 'Task');
-    var task = new TaskModel(req.body);
-    task.user_id = req.user._id;
-    task.save(function() {
-      var taskData = task.toObject();
-      syncCurrentTasks(taskData._id, function() {
-        res.send(taskData);
+    var doc = new TaskModel(req.body);
+    console.log(req.body);
+    doc.user_id = req.user._id;
+    doc.save(function() {
+      var data = doc.toObject();
+      addCurrentTask({
+        task: data._id,
+        user_id: req.user._id
+      }, function() {
+        res.send(data);
       });
     });
 
-    function syncCurrentTasks(taskId, fn) {
+    function addCurrentTask(taskData, fn) {
       var TasksCurrentModel = models(db, 'TasksCurrent');
-      var doc = new TasksCurrentModel({
-        task_id: taskId
-      });
+      var doc = new TasksCurrentModel(taskData);
       doc.save(function() {
         fn();
       });
@@ -36,7 +37,7 @@ module.exports = function(app, db) {
 
   });
 
-  app.del('/task/:id', access, function (req, res, next) {
+  app.del('/task/:id', access, function (req, res) {
     var TaskModel = models(db, 'Task');
     TaskModel.findOne({ _id: req.params.id, user_id: req.user._id },
       function (err, doc) {
@@ -47,7 +48,7 @@ module.exports = function(app, db) {
     );
   });
 
-  app.get('/tasks/:dateText', access, function (req, res, next) {
+  app.get('/tasks/:dateText', access, function (req, res) {
     var TasksArchiveModel = models(db, 'TasksArchive');
     var dateText = req.params.dateText;
     TasksArchiveModel.findOne({ dateText: dateText, user_id: req.user._id },
@@ -58,7 +59,7 @@ module.exports = function(app, db) {
     );
   });
 
-  app.post('/tasks/:dateText', access, function (req, res, next) {
+  app.post('/tasks/:dateText', access, function (req, res) {
     var TasksArchiveModel = models(db, 'TasksArchive');
     var doc = TasksArchiveModel(req.body);
     doc.dateText = req.params.dateText;
@@ -69,7 +70,7 @@ module.exports = function(app, db) {
 
 
   //Feed init data
-  app.get('/init/:dateText', access, function (req, res, next) {
+  app.get('/init/:dateText', access, function (req, res) {
     var TasksArchiveModel = models(db, 'TasksArchive');
     var result = {};
     var dateText = req.params.dateText;
@@ -87,11 +88,11 @@ module.exports = function(app, db) {
     function getCurrentTasks(ueserId, fn) {
       models(db, 'TasksCurrent')
         .find({user_id: ueserId})
-        .populate('task_id')
+        .populate('task')
         .run(function(err, docs) {
           var tasks = [];
           docs.forEach(function(doc) {
-            taskAry.push(doc.toObject());
+            tasks.push(doc.toObject());
           });
           fn(tasks);
         });

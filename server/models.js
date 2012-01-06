@@ -61,7 +61,7 @@ module.exports = function(db, modelName) {
     */
   var TasksCurrent = new Schema({
     'user_id': String,
-    'task_id': {
+    'task': {
       'type': ObjectId,
       'ref': 'Task'
     }

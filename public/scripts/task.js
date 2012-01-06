@@ -12,61 +12,59 @@ define(function(require, exports, module) {
     render: function() {
       var self = this;
       var data = this.model.attributes;
+      console.log(this.el);
       this.template.update(this.el, data);
-      
-      this.taskActions = $('.task-actions-trigger', this.el).overlay({
-        srcNode: '#ui-overlay-task',
-        open: function(e, ui) {
-          $(document).trigger('overlay:task', self);
-        }
-      });
+      // this.taskActions = $('.task-action-trigger', this.el).overlay({
+      //   srcNode: '#ui-overlay-task',
+      //   open: function(e, ui) {
+      //     $(document).trigger('overlay:task', self);
+      //   }
+      // });
 
-      this.taskNotes = $('.task-actions-notes', this.el).overlay({
-        srcNode: '#ui-overlay-notes',
-        position: {
-          offset: '7 10',
-          at: 'right bottom',
-          my: 'right top'
-        },
-        open: function(e, ui) {
-          $(document).trigger('overlay:notes', self);
-        }
-      });
+      // this.taskNotes = $('.task-action-notes', this.el).overlay({
+      //   srcNode: '#ui-overlay-notes',
+      //   position: {
+      //     offset: '7 10',
+      //     at: 'right bottom',
+      //     my: 'right top'
+      //   },
+      //   open: function(e, ui) {
+      //     $(document).trigger('overlay:notes', self);
+      //   }
+      // });
 
-      var slideStartValue;
-      $('.task-progress', this.el).slider({
-        start: function(e, ui) {
-          slideStartValue = $(this).slider('value');
-        },
+      // var slideStartValue;
+      // $('.task-progress', this.el).slider({
+      //   start: function(e, ui) {
+      //     slideStartValue = $(this).slider('value');
+      //   },
 
-        slide: function(e, ui) {
-          if (ui.value <= slideStartValue) {
-            e.preventDefault();
-          } else {
-            $(this).siblings('.task-process-val').text(ui.value + '%');
-          }
-        },
+      //   slide: function(e, ui) {
+      //     if (ui.value <= slideStartValue) {
+      //       e.preventDefault();
+      //     } else {
+      //       $(this).siblings('.task-process-val').text(ui.value + '%');
+      //     }
+      //   },
 
-        stop: function(e, ui) {
-          if (ui.value == 100) {
-            self.check();
-          }
-          connect.progressChange(self.model.get('_id'), slideStartValue, ui.value);
-        },
+      //   stop: function(e, ui) {
+      //     if (ui.value == 100) {
+      //       self.check();
+      //     }
+      //     connect.progressChange(self.model.get('_id'), slideStartValue, ui.value);
+      //   },
 
-        value: self.model.get('progress')
-      });
+      //   value: self.model.get('progress')
+      // });
 
-      var taskContentEl = $('.task-content', this.el).hotedit({
-        callback: function(text) {
-          taskContentEl.text(text);
-          $(document).trigger('task:change', [self.model.get('_id'), 'content', text]);
-        }
-      });
+      // var taskContentEl = $('.task-content', this.el).hotedit({
+      //   callback: function(text) {
+      //     taskContentEl.text(text);
+      //     $(document).trigger('task:change', [self.model.get('_id'), 'content', text]);
+      //   }
+      // });
 
-      $('.task-content', this.el).tipsy();
-      $('.task-actions-notes', this.el).tipsy();
-      $('.task-actions-trigger', this.el).tipsy();
+      // $('.task-content, .task-action-trigger, .task-action-notes', this.el).tipsy();
       return this;
     },
 
@@ -83,19 +81,20 @@ define(function(require, exports, module) {
     }
   });
 
+
   var templateTaskSession = new EJS({url: 'views/task-session.ejs'});
 
-  function addToCurrent(task) {
-    var taskModel = new Backbone.Model(task);
-    var taskView = new TaskView({
-      model: taskModel
+  function addToCurrent(taskData) {
+    var task = new TaskView({
+      model: new Backbone.Model(taskData)
     });
+    
+    var container = $('#task-today-current');
+    var list = container.find('.task-list');
+    var el = task.render().el;
 
-    var container = $('#task-today-current'),
-        list = container.find('.task-list');
-      
     container.removeClass('task-list-empty');
-    list.append(taskView.render().el);
+    list.append(el);
   }
 
   function makeSessionList(id, date) {
@@ -106,7 +105,7 @@ define(function(require, exports, module) {
 
       if (!data || data.length == 0) {
         container.addClass('task-list-empty');
-        list.append('<li class="task-default">没有记录哦</li>');
+        list.append('<li class="task-empty">没有记录哦!</li>');
       } else {
         _.each(data, function(item) {
           var el = templateTaskSession.render(item);
@@ -202,11 +201,10 @@ define(function(require, exports, module) {
           addToCurrent(task);
         } else {
           connect.addTask({
-              content: content
-            }, function (task) {
-              addToCurrent(task);
-            }
-          );
+            content: content
+          }, function (task) {
+            addToCurrent(task);
+          });
         }
       }
     });
@@ -244,25 +242,30 @@ define(function(require, exports, module) {
         if (ui.index == 1) {
           var yesterday = new Date().valueOf() -  24 * 60 * 60 * 1000;
           $('#task-datepicker').val($.datepicker.formatDate('mm/dd/yy', new Date(yesterday)));
-          makeSessionList('task-past', yesterday);
+          makeSessionList('task-archives', yesterday);
         }
       }
     });
 
     $('#task-datepicker', el).datepicker({
       onClose: function(dateText, inst) {
-        makeSessionList('task-past', dateText);
+        makeSessionList('task-archives', dateText);
       }
     });
-  }
-  
 
-  return {
+    connect.start();
+  }
+
+  var expt = {
     initAutocomplete: initAutocomplete,
     addToCurrent: addToCurrent,
 
     focusInput: focusInput,
     start: start
   };
-  
+
+  connect.host = expt;
+
+  return expt;
+
 });

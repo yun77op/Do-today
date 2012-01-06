@@ -4,7 +4,8 @@ var app = express.createServer();
 var config = require('./config');
 var models = require('./models');
 
-var env  = process.env.NODE_ENV || 'development';
+process.env.NODE_ENV = 'development';
+var env  = process.env.NODE_ENV;
 var port = process.env.PORT || 8888;
 var envConfig = config.environment[env];
 

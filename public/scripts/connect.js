@@ -11,41 +11,43 @@ define(function(require, exports, module) {
   }
 
   function Connect() {
-    var self = this;
     this.archiveData = {};
-    //TODO 零点情况，请求的还是当天的数据，返回数据时却是明天了
-    var dateText = getDateHandle();
-    $.ajax('/init/' + dateText, {
-      contentType: 'json',
-      success: function (data) {
-        self.currentTasks = data.current;
-        self.archiveData[dateText] = data.today;
-        this.initUI();
-      }
-    });
   }
 
   Connect.prototype = {
-    initUI: function() {
+    start: function() {
+      //TODO 零点情况，请求的还是当天的数据，返回数据时却是明天了
+      var dateText = getDateHandle();
       var self = this;
-      var taskId, task;
-      var source = [], hiddenTasks = [];
-      for (taskId in this.currentTasks) {
-        task = this.currentTasks[taskId];
+      $.ajax('/init/' + dateText, {
+        contentType: 'json',
+        success: function(data) {
+          self.currentTasks = data.current;
+          self.archiveData[dateText] = data.today;
+          self.renderUI();
+        }
+      });
+    },
+    renderUI: function() {
+      var task, currentTasks = this.currentTasks;
+      var hiddenTasks = [];
+      for (var i = 0, l = currentTasks.length; i < l; ++i) {
+        task = currentTasks[i];
         if (task.hidden) {
           hiddenTasks.push(task);
         } else {
           this.host.addToCurrent(task);
         }
       }
-
+      var source = [];
       if (hiddenTasks.length > 0) {
-        _.each(hiddenTasks, function(task, taskId) {
+        for (i = 0, l = hiddenTasks.length; i < l; ++i) {
+          task = hiddenTasks[i];
           source.push({
-            id: id,
+            id: task._id,
             value: task.content
           });
-        });
+        }
       }
       this.host.initAutocomplete(source);
     },
@@ -64,9 +66,8 @@ define(function(require, exports, module) {
 
     removeTask: function(id) {
       var self = this;
-      $.ajax('/task', {
+      $.ajax('/task/' + id, {
         type: 'delete',
-        data: { id: id },
         success: function () {
           delete self.currentTasks[id];
         }
