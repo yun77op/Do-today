@@ -7,8 +7,14 @@ module.exports = function(db, modelName) {
     * Model: Task
     */
   var Task = new Schema({
-    'percent': Number,
-    'priority': Number,
+    'progress': {
+      'type': Number,
+      'default': 0
+    },
+    'priority': {
+      'type': Number,
+      'default': 0
+    },
     'notes': [{
       'time': {
         'type': Date,
@@ -16,8 +22,14 @@ module.exports = function(db, modelName) {
       },
       'content': String
     }],
-    'hidden': Boolean,
-    'content': String,
+    'hidden': {
+      'type': Boolean,
+      'default': false
+    },
+    'content': {
+      'type': String,
+      'required': true
+    },
     'user_id': String
   });
 

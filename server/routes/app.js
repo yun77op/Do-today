@@ -15,7 +15,6 @@ module.exports = function(app, db) {
   app.post('/task', access, function (req, res) {
     var TaskModel = models(db, 'Task');
     var doc = new TaskModel(req.body);
-    console.log(req.body);
     doc.user_id = req.user._id;
     doc.save(function() {
       var data = doc.toObject();

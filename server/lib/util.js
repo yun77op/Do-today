@@ -17,8 +17,8 @@ function addURLParam(url, key, value) {
     }
   } else {
     var sep = (url.indexOf('?') >= 0) ? "&" : "?";
-    return url + sep + toRfc3986(key) + "="
-        + toRfc3986(value);
+    return url + sep + toRfc3986(key) + "=" +
+      toRfc3986(value);
   }
   return url;
 }
@@ -37,7 +37,7 @@ function extend(target, obj) {
     }
   }
   return target;
-} 
+}
 
 
 exports.stringify = stringify;

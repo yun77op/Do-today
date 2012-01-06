@@ -1,13 +1,13 @@
 <div class="task-check left">
 	<div class="task-progress-container">
 		<div class="task-progress right"></div>
-		<span class="task-process-val"><%= progress %>%</span>
+		<span class="task-progress-val"><%= task.progress %>%</span>
 		<div class="triangle"></div>
 	</div>
 </div>
-<span title="单击编辑任务" class="task-content task-priority-<%= priority %>"><%= content %></span>
+<span title="单击编辑任务" class="task-content task-priority-<%= task.priority %>"><%= task.content %></span>
 <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-<div class="actions">
+<div class="actionArea">
 	<a href="#" class="button task-action-notes" title="笔记">笔记</a>
 	<a href="#" class="button task-action-trigger" title="更多操作">更多操作</a>
 </div>

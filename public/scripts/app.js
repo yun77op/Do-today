@@ -14,7 +14,6 @@ define(function(require, exports, module) {
     for (var i in initPlugins) {
       initPlugins[i].fn();
     }
-    taskMod.start();
 
     timerMod.initialize('work');
     $('#mask').fadeOut();
@@ -25,9 +24,11 @@ define(function(require, exports, module) {
       .script('lib/jquery.tipsy.js')
       .wait(function() {
         $('.tipsy').tipsy();
+        //taskMod depends tipsy
+        taskMod.start();
       });
     //sound notification
-    if (settings.get('notification', 'sound')) { 
+    if (settings.get('notification', 'sound')) {
       $LAB
         .script('lib/soundmanager2-nodebug-jsmin.js')
         .wait(function() {

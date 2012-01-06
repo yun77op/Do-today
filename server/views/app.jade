@@ -47,7 +47,9 @@ link(href='stylesheets/tipsy.css', media='screen, projection', rel='stylesheet')
       .script('lib/sea.js')
       .script('lib/underscore.js').wait()
       .script('lib/backbone.js')
-      .script('lib/jquery-ui.min.js')
+      .script('lib/jquery-ui.min.js').wait()
+      .script('jquery.overlay.js')
+      .script('jquery.hotedit.js')
       .wait(function() {
         seajs.config({
           base: '/scripts'

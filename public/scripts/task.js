@@ -12,59 +12,60 @@ define(function(require, exports, module) {
     render: function() {
       var self = this;
       var data = this.model.attributes;
-      console.log(this.el);
       this.template.update(this.el, data);
-      // this.taskActions = $('.task-action-trigger', this.el).overlay({
-      //   srcNode: '#ui-overlay-task',
-      //   open: function(e, ui) {
-      //     $(document).trigger('overlay:task', self);
-      //   }
-      // });
 
-      // this.taskNotes = $('.task-action-notes', this.el).overlay({
-      //   srcNode: '#ui-overlay-notes',
-      //   position: {
-      //     offset: '7 10',
-      //     at: 'right bottom',
-      //     my: 'right top'
-      //   },
-      //   open: function(e, ui) {
-      //     $(document).trigger('overlay:notes', self);
-      //   }
-      // });
+      var elJ = $(this.el);
+      this.taskActions = $('.task-action-trigger', elJ).overlay({
+        srcNode: '#ui-overlay-task',
+        open: function(e, ui) {
+          $(document).trigger('overlay:task', self);
+        }
+      });
 
-      // var slideStartValue;
-      // $('.task-progress', this.el).slider({
-      //   start: function(e, ui) {
-      //     slideStartValue = $(this).slider('value');
-      //   },
+      this.taskNotes = $('.task-action-notes', elJ).overlay({
+        srcNode: '#ui-overlay-notes',
+        position: {
+          offset: '7 10',
+          at: 'right bottom',
+          my: 'right top'
+        },
+        open: function(e, ui) {
+          $(document).trigger('overlay:notes', self);
+        }
+      });
 
-      //   slide: function(e, ui) {
-      //     if (ui.value <= slideStartValue) {
-      //       e.preventDefault();
-      //     } else {
-      //       $(this).siblings('.task-process-val').text(ui.value + '%');
-      //     }
-      //   },
+      var slideStartValue;
+      $('.task-progress', elJ).slider({
+        start: function(e, ui) {
+          slideStartValue = $(this).slider('value');
+        },
 
-      //   stop: function(e, ui) {
-      //     if (ui.value == 100) {
-      //       self.check();
-      //     }
-      //     connect.progressChange(self.model.get('_id'), slideStartValue, ui.value);
-      //   },
+        slide: function(e, ui) {
+          if (ui.value <= slideStartValue) {
+            e.preventDefault();
+          } else {
+            $(this).siblings('.task-process-val').text(ui.value + '%');
+          }
+        },
 
-      //   value: self.model.get('progress')
-      // });
+        stop: function(e, ui) {
+          if (ui.value == 100) {
+            self.check();
+          }
+          connect.progressChange(self.model.get('_id'), slideStartValue, ui.value);
+        },
 
-      // var taskContentEl = $('.task-content', this.el).hotedit({
-      //   callback: function(text) {
-      //     taskContentEl.text(text);
-      //     $(document).trigger('task:change', [self.model.get('_id'), 'content', text]);
-      //   }
-      // });
+        value: self.model.get('progress')
+      });
 
-      // $('.task-content, .task-action-trigger, .task-action-notes', this.el).tipsy();
+      var taskContentEl = $('.task-content', elJ).hotedit({
+        callback: function(text) {
+          taskContentEl.text(text);
+          $(document).trigger('task:change', [self.model.get('_id'), 'content', text]);
+        }
+      });
+
+      $('.task-content, .task-action-trigger, .task-action-notes', elJ).tipsy();
       return this;
     },
 
@@ -92,7 +93,6 @@ define(function(require, exports, module) {
     var container = $('#task-today-current');
     var list = container.find('.task-list');
     var el = task.render().el;
-
     container.removeClass('task-list-empty');
     list.append(el);
   }
@@ -103,7 +103,7 @@ define(function(require, exports, module) {
       var list = container.find('.task-list').empty();
       container.removeClass('task-list-empty');
 
-      if (!data || data.length == 0) {
+      if (!data || data.length === 0) {
         container.addClass('task-list-empty');
         list.append('<li class="task-empty">没有记录哦!</li>');
       } else {
