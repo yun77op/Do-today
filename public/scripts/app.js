@@ -1,6 +1,5 @@
 define(function(require, exports, module) {
   
-
   Date.now = Date.now || function() {
     return new Date().getTime();
   };
@@ -23,8 +22,8 @@ define(function(require, exports, module) {
     $LAB
       .script('lib/jquery.tipsy.js')
       .wait(function() {
-        $('.tipsy').tipsy();
-        //taskMod depends tipsy
+        $('.fn-tipsy').tipsy();
+        //Mod task depends tipsy
         taskMod.start();
       });
     //sound notification
@@ -46,8 +45,6 @@ define(function(require, exports, module) {
           soundManager.beginDelayedInit();
         });
     }
-
-
   }
 
   return {

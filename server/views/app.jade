@@ -1,60 +1,65 @@
-link(href='stylesheets/Aristo/jquery-ui-1.8.7.custom.css', media='screen, projection', rel='stylesheet')
-link(href='stylesheets/tipsy.css', media='screen, projection', rel='stylesheet')
-.page-app
-  #timer
-    .timer-time 25:00
-    .timer-progress
-      .button.timer-start
-    #settings
-      a.button.tipsy(href="#", title="设置") i
-  #task.tabs
-    ul
-      li: a(href="#task-today") 今日任务
-      li: a(href="#task-archives") 往日记录
-    #task-today
-      #task-today-current.task-list-container.task-list-empty
-        .task-add
-          input(placeholder="添加任务")
-          a.task-add-button.button.tipsy(title="查看全部隐藏任务")
-        ul.task-list
-          li.task-empty 没有记录哦!
-        .actionArea
-          a.button.button-viewall(href="#task-today-archive") 查看全部
-          a.button.button-reorder(href="#") 重排
-      #task-today-archive.task-list-container.hidden
-        ul.task-list.task-session
-        .actionArea
-          a.button-return.button(href="#task-today-current") 返回
-    #task-archives.task-list-container
-      p: input#task-datepicker
-      .content
-        ul.task-list.task-session
-  //
-    #mask
-      .mask-message
-        strong.mask-text 载入中...
-        p: img(src="images/loading.gif")
+extends layout
 
-  include partials/overlay-notes
-  include partials/overlay-task
+block styles
+  link(href='stylesheets/Aristo/jquery-ui-1.8.7.custom.css', media='screen, projection', rel='stylesheet')
+  link(href='stylesheets/tipsy.css', media='screen, projection', rel='stylesheet')
 
-  script(src="scripts/lib/LAB.min.js")
-  script
-    $LAB.setGlobalDefaults({BasePath: '/scripts/'});
-    $LAB
-      .script('lib/jquery.min.js')
-      .script('lib/ejs.js')
-      .script('lib/sea.js')
-      .script('lib/underscore.js').wait()
-      .script('lib/backbone.js')
-      .script('lib/jquery-ui.min.js').wait()
-      .script('jquery.overlay.js')
-      .script('jquery.hotedit.js')
-      .wait(function() {
-        seajs.config({
-          base: '/scripts'
+block body
+  .page-app
+    #timer
+      .timer-time 25:00
+      .timer-progress
+        .button.timer-start
+      #settings
+        a.button.fn-tipsy(href="#", title="设置") i
+    #task.tabs
+      ul
+        li: a(href="#task-today") 今日任务
+        li: a(href="#task-archives") 往日记录
+      #task-today
+        #task-today-current.task-list-container.task-list-empty
+          .task-add
+            input(placeholder="添加任务")
+            a.task-add-button.button.fn-tipsy(title="查看全部隐藏任务")
+          ul
+            li.task-empty 没有记录哦!
+          .actionArea
+            button.button-reorder.button-dt 重排
+        #task-today-archive.task-list-container
+          ul.task-session
+          .actionArea
+            a.listToday(href="#") 查看今日任务明细
+            //img.throbber(src="images/throbber.gif")
+      #task-archives.task-list-container
+        p: input#task-datepicker
+        .content
+          ul.task-session
+    //
+      #mask
+        .mask-message
+          strong.mask-text 载入中...
+          p: img(src="images/loading.gif")
+
+    include partials/overlay-notes
+    include partials/overlay-task
+
+    script(src="scripts/lib/LAB.min.js")
+    script
+      $LAB.setGlobalDefaults({BasePath: '/scripts/'});
+      $LAB
+        .script('lib/jquery.min.js')
+        .script('lib/ejs.js')
+        .script('lib/sea.js')
+        .script('lib/underscore.js').wait()
+        .script('lib/backbone.js')
+        .script('lib/jquery-ui.min.js').wait()
+        .script('jquery.overlay.js')
+        .script('jquery.hotedit.js')
+        .wait(function() {
+          seajs.config({
+            base: '/scripts'
+          });
+          seajs.use('app', function(app) {
+            app.start();
+          });
         });
-        seajs.use('app', function(app) {
-          app.start();
-        });
-      });

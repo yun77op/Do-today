@@ -114,14 +114,9 @@
   #task
     background: transparent
     font-size: 1em
-    .ui-widget-content
-      color: $font-color
-    .ui-tabs-nav a
-      color: $font-color
     .task-list-container
       position: relative
-      > .actionArea .button
-        @extend .button-dt
+      > .actionArea .button-dt
         &.active
           background: $notice-color
           +border-radius(4px)
@@ -164,7 +159,7 @@
         height: 14px
         line-height: 14px
         padding: 0 2px
-    .task-list
+    ul
       list-style: none
       margin: 0 1em 1em
       .task
@@ -235,6 +230,14 @@
             background: url(../images/sprites.png) -149px -173px
             .task-progress-container
               display: block
+      .task-priority-0
+        color: #202020
+      .task-priority-1
+        color: red
+      .task-priority-2
+        color: #007700
+      .task-priority-3
+        color: #006699
     .task-session
       list-style: upper-roman outside
     .task-notes
@@ -246,24 +249,6 @@
           visibility: visible !important
         .actions
           visibility: hidden !important
-
-  .task-priority
-    border-bottom: none !important
-    li
-      +horizontal-list-item(2px)
-      cursor: pointer
-      border: 1px solid #222
-      line-height: 1.1
-      margin-right: .2em
-      color: darken(#FFF, 20%)
-  .task-priority-0
-    color: #202020
-  .task-priority-1
-    color: red
-  .task-priority-2
-    color: #007700
-  .task-priority-3
-    color: #006699
 
   #message-main
     top: 72px
@@ -285,7 +270,18 @@
     height: 50px
     margin: -25px 0 0 -25px
     background: url(../images/loading.png)
-  
+
+  .task-priority
+    border-bottom: none !important
+    ul 
+      li
+        +horizontal-list-item(2px)
+        cursor: pointer
+        border: 1px solid #222
+        line-height: 1.1
+        margin-right: .2em
+        color: darken(#FFF, 20%)
+
   #ui-overlay-notes
     padding: .4em .6em
     h3

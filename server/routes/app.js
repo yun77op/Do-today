@@ -6,6 +6,7 @@ module.exports = function(app, db) {
   app.get('/app', access, function (req, res) {
     var user = req.user;
     res.render('app', {
+      layout: false,
       locals: {
         title: user.name
       }

@@ -18,27 +18,26 @@ html(class='no-js', lang='en')
       title Dotoday
     meta(name='viewport', content='width=device-width,initial-scale=1')
     link(href='stylesheets/screen.css', media='screen, projection', rel='stylesheet')
-
+    block styles
     //script(src='/js/lib/modernizr-2.0.6.min.js')
   body
-    #container
-      noscript
-        | Please
-        a(href='http://enable-javascript.com/', target="_blank") enable JavaScript
-        |  to view this website.
-      #header
-        .logo
-          a(href="/") Dotoday
+    noscript
+      | Please
+      a(href='http://enable-javascript.com/', target="_blank") enable JavaScript
+      |  to view this website.
+    #header
+      .logo
+        a(href="/") Dotoday
       #global-nav
         ul
           - if (isLoggedIn)
             li #{user.name}
-            li: a(href='/logout') 退出
-      div#main(role='main')
+          li: a(href='/logout') 退出
+    div#main(role='main')
 
-        //- Dynamically load the body content with support for { layout: false }
-        //-  (e.g. index's route and view this through use of extends/inheritance)
-        block body
-          !=body
-      #footer
-        p @2012 Dotoday
+      //- Dynamically load the body content with support for { layout: false }
+      //-  (e.g. index's route and view this through use of extends/inheritance)
+      block body
+        !=body
+    #footer
+      p @2012 Dotoday

@@ -91,16 +91,16 @@ define(function(require, exports, module) {
     });
     
     var container = $('#task-today-current');
-    var list = container.find('.task-list');
+    var list = container.find('ul');
     var el = task.render().el;
     container.removeClass('task-list-empty');
     list.append(el);
   }
 
-  function makeSessionList(id, date) {
+  function makeSessionList(id, date, fn) {
     connect.getArchiveData(date, function (data) {
       var container = $('#' + id);
-      var list = container.find('.task-list').empty();
+      var list = container.find('ul').empty();
       container.removeClass('task-list-empty');
 
       if (!data || data.length === 0) {
@@ -112,6 +112,7 @@ define(function(require, exports, module) {
           list.append(el);
         });
       }
+      fn && fn();
     });
   }
 
@@ -137,7 +138,7 @@ define(function(require, exports, module) {
 
   function checkTaskListStatus() {
     var container = $('#task-today-current');
-    if (container.find('li:visible').length == 0) {
+    if (container.find('li:visible').length === 0) {
       container.addClass('task-list-empty');
     }
   }
@@ -162,13 +163,13 @@ define(function(require, exports, module) {
     });
 
     input.data( 'autocomplete' )._renderItem = function( ul, item ) {
-      var a = $('<a>' + item.label + '</a>'),
-        span = $('<span class="del" title="删除">x</span>');
+      var a = $('<a>' + item.label + '</a>');
+      var span = $('<span class="del" title="删除">x</span>');
         
       span.bind('click', function(e) {
         e.stopPropagation();
         $(this).parents('li').remove();
-        if ($(this).parents('ul').find('li').length == 0) {
+        if ($(this).parents('ul').find('li').length === 0) {
           input.autocomplete('close');
         }
 
@@ -211,28 +212,36 @@ define(function(require, exports, module) {
 
     //sort
     var sortable = true;
-    el.delegate('.actions .button-reorder', 'click', function(e) {
-      e.preventDefault();
-      $(this).toggleClass('active');
-      $(this).text((sortable ? '完成': '') + '重排');
+    el.delegate('.actionArea .button-reorder', 'click', function(e) {
+      $(this)
+        .toggleClass('active')
+        .text((sortable ? '完成': '') + '重排');
       sortable = !sortable;
-      var container = $('#task-today-current');
-      $('.task-list', container).sortable({ disabled: sortable })
+      $('#task-today-current ul').sortable({ disabled: sortable })
         .toggleClass('sortable');
-    }).delegate('.actions .button-viewall, .actions .button-return', 'click', function(e) {
+    });
+
+    var isTodayListShow = false;
+    el.delegate('.actionArea .listToday', 'click', function(e) {
       e.preventDefault();
-      var targetID = this.href.slice(1);
-      if (targetID == 'task-today-all') {
-        makeSessionList(targetID, Date.now());
+      var text;
+      var button = $(this);
+      if (isTodayListShow) {
+        text = '查看今日任务明细';
+        $('#task-today-archive ul').empty();
+      } else {
+        var throbber = button.next();
+        throbber.show();
+        text = '隐藏';
+        makeSessionList('task-today-archive', Date.now());
       }
-      var target = $(this.href);
-      target.siblings().fadeOut(function() {
-        target.fadeIn();
-      });
+      button.text(text);
+      isTodayListShow = !isTodayListShow;
+      
     });
 
 
-    $('.button', el).click(function() {
+    $('.task-add-button', el).click(function() {
       input.autocomplete('search', '');
     });
 
