@@ -195,27 +195,6 @@
           top: 50%
           margin-top: -8px
           visibility: hidden
-        .task-progress-container
-          display: none
-          height: 30px
-          line-height: 30px
-          padding: 10px 10px
-          position: absolute
-          top: -50px
-          left: -45px
-          +background($background-color)
-          +background(rgba($background-color, 0.7))
-          +box-shadow
-          +border-radius(5px)
-          .task-progress
-            width: 60px
-            margin: 8px 0 0 10px
-          .triangle
-            +triangle(bottom, 10px, $background-color)
-            +triangle(bottom, 10px, rgba($background-color, 0.7))
-            position: absolute
-            bottom: -10px
-            left: 50px
         .task-check
           cursor: pointer
           width: 17px
@@ -228,8 +207,6 @@
           &:hover
             +box-shadow()
             background: url(../images/sprites.png) -149px -173px
-            .task-progress-container
-              display: block
       .task-priority-0
         color: #202020
       .task-priority-1

@@ -140,16 +140,6 @@ define(function(require, exports, module) {
       });
     },
 
-    progressChange: function(taskId, startValue, endValue) {
-      var todayData = this.todayData;
-      todayData[taskId] = {
-        start: startValue,
-        end: endValue
-      };
-    },
-
-    
-
     checkHidden: function (taskId) {
       var task = this.currentTasks[taskId];
       if (task.hidden) {

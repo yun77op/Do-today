@@ -34,30 +34,6 @@ define(function(require, exports, module) {
         }
       });
 
-      var slideStartValue;
-      $('.task-progress', elJ).slider({
-        start: function(e, ui) {
-          slideStartValue = $(this).slider('value');
-        },
-
-        slide: function(e, ui) {
-          if (ui.value <= slideStartValue) {
-            e.preventDefault();
-          } else {
-            $(this).siblings('.task-process-val').text(ui.value + '%');
-          }
-        },
-
-        stop: function(e, ui) {
-          if (ui.value == 100) {
-            self.check();
-          }
-          connect.progressChange(self.model.get('_id'), slideStartValue, ui.value);
-        },
-
-        value: self.model.get('progress')
-      });
-
       var taskContentEl = $('.task-content', elJ).hotedit({
         callback: function(text) {
           connect.taskAttrChange(self.model.get('_id'), 'content', text, function() {

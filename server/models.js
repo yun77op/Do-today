@@ -7,9 +7,9 @@ module.exports = function(db, modelName) {
     * Model: Task
     */
   var Task = new Schema({
-    'progress': {
-      'type': Number,
-      'default': 0
+    'checked': {
+      'type': Boolean,
+      'default': false
     },
     'priority': {
       'type': Number,
