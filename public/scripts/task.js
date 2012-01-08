@@ -60,8 +60,9 @@ define(function(require, exports, module) {
 
       var taskContentEl = $('.task-content', elJ).hotedit({
         callback: function(text) {
-          taskContentEl.text(text);
-          $(document).trigger('task:change', [self.model.get('_id'), 'content', text]);
+          connect.taskAttrChange(self.model.get('_id'), 'content', text, function() {
+            taskContentEl.text(text);
+          });
         }
       });
 
@@ -237,7 +238,6 @@ define(function(require, exports, module) {
       }
       button.text(text);
       isTodayListShow = !isTodayListShow;
-      
     });
 
 

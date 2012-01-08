@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
   
   function getDateHandle(date) {
-    if (date == undefined) {
+    if (date === undefined) {
       date = Date.now();
     }
     if (!(typeof date == 'object' && date instanceof Date)) {
@@ -31,8 +31,9 @@ define(function(require, exports, module) {
     renderUI: function() {
       var task, currentTasks = this.currentTasks;
       var hiddenTasks = [];
-      for (var i = 0, l = currentTasks.length; i < l; ++i) {
-        task = currentTasks[i];
+      var id;
+      for (id in currentTasks) {
+        task = currentTasks[id];
         if (task.hidden) {
           hiddenTasks.push(task);
         } else {
@@ -41,7 +42,7 @@ define(function(require, exports, module) {
       }
       var source = [];
       if (hiddenTasks.length > 0) {
-        for (i = 0, l = hiddenTasks.length; i < l; ++i) {
+        for (var i = 0, l = hiddenTasks.length; i < l; ++i) {
           task = hiddenTasks[i];
           source.push({
             id: task._id,
@@ -95,9 +96,48 @@ define(function(require, exports, module) {
       }
     },
 
-    taskAttrChange: function(taskId, key, val) {
+    taskAttrChange: function(taskId, key, value, fn) {
       var task = this.currentTasks[taskId];
-      task[key] = val;
+      var data = {};
+      data[key] = value;
+      $.ajax('/task/' + task._id, {
+        type: 'put',
+        contentType: 'json',
+        data: data,
+        success: function(data) {
+          task[key] = value;
+          fn && fn();
+        }
+      });
+    },
+
+    addNote: function (taskId, value) {
+      var note = {
+        content: value
+      };
+      var self = this;
+      $.ajax('/task/note', {
+        type: 'post',
+        contentType: 'json',
+        data: note,
+        success: function(data) {
+          self.currentTasks[taskId].notes.push(data);
+        }
+      });
+    },
+
+    removeNote: function (taskId, timestamp) {
+      var self = this;
+      $.ajax('/task/note', {
+        type: 'delete',
+        contentType: 'json',
+        data: { timestamp: timestamp },
+        success: function(data) {
+          this.currentTasks[taskId].notes = this.currentTasks[taskId].notes.filter(function(elm, index) {
+            return elm.timestamp != timestamp;
+          });
+        }
+      });
     },
 
     progressChange: function(taskId, startValue, endValue) {
@@ -108,19 +148,7 @@ define(function(require, exports, module) {
       };
     },
 
-    addNote: function (taskId, value) {
-      var id = new ObjectID().toHexString();
-      var note = {
-        id: id,
-        time: Date.now(),
-        content: value
-      };
-      this.currentTasks[taskId].notes.id = note;
-    },
-
-    removeNote: function (taskId, id) {
-      delete this.currentTasks[taskId].notes.id;
-    },
+    
 
     checkHidden: function (taskId) {
       var task = this.currentTasks[taskId];

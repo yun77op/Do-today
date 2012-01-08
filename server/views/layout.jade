@@ -31,8 +31,8 @@ html(class='no-js', lang='en')
       #global-nav
         ul
           - if (isLoggedIn)
-            li #{user.name}
-          li: a(href='/logout') 退出
+              li #{user.name}
+              li: a(href='/logout') 退出
     div#main(role='main')
 
       //- Dynamically load the body content with support for { layout: false }

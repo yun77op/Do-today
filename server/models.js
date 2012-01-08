@@ -16,7 +16,7 @@ module.exports = function(db, modelName) {
       'default': 0
     },
     'notes': [{
-      'time': {
+      'timestamp': {
         'type': Date,
         'default': Date.now
       },

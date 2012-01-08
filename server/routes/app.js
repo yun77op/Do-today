@@ -1,4 +1,5 @@
 var models = require('../models');
+var util = require('../lib/util');
 
 module.exports = function(app, db) {
   var access = app.access;
@@ -35,6 +36,19 @@ module.exports = function(app, db) {
       });
     }
 
+  });
+
+  app.put('/task/:id', access, function (req, res) {
+    var obj = req.body;
+    var TaskModel = models(db, 'Task');
+    TaskModel.findOne({ _id: req.params.id, user_id: req.user._id },
+      function (err, doc) {
+        util.extend(doc, obj);
+        doc.save(function() {
+          res.send(doc.toObject());
+        });
+      }
+    );
   });
 
   app.del('/task/:id', access, function (req, res) {
@@ -90,14 +104,14 @@ module.exports = function(app, db) {
         .find({user_id: ueserId})
         .populate('task')
         .run(function(err, docs) {
-          var tasks = [];
+          var tasks = {};
           docs.forEach(function(doc) {
-            tasks.push(doc.toObject());
+            var obj = doc.toObject();
+            tasks[obj.task._id] = obj.task;
           });
           fn(tasks);
         });
     }
 
   });
-}
-
+};
