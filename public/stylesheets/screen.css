@@ -284,6 +284,9 @@ figcaption { text-align: center; margin-bottom: 1.5em; font-size: 1.2em; }
 .page-app .task-priority ul li:first-child, .page-app .task-priority ul li.first { padding-left: 0; }
 .page-app .task-priority ul li:last-child { padding-right: 0; }
 .page-app .task-priority ul li.last { padding-right: 0; }
+.page-app .ui-overlay-menu { display: inline; float: left; }
+.page-app .ui-overlay-menu .ui-overlay-content { display: inline; float: left; }
+.page-app .ui-overlay-menu .ui-overlay-content .ui-menu-item > a:hover { background: #999999; }
 .page-app #ui-overlay-notes h3 { color: #4f4f4f; }
 .page-app #ui-overlay-notes textarea { width: 272px; margin-bottom: 10px; }
 .page-app #ui-overlay-notes .triangle { width: 0; height: 0; border-style: solid; border-width: 10px; border-top-width: 0; border-color: #fff transparent; position: absolute; top: -10px; right: 0; }
