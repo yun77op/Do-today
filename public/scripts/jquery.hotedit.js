@@ -34,7 +34,7 @@
 
 	$.fn.hotedit = function(options) {
 		var el = $(this);
-		if (el.length) { 
+		if (el.length) {
 			options = $.extend({}, defaults, options);
 			el.data('hotedit', options);
 			el.unbind('click.he').bind('click.he', function(e) {

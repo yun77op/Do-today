@@ -3,7 +3,7 @@ define(function(require, exports, module) {
 
 	Message = function() {
 		this.initialize.apply(this, arguments);
-	}
+	};
 
 	Message.prototype = {
 		initialize: function(name, options) {
@@ -106,12 +106,12 @@ define(function(require, exports, module) {
 					});
 				});
 				actions.appendTo(this.el);
-			}, 
+			},
 
 			className: function(className) {
 				this.el.addClass(className);
 			}
-		} 
+		}
 	});
 
 	return {
@@ -120,6 +120,6 @@ define(function(require, exports, module) {
 			if(cur) { return cur; }
 			return new Message(name, options);
 		}
-	}
+	};
 
 });

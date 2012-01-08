@@ -1,8 +1,15 @@
-#ui-overlay-notes.ui-overlay.hidden(style="width:300px")
-  .ui-overlay-content.ui-widget-content
-    .triangle
-    h3 添加笔记
-    textarea
-    .action-area.cr
-      button.button.button-ok 确定
-      button.button.button-discard 取消
+#ui-dialog-notes
+  textarea
+  .actionArea.cr
+    button.button-ok 确定
+  table.table-notes
+    tr
+      th 备注
+      th(width="80") 操作
+  table#template-note.hidden
+    tr
+      td
+        span.text [%= note %]
+      td
+        a.del(href="#") 删除
+        a.edit(href="#") 修改

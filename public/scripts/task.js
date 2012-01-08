@@ -1,11 +1,46 @@
 define(function(require, exports, module) {
   var connect = require('./connect').connect;
 
+  var TaskNoteView = Backbone.View.extend({
+    
+    events: {
+      'click .edit': 'edit',
+      'click .del': 'del'
+    },
+
+    edit: function(e) {
+      
+    },
+
+    del: function(e) {
+      
+    }
+  });
+
   var TaskView = Backbone.View.extend({
     tagName: 'li',
     className: 'task',
     template: new EJS({url: 'views/task-current.ejs'}),
     initialize: function() {
+      var dialogNotes = $('#ui-dialog-notes').dialog({
+        autoOpen: false,
+        title: '任务备注'
+      });
+      var self = this;
+
+      dialogNotes.delegate('.button-ok', 'click', function() {
+        var button = $(this);
+        var textarea = dialogNotes.find('textarea');
+        var note = textarea.val().trim();
+        textarea.val('');
+        if (note === '') {
+          textarea.focus();
+        } else {
+          self.addNotes(note);
+        }
+      });
+
+      this.dialogNotes = dialogNotes;
       _.bindAll(this, 'render');
     },
 
@@ -21,17 +56,11 @@ define(function(require, exports, module) {
           $(document).trigger('overlay:task', self);
         }
       });
-
-      this.taskNotes = $('.task-action-notes', elJ).overlay({
-        srcNode: '#ui-overlay-notes',
-        position: {
-          offset: '7 10',
-          at: 'right bottom',
-          my: 'right top'
-        },
-        open: function(e, ui) {
-          $(document).trigger('overlay:notes', self);
-        }
+ 
+      $('.task-action-notes', elJ).click(function(e) {
+        e.preventDefault();
+        self.dialogNotes.dialog('open');
+        self.listNotes();
       });
 
       var taskContentEl = $('.task-content', elJ).hotedit({
@@ -44,6 +73,29 @@ define(function(require, exports, module) {
 
       $('.task-content, .task-action-trigger, .task-action-notes', elJ).tipsy();
       return this;
+    },
+
+    listNotes: function() {
+      var notes = this.model.attributes.notes;
+      var notesEl = this.dialogNotes.find('.table-notes');
+      var self = this;
+      if (notes.length === 0) {
+        notesEl.hide();
+      } else {
+        notesEl.hide().empty();
+        notes.forEach(function(note, index) {
+          self.addNotes(note);
+        });
+        notesEl.show();
+      }
+    },
+
+    addNotes: function(note) {
+      var template = new EJS({element: $('#template-note tbody').get(0)});
+      var text = template.render({note: note});
+      var notesEl = this.dialogNotes.find('.table-notes');
+      notesEl.find('tbody').append($(text));
+      notesEl.show();
     },
 
     events: {

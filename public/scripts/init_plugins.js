@@ -13,33 +13,42 @@ define(function(require, exports, module) {
 				settings.registerKey('notification', 'popup', '弹出提示', true, []);
 				settings.registerKey('notification', 'sound', '声音提示', true, []);
 
-				var el = $('#settings');
+				var settingsEl = $('#settings');
 				var data = settings.data();
-				var dialogSettings = new EJS({url: 'views/settings-dialog.ejs'}).render({settings: data});
-				dialogSettings = $(dialogSettings);
-				dialogSettings.hide().appendTo('body').dialog({
-					autoOpen: false,
-					title: '设置'
-				});
+				var dialogSettings;
 
-				el.delegate('a', 'click', function(e) {
-					dialogSettings.dialog('open');
+				settingsEl.delegate('a', 'click', function(e) {
 					e.preventDefault();
-				});
-
-				el = $('#ui-dialog-settings');
-				el.delegate('input', 'change', function() {
-					var el = $(this);
-					var arr = el.attr('id').split('-');
-					var ns = arr[1], key = arr[2], value;
-
-					value = el.attr('type') == 'checkbox'? el.prop('checked') : el.val();
-					settings.set(ns, key, value);
+					if (dialogSettings === undefined) {
+						initSettingsDialog();
+					}
+					dialogSettings.dialog('open');
 				});
 
 				settings.subscribe('timer', 'work', function(value) {
 					$(document).trigger('timer:settings:changed', ['work', value]);
 				});
+
+				function initSettingsDialog() {
+					var text = new EJS({url: 'views/settings-dialog.ejs'}).render({settings: data});
+					dialogSettings = $(text);
+					dialogSettings.hide().appendTo('body').dialog({
+						autoOpen: false,
+						title: '设置'
+					});
+					bindEventSettingsDialog();
+				}
+
+				function bindEventSettingsDialog() {
+					dialogSettings.delegate('input', 'change', function() {
+						var el = $(this);
+						var arr = el.attr('id').split('-');
+						var ns = arr[1], key = arr[2], value;
+
+						value = el.attr('type') == 'checkbox'? el.prop('checked') : el.val();
+						settings.set(ns, key, value);
+					});
+				}
 			}
 		},
 
