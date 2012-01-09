@@ -1,15 +1,18 @@
-#ui-dialog-notes
+#ui-dialog-notes.hidden
   textarea
   .actionArea.cr
     button.button-ok 确定
   table.table-notes
-    tr
-      th 备注
-      th(width="80") 操作
+    thead
+      tr
+        th 备注
+        th(width="80") 操作
+    tbody
   table#template-note.hidden
-    tr
-      td
-        span.text [%= note %]
-      td
-        a.del(href="#") 删除
-        a.edit(href="#") 修改
+    tbody
+      tr
+        td
+          span.text [%= content %]
+        td
+          a.del(href="#") 删除
+          a.edit(href="#") 修改

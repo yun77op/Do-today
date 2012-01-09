@@ -4,6 +4,17 @@ module.exports = function(db, modelName) {
   var ObjectId = Schema.ObjectId;
 
   /**
+    * Model: Note
+    */
+  var Note = new Schema({
+    'created_at': {
+      'type': Date,
+      'default': Date.now
+    },
+    'content': String
+  });
+
+  /**
     * Model: Task
     */
   var Task = new Schema({
@@ -15,13 +26,7 @@ module.exports = function(db, modelName) {
       'type': Number,
       'default': 0
     },
-    'notes': [{
-      'timestamp': {
-        'type': Date,
-        'default': Date.now
-      },
-      'content': String
-    }],
+    'notes': [Note],
     'hidden': {
       'type': Boolean,
       'default': false

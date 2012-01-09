@@ -38,12 +38,12 @@ module.exports = function(app, db) {
 
   });
 
-  app.put('/task/:id', access, function (req, res) {
-    var obj = req.body;
+  app.put('/task/:id', access, function(req, res) {
+    var body = req.body;
     var TaskModel = models(db, 'Task');
     TaskModel.findOne({ _id: req.params.id, user_id: req.user._id },
       function (err, doc) {
-        util.extend(doc, obj);
+        util.extend(doc, body);
         doc.save(function() {
           res.send(doc.toObject());
         });
@@ -51,7 +51,7 @@ module.exports = function(app, db) {
     );
   });
 
-  app.del('/task/:id', access, function (req, res) {
+  app.del('/task/:id', access, function(req, res) {
     var TaskModel = models(db, 'Task');
     TaskModel.findOne({ _id: req.params.id, user_id: req.user._id },
       function (err, doc) {
@@ -62,7 +62,23 @@ module.exports = function(app, db) {
     );
   });
 
-  app.get('/tasks/:dateText', access, function (req, res) {
+  app.post('/task/note', access, function(req, res) {
+    var body = req.body;
+    var TaskModel = models(db, 'Task');
+    TaskModel.findOne({ _id: body.taskId, user_id: req.user._id },
+      function (err, doc) {
+        doc.notes.push({
+          content: body.content
+        });
+        doc.save(function() {
+          res.send(doc.toObject().notes.pop());
+        });
+      }
+    );
+  });
+
+
+  app.get('/tasks/:dateText', access, function(req, res) {
     var TasksArchiveModel = models(db, 'TasksArchive');
     var dateText = req.params.dateText;
     TasksArchiveModel.findOne({ dateText: dateText, user_id: req.user._id },
@@ -73,7 +89,7 @@ module.exports = function(app, db) {
     );
   });
 
-  app.post('/tasks/:dateText', access, function (req, res) {
+  app.post('/tasks/:dateText', access, function(req, res) {
     var TasksArchiveModel = models(db, 'TasksArchive');
     var doc = TasksArchiveModel(req.body);
     doc.dateText = req.params.dateText;
@@ -84,7 +100,7 @@ module.exports = function(app, db) {
 
 
   //Feed init data
-  app.get('/init/:dateText', access, function (req, res) {
+  app.get('/init/:dateText', access, function(req, res) {
     var TasksArchiveModel = models(db, 'TasksArchive');
     var result = {};
     var dateText = req.params.dateText;

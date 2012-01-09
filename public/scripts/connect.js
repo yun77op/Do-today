@@ -28,6 +28,7 @@ define(function(require, exports, module) {
         }
       });
     },
+
     renderUI: function() {
       var task, currentTasks = this.currentTasks;
       var hiddenTasks = [];
@@ -53,32 +54,6 @@ define(function(require, exports, module) {
       this.host.initAutocomplete(source);
     },
 
-    addTask: function(task, fn) {
-      var self = this;
-      $.ajax('/task', {
-        type: 'post',
-        data: task,
-        success: function (task) {
-          self.currentTasks[task._id] = task;
-          fn(task);
-        }
-      });
-    },
-
-    removeTask: function(id) {
-      var self = this;
-      $.ajax('/task/' + id, {
-        type: 'delete',
-        success: function () {
-          delete self.currentTasks[id];
-        }
-      });
-    },
-
-    hideTask: function(id) {
-      this.currentTasks[id].hidden = true;
-    },
-
     getArchiveData: function(date, fn) {
       var dateText = getDateHandle(date);
       var data = this.archiveData[dateText];
@@ -96,45 +71,74 @@ define(function(require, exports, module) {
       }
     },
 
+    addTask: function(task, fn) {
+      var self = this;
+      $.ajax('/task', {
+        type: 'post',
+        data: task,
+        success: function(task) {
+          self.currentTasks[task._id] = task;
+          fn(task);
+        }
+      });
+    },
+
+    removeTask: function(id) {
+      var self = this;
+      $.ajax('/task/' + id, {
+        type: 'delete',
+        success: function() {
+          delete self.currentTasks[id];
+        }
+      });
+    },
+
+    hideTask: function(id) {
+      this.currentTasks[id].hidden = true;
+    },
+
     taskAttrChange: function(taskId, key, value, fn) {
       var task = this.currentTasks[taskId];
       var data = {};
       data[key] = value;
       $.ajax('/task/' + task._id, {
         type: 'put',
-        contentType: 'json',
         data: data,
         success: function(data) {
           task[key] = value;
-          fn && fn();
+          fn();
         }
       });
     },
 
-    addNote: function (taskId, value) {
-      var note = {
-        content: value
+    addNote: function (taskId, note, fn) {
+      var data = {
+        content: note,
+        taskId: taskId
       };
       var self = this;
       $.ajax('/task/note', {
         type: 'post',
-        contentType: 'json',
-        data: note,
-        success: function(data) {
-          self.currentTasks[taskId].notes.push(data);
+        data: data,
+        success: function(note) {
+          self.currentTasks[taskId].notes.push(note);
+          fn(note);
         }
       });
     },
 
-    removeNote: function (taskId, timestamp) {
+    removeNote: function(taskId, noteId) {
       var self = this;
+      var data = {
+        taskId: taskId,
+        noteId: noteId
+      };
       $.ajax('/task/note', {
         type: 'delete',
-        contentType: 'json',
-        data: { timestamp: timestamp },
-        success: function(data) {
-          this.currentTasks[taskId].notes = this.currentTasks[taskId].notes.filter(function(elm, index) {
-            return elm.timestamp != timestamp;
+        data: data,
+        success: function() {
+          self.currentTasks[taskId].notes = this.currentTasks[taskId].notes.filter(function(elm, index) {
+            return elm._id != noteId;
           });
         }
       });
