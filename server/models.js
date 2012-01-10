@@ -22,6 +22,10 @@ module.exports = function(db, modelName) {
       'type': Boolean,
       'default': false
     },
+    'created_at': {
+      'type': Date,
+      'default': Date.now
+    },
     'priority': {
       'type': Number,
       'default': 0

@@ -1,5 +1,6 @@
 var models = require('../models');
 var util = require('../lib/util');
+var dateformat = require('../lib/dateformat').strftime;
 
 module.exports = function(app, db) {
   var access = app.access;
@@ -38,6 +39,59 @@ module.exports = function(app, db) {
 
   });
 
+  app.post('/task/note', access, function(req, res) {
+    var body = req.body;
+    var TaskModel = models(db, 'Task');
+    TaskModel.findOne({ _id: body.taskId, user_id: req.user._id },
+      function (err, doc) {
+        doc.notes.push({
+          content: body.content
+        });
+        var note = doc.toObject().notes.pop();
+        note.created_at = dateformat(new Date(note.created_at), '%w/%m/%Y');
+        doc.save(function() {
+          res.send(note);
+        });
+      }
+    );
+  });
+  
+  app.put('/task/note', access, function(req, res) {
+    var body = req.body;
+    var TaskModel = models(db, 'Task');
+    TaskModel.findOne({ _id: body.taskId, user_id: req.user._id },
+      function (err, doc) {
+        var data;
+        doc.notes.forEach(function(el, index) {
+          if (el._id == body.noteId) {
+            el.content = body.content;
+            data = el.toObject();
+          }
+        });
+        doc.save(function() {
+          res.send(data);
+        });
+      }
+    );
+  });
+
+  app.delete('/task/note', access, function(req, res) {
+    var body = req.body;
+    var TaskModel = models(db, 'Task');
+    TaskModel.findOne({ _id: body.taskId, user_id: req.user._id },
+      function (err, doc) {
+        doc.notes.forEach(function(el, index) {
+          if (el._id == body.noteId) {
+            el.remove();
+          }
+        });
+        doc.save(function() {
+          res.send('ok');
+        });
+      }
+    );
+  });
+
   app.put('/task/:id', access, function(req, res) {
     var body = req.body;
     var TaskModel = models(db, 'Task');
@@ -57,21 +111,6 @@ module.exports = function(app, db) {
       function (err, doc) {
         doc.remove(function() {
           res.send('ok');
-        });
-      }
-    );
-  });
-
-  app.post('/task/note', access, function(req, res) {
-    var body = req.body;
-    var TaskModel = models(db, 'Task');
-    TaskModel.findOne({ _id: body.taskId, user_id: req.user._id },
-      function (err, doc) {
-        doc.notes.push({
-          content: body.content
-        });
-        doc.save(function() {
-          res.send(doc.toObject().notes.pop());
         });
       }
     );
@@ -122,8 +161,11 @@ module.exports = function(app, db) {
         .run(function(err, docs) {
           var tasks = {};
           docs.forEach(function(doc) {
-            var obj = doc.toObject();
-            tasks[obj.task._id] = obj.task;
+            var task = doc.toObject().task;
+            task.notes.forEach(function(el, index) {
+              el.created_at = dateformat(new Date(el.created_at), '%w/%m/%Y');
+            });
+            tasks[task._id] = task;
           });
           fn(tasks);
         });

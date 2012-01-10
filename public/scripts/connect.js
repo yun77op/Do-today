@@ -127,7 +127,7 @@ define(function(require, exports, module) {
       });
     },
 
-    removeNote: function(taskId, noteId) {
+    removeNote: function(taskId, noteId, fn) {
       var self = this;
       var data = {
         taskId: taskId,
@@ -137,9 +137,31 @@ define(function(require, exports, module) {
         type: 'delete',
         data: data,
         success: function() {
-          self.currentTasks[taskId].notes = this.currentTasks[taskId].notes.filter(function(elm, index) {
-            return elm._id != noteId;
+          self.currentTasks[taskId].notes = this.currentTasks[taskId].notes.filter(function(el, index) {
+            return el._id != noteId;
           });
+          fn && fn();
+        }
+      });
+    },
+
+    updateNote: function(taskId, noteId, content, fn) {
+      var self = this;
+      var data = {
+        taskId: taskId,
+        noteId: noteId,
+        content: content
+      };
+      $.ajax('/task/note', {
+        type: 'put',
+        data: data,
+        success: function(data) {
+          self.currentTasks[taskId].notes.forEach(function(el, index) {
+            if (el._id == noteId) {
+              el.content = content;
+            }
+          });
+          fn(data);
         }
       });
     },

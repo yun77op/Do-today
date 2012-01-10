@@ -8,7 +8,6 @@ define(function(require, exports, module) {
       var data = this.model.attributes;
       this.template.update(this.el, data);
       this.el.id = 'note' + data._id;
-      this.textarea = $('#ui-dialog-notes textarea');
       return this;
     },
     events: {
@@ -17,10 +16,9 @@ define(function(require, exports, module) {
     },
 
     edit: function(e) {
-      this.textarea.text(this.model.attributes.content);
-      return;
-      this.notesButtonCallbackTmp = this.host.notesButtonCallback;
-      this.host.notesButtonCallback = this.notesButtonCallback;
+      note.dialog.find('textarea').text(this.model.attributes.content);
+      note.dialog.undelegate('.button-ok', 'click')
+        .delegate('.button-ok', 'click', this.notesButtonCallback.bind(this));
     },
 
     del: function(e) {
@@ -30,11 +28,14 @@ define(function(require, exports, module) {
     },
 
     notesButtonCallback: function() {
-      console.log('sdfs');
-      var text = this.textarea.val().trim();
-      $('#note' + this.model.attributes._id).find('.text').text(text);
-      this.textarea.val('');
-      this.host.notesButtonCallback = this.notesButtonCallbackTmp;
+      var data = this.model.attributes;
+      var textarea = note.dialog.find('textarea');
+      var text = textarea.val().trim();
+      connect.updateNote(data.task._id, data._id, text, function onSuccess(data) {
+        $('#note' + data._id).find('.text').text(text);
+        textarea.val('');
+        note.dialog.delegate('.button-ok', 'click', note.buttonCallback);
+      });
     }
   });
 
@@ -78,8 +79,12 @@ define(function(require, exports, module) {
 
     'notes': function(e) {
       e.preventDefault();
-      this.dialogNotes.dialog('open');
-      this.listNotes();
+
+      //Connect {taskView} to {note}
+      note.data = this.model.attributes;
+
+      note.listNotes();
+      note.dialog.dialog('open');
     },
 
     check: function(e) {
@@ -93,59 +98,64 @@ define(function(require, exports, module) {
 
   var note = (function() {
 
+    var dialog;
+
     function start() {
-      var dialogNotes = $('#ui-dialog-notes').dialog({
+      dialog = $('#ui-dialog-notes').dialog({
         autoOpen: false,
         title: '任务备注'
       });
+      dialog.delegate('.button-ok', 'click', buttonCallback);
 
-      dialogNotes.delegate('.button-ok', 'click', notesButtonCallback);  
+      note.dialog = dialog;
     }
 
-    function notesButtonCallback() {
-      var textarea = dialogNotes.find('textarea');
+    function buttonCallback() {
+      var textarea = dialog.find('textarea');
       var note = textarea.val().trim();
       textarea.val('');
       if (note === '') {
         textarea.focus();
       } else {
-        this.host.addNotes(note);
+        addNotes(note);
       }
     }
 
     function listNotes() {
-      var notes = this.model.attributes.notes;
-      var notesEl = this.dialogNotes.find('.table-notes');
+      var notes = note.data.notes;
+      var notesEl = dialog.find('.table-notes');
       var self = this;
       notesEl.hide();
       if (notes.length > 0) {
         notesEl.find('tbody').empty();
         notes.forEach(function(note, index) {
-          self.addNotes_(note);
+          addNotes_(note);
         });
-        notesEl.show();
       }
     }
 
     function addNotes(content) {
-      var taskData = this.model.attributes;
-      var self = this;
+      var taskData = note.data;
       connect.addNote(taskData._id, content, function(note) {
-        self.addNotes_(note);
+        addNotes_(note);
       });
     }
 
-    function addNotes_(note) {
-      note.task = this.model.attributes;
+    function addNotes_(data) {
+      data.task = note.data;
       var taskNote = new TaskNoteView({
-        model: new Backbone.Model(note)
+        model: new Backbone.Model(data)
       });
       taskNote.host = this;
-      var notesEl = this.dialogNotes.find('.table-notes');
+      var notesEl = dialog.find('.table-notes');
       notesEl.find('tbody').append(taskNote.render().el);
+      notesEl.show();
     }
 
     return {
+      start: start,
+
+      buttonCallback: buttonCallback,
       listNotes: listNotes,
       addNotes: addNotes
     };
@@ -329,7 +339,9 @@ define(function(require, exports, module) {
         makeSessionList('task-archives', dateText);
       }
     });
+    
 
+    note.start();
     connect.start();
   }
 

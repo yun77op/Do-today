@@ -5,12 +5,14 @@
   table.table-notes
     thead
       tr
+        th(width="120") 创建时间
         th 备注
         th(width="80") 操作
     tbody
   table#template-note.hidden
     tbody
       tr
+        td [%= created_at %]
         td
           span.text [%= content %]
         td
