@@ -117,7 +117,7 @@ define(function(require, exports, module) {
       if (note === '') {
         textarea.focus();
       } else {
-        addNotes(note);
+        addNote(note);
       }
     }
 
@@ -129,19 +129,19 @@ define(function(require, exports, module) {
       if (notes.length > 0) {
         notesEl.find('tbody').empty();
         notes.forEach(function(note, index) {
-          addNotes_(note);
+          addNote_(note);
         });
       }
     }
 
-    function addNotes(content) {
+    function addNote(content) {
       var taskData = note.data;
       connect.addNote(taskData._id, content, function(note) {
-        addNotes_(note);
+        addNote_(note);
       });
     }
 
-    function addNotes_(data) {
+    function addNote_(data) {
       data.task = note.data;
       var taskNote = new TaskNoteView({
         model: new Backbone.Model(data)
@@ -157,7 +157,7 @@ define(function(require, exports, module) {
 
       buttonCallback: buttonCallback,
       listNotes: listNotes,
-      addNotes: addNotes
+      addNote: addNote
     };
 
   })();

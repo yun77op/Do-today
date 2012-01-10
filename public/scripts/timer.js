@@ -7,26 +7,43 @@ define(function(require, exports, module) {
   var el = $('#timer');
   var timeEl = $('.timer-time', el);
   var progressEl = $('.timer-progress', el);
-  var startButton = $('.timer-start', el).click(run);
+  
 
-  var count, step, instance, active;
+  var active;
   var initial = true;
   var working = true;
-  var notify;
 
-  var progressWidth,
-      totalWidth = 432,
-      initialWidth = progressEl.width();
+  var progressWidth;
+
+  var conf = {
+    progressInitialWidth: 20,
+    progressTotalWidth: 432
+  };
 
   function initialize(type) {
-    count = settings.get('timer', type);
-    count *= 60;
-    progressWidth = initialWidth;
-    step = (totalWidth - initialWidth) / count;
-    updateTime(count);
+    var num = settings.get('timer', type);
+    num *= 60;
+    progressWidth = conf.progressInitialWidth;
+    step = (conf.progressTotalWidth - conf.progressInitialWidth) / num;
+    updateTime(num);
+    $('.timer-start', el).click(run);
+
+    var notify;
+
+    if (window.webkitNotifications) {
+      notify = function (text) {
+        webkitNotifications.createNotification(
+          '/webstore/logo-48.png',
+          '时间到了',
+          text
+        ).show();
+      };
+    }
+
   }
 
   var actionIndex = 0;
+  var step, instance;
   var actionHandlers = {
     'start': {
       fn: function() {
@@ -65,10 +82,9 @@ define(function(require, exports, module) {
   function run(canTrigger) {
     var prevActionHandler = actionHandlers[actions[(actionIndex + 2) % 3]];
     var actionHandler = actionHandlers[actions[actionIndex]];
-    if (actionHandler.fn.call(startButton.get(0))) {
-      return;
-    }
-    startButton.removeClass(prevActionHandler.className)
+    if (actionHandler.fn())) { return; }
+
+    $('.timer-start', el).removeClass(prevActionHandler.className)
       .addClass(actionHandler.className);
     if (canTrigger !== false) {
       $(document).trigger('timer:action:' + actions[actionIndex]);
@@ -114,47 +130,11 @@ define(function(require, exports, module) {
       }
     };
   }
-  
-  if (window.webkitNotifications) {
-    notify = function (text) {
-      webkitNotifications.createNotification(
-        '/webstore/logo-48.png',
-        '时间到了',
-        text
-      ).show();
-    };
-  } else {
-    var messageMain = message.generate('main', {
-      className: 'notice'
-    });
 
-    notify = function (text) {
-      if (!working) {
-        messageMain.option({
-          text: text
-        });
-        messageMain.show(true);
-      } else {
-        messageMain.option({
-          actions: {
-            'dismiss': {
-              'label': '知道了',
-              'click': function() {
-                this.option({ actions: null });
-                this.hide();
-              }
-            }
-          },
-          text: text
-        });
-        messageMain.show();
-      }
-    };
-  }
 
   function updateTime(num) {
-    var m = Math.floor(num / 60),
-        s = Math.floor(num % 60);
+    var m = Math.floor(num / 60);
+    var s = Math.floor(num % 60);
     timeEl.text(zeroFill(m) + ':' + zeroFill(s));
   }
 
