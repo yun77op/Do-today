@@ -1,18 +1,16 @@
 define(function(require, exports, module) {
   var settings = require('./settings');
-  var connect = require('./connect');
+  var connect = require('./connect').connect;
   var message = require('./message');
   var task = require('./task');
 
   var el = $('#timer');
   var timeEl = $('.timer-time', el);
-  var progressEl = $('.timer-progress', el);
-  
 
   var active;
   var initial = true;
   var working = true;
-
+  var count;
   var progressWidth;
 
   var conf = {
@@ -21,11 +19,11 @@ define(function(require, exports, module) {
   };
 
   function initialize(type) {
-    var num = settings.get('timer', type);
-    num *= 60;
+    count = settings.get('timer', type);
+    count *= 60;
     progressWidth = conf.progressInitialWidth;
-    step = (conf.progressTotalWidth - conf.progressInitialWidth) / num;
-    updateTime(num);
+    step = (conf.progressTotalWidth - conf.progressInitialWidth) / count;
+    updateTime(count);
     $('.timer-start', el).click(run);
 
     var notify;
@@ -44,6 +42,7 @@ define(function(require, exports, module) {
 
   var actionIndex = 0;
   var step, instance;
+  var progressEl = $('.timer-progress', el);
   var actionHandlers = {
     'start': {
       fn: function() {
@@ -54,7 +53,7 @@ define(function(require, exports, module) {
           updateTime(--count);
           if (count === 0) {
             run();
-            run(false);
+            run();
             complete();
           }
         });
@@ -79,16 +78,13 @@ define(function(require, exports, module) {
 
   var actions = _.keys(actionHandlers);
 
-  function run(canTrigger) {
+  function run() {
     var prevActionHandler = actionHandlers[actions[(actionIndex + 2) % 3]];
     var actionHandler = actionHandlers[actions[actionIndex]];
-    if (actionHandler.fn())) { return; }
+    if (actionHandler.fn()) { return; }
 
     $('.timer-start', el).removeClass(prevActionHandler.className)
       .addClass(actionHandler.className);
-    if (canTrigger !== false) {
-      $(document).trigger('timer:action:' + actions[actionIndex]);
-    }
     actionIndex = (++actionIndex) % 3;
   }
 
@@ -109,17 +105,17 @@ define(function(require, exports, module) {
     if (!settings.get('notification', 'popup')) { return; }
     var text = !working ? '休息，休息一下！' : '开始工作了！';
     nofity();
-    if (!working) { timer.run(); }
+    if (!working) { run(); }
   }
 
   function checkBeforeStart() {
-    if (initial && !connect.set('current')) {
+    if (initial && connect.currentTasks.length === 0) {
       if(confirm('你不添加个任务先？')) {
         task.focusInput();
         return true;
       }
-      initial = false;
     }
+    initial = false;
   }
 
   function interval(callback) {
@@ -131,14 +127,13 @@ define(function(require, exports, module) {
     };
   }
 
-
-  function updateTime(num) {
-    var m = Math.floor(num / 60);
-    var s = Math.floor(num % 60);
-    timeEl.text(zeroFill(m) + ':' + zeroFill(s));
+  function updateTime(count) {
+    var m = Math.floor(count / 60);
+    var s = Math.floor(count % 60);
+    timeEl.text(xPad(m) + ':' + xPad(s));
   }
 
-  function zeroFill(s) {
+  function xPad(s) {
     s += '';
     return s.length == 1 ? '0' + s : s;
   }
