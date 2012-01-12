@@ -97,7 +97,6 @@ define(function(require, exports, module) {
   });
 
   var note = (function() {
-
     var dialog;
 
     function start() {
@@ -350,7 +349,9 @@ define(function(require, exports, module) {
     addToCurrent: addToCurrent,
 
     focusInput: focusInput,
-    start: start
+    start: start,
+
+    note: note
   };
 
   connect.host = expt;

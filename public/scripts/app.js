@@ -14,7 +14,8 @@ define(function(require, exports, module) {
       initPlugins[i].fn();
     }
 
-    timerMod.initialize('work');
+    timerMod.initialize();
+    timerMod.initSession('work');
     $('#mask').fadeOut();
 
     ////extra
