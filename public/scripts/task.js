@@ -53,7 +53,7 @@ define(function(require, exports, module) {
       this.template.update(this.el, data);
 
       var elJ = $(this.el);
-      this.taskActions = $('.task-action-trigger', elJ).overlay({
+      $('.task-action-trigger', elJ).overlay({
         srcNode: '#ui-overlay-task',
         open: function(e, ui) {
           $(document).trigger('overlay:task', self);
@@ -70,6 +70,38 @@ define(function(require, exports, module) {
 
       $('.task-content, .task-action-trigger, .task-action-notes', elJ).tipsy();
       return this;
+    },
+
+    removeTask: function() {
+      var self = this;
+      connect.removeTask(this.model.get('_id'), function() {
+        self.remove();
+      });
+    },
+
+    hideTask: function() {
+      var self = this;
+      connect.taskAttrChange(this.model.get('_id'), 'hidden', true, function() {
+        var input = $('#task-today-current input');
+        var source = _.clone(input.data('autocomplete').options.source);
+        if (!source) { source = []; }
+        source.push({
+          id: id,
+          value: task.content
+        });
+        initAcSource(source);
+        self.remove();
+      });
+    },
+
+    changePriority: function(priority) {
+      var self = this;
+      var prevPriority = this.model.get('priority');
+      connect.taskAttrChange(this.model.get('_id'), 'priority', priority, function() {
+        var prefix = 'task-priority-';
+        $(self.el).removeClass(prefix + prevPriority)
+          .addClass(prefix + priority);
+      });
     },
 
     events: {
@@ -220,16 +252,6 @@ define(function(require, exports, module) {
       container.addClass('task-list-empty');
     }
   }
-
-  $(document).bind('task:hide', function(e, id, task) {
-    var source = _.clone(input.data('autocomplete').options.source);
-    if (!source) { source = []; }
-    source.push({
-      id: id,
-      value: task.content
-    });
-    initAcSource(source);
-  });
   
   function initAutocomplete(source) {
     input.autocomplete({
@@ -339,6 +361,25 @@ define(function(require, exports, module) {
       }
     });
     
+
+    var taskOverlay = $('#ui-overlay-task'), taskView;
+
+    $('.del', taskOverlay).click(function() {
+      taskView.removeTask();
+    });
+
+    $('.hide', taskOverlay).click(function() {
+      taskView.hideTask();
+    });
+
+    $('.task-priority li', taskOverlay).click(function() {
+      var priority = $(this).data('priority');
+      taskView.changePriority(priority);
+    });
+
+    $(document).bind('overlay:task', function(e, v) {
+      taskView = v;
+    });
 
     note.start();
     connect.start();
