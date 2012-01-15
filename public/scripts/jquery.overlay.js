@@ -68,8 +68,8 @@
 
   $.extend($.ui.overlay.prototype, {
     'open': function() {
-      var self = this,
-          srcNode = this.options.srcNode;
+      var self = this;
+      var srcNode = this.options.srcNode;
       srcNode.show();
       this._position();
       this._trigger('open');

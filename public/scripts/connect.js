@@ -94,20 +94,24 @@ define(function(require, exports, module) {
       });
     },
 
-    hideTask: function(id) {
-      this.currentTasks[id].hidden = true;
-    },
-
     taskAttrChange: function(taskId, key, value, fn) {
-      var task = this.currentTasks[taskId];
+      var self = this;
       var data = {};
-      data[key] = value;
+      if (arguments.length == 3) {
+        data = key;
+        fn = value;
+      } else {
+        data[key] = value;
+      }
+      var task = this.currentTasks[taskId];
       $.ajax('/task/' + task._id, {
         type: 'put',
-        data: data,
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        processData: false,
         success: function(data) {
-          task[key] = value;
-          fn();
+          self.currentTasks[taskId] = data;
+          fn(data);
         }
       });
     },
@@ -141,7 +145,7 @@ define(function(require, exports, module) {
           self.currentTasks[taskId].notes = this.currentTasks[taskId].notes.filter(function(el, index) {
             return el._id != noteId;
           });
-          fn && fn();
+          fn();
         }
       });
     },
@@ -165,14 +169,6 @@ define(function(require, exports, module) {
           fn(data);
         }
       });
-    },
-
-    checkHidden: function (taskId) {
-      var task = this.currentTasks[taskId];
-      if (task.hidden) {
-        task.hidden = false;
-        return task;
-      }
     }
   };
 

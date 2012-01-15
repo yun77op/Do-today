@@ -68,6 +68,7 @@ define(function(require, exports, module) {
         }
       });
 
+      $(this.el).addClass('task-priority-' + this.model.get('priority'));
       $('.task-content, .task-action-trigger, .task-action-notes', elJ).tipsy();
       return this;
     },
@@ -81,15 +82,17 @@ define(function(require, exports, module) {
 
     hideTask: function() {
       var self = this;
-      connect.taskAttrChange(this.model.get('_id'), 'hidden', true, function() {
+      var model = this.model;
+      connect.taskAttrChange(model.get('_id'), 'hidden', true, function() {
         var input = $('#task-today-current input');
         var source = _.clone(input.data('autocomplete').options.source);
         if (!source) { source = []; }
         source.push({
-          id: id,
-          value: task.content
+          id: model.get('_id'),
+          value: model.get('content')
         });
         initAcSource(source);
+        self.model.set({hidden: true});
         self.remove();
       });
     },
@@ -99,6 +102,7 @@ define(function(require, exports, module) {
       var prevPriority = this.model.get('priority');
       connect.taskAttrChange(this.model.get('_id'), 'priority', priority, function() {
         var prefix = 'task-priority-';
+        self.model.set({priority: priority});
         $(self.el).removeClass(prefix + prevPriority)
           .addClass(prefix + priority);
       });
@@ -229,7 +233,7 @@ define(function(require, exports, module) {
   var input = $('#task-today-current input');
   
   function focusInput() {
-    input.get(0).focus();
+    input.focus();
   }
 
   function initAcSource(source) {
@@ -293,17 +297,19 @@ define(function(require, exports, module) {
         input.val('');
         if (content === '') { return; }
         
-        var hiddenId = input.data('hiddenId'), task;
+        var hiddenId = input.data('hiddenId');
+        var taskData = {
+          content: content
+        };
         if (hiddenId) {
-          task = connect.checkHidden(hiddenId);
-          acRemove(hiddenId);
-          input.removeData('hiddenId');
-          task.content = content;
-          addToCurrent(task);
+          taskData.hidden = false;
+          connect.taskAttrChange(hiddenId, taskData, function(task) {
+            acRemove(hiddenId);
+            input.removeData('hiddenId');
+            addToCurrent(task);
+          });
         } else {
-          connect.addTask({
-            content: content
-          }, function (task) {
+          connect.addTask(taskData, function(task) {
             addToCurrent(task);
           });
         }
@@ -367,11 +373,13 @@ define(function(require, exports, module) {
     $('.del', taskOverlay).click(function(e) {
       e.preventDefault();
       taskView.removeTask();
+      taskOverlay.hide();
     });
 
     $('.hide', taskOverlay).click(function(e) {
       e.preventDefault();
       taskView.hideTask();
+      taskOverlay.hide();
     });
 
     $('.task-priority li', taskOverlay).click(function() {

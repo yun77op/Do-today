@@ -89,6 +89,7 @@ exports.bootApplication = function(app, db) {
     //  and in your Jade view use the following:
     //  `input(type="hidden",name="_csrf", value=csrf)`
     csrf: function(req, res) {
+      console.log('csrf');
       return req.session._csrf;
     }
 
