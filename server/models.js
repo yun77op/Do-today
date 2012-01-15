@@ -46,7 +46,8 @@ module.exports = function(db, modelName) {
     * Model: TaskArchive
     */
   var TaskArchive = new Schema({
-    'dateText': String,
+    'user_id': String,
+    'date_text': String,
     'task': {
       'type': ObjectId,
       'ref': 'Task'

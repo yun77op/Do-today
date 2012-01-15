@@ -114,7 +114,7 @@ module.exports = function(app, db) {
     });
   });
 
-  function removeTaskCurrent(taskId, fn) {
+  function removeCurrentTask(taskId, fn) {
     models(db, 'TasksCurrent').findOne({ task: taskId },
       function(err, doc) {
         if (err) { return fn(err); }
@@ -145,8 +145,8 @@ module.exports = function(app, db) {
           }
         );
       },
-      removeTaskCurrent: function(callback) {
-        removeTaskCurrent(taskId, function(err) {
+      removeCurrentTask: function(callback) {
+        removeCurrentTask(taskId, function(err) {
           callback(err);
         });
       }
@@ -160,28 +160,23 @@ module.exports = function(app, db) {
   app.get('/tasks/:dateText', access, function(req, res) {
     var TaskArchiveModel = models(db, 'TaskArchive');
     var dateText = req.params.dateText;
-    TaskArchiveModel.findOne({ dateText: dateText, user_id: req.user._id },
-      function(err, doc) {
-        var data = doc ? doc.toObject().sessions : [];
-        res.send(data);
-      }
-    );
-  });
-
-  app.post('/tasks/:dateText', access, function(req, res) {
-    var TaskArchiveModel = models(db, 'TaskArchive');
-    var doc = TaskArchiveModel(req.body);
-    doc.dateText = req.params.dateText;
-    doc.save(function () {
-      res.send(doc.toObject().sessions);
-    });
+    TaskArchiveModel
+      .find({ date_text: dateText, user_id: req.user._id })
+      .populate('task')
+      .run(function(err, docs) {
+        if (err) { return res.send(err); }
+        var results = docs.map(function(doc) {
+          return doc.toObject();
+        });
+        res.send(results);
+      });
   });
 
   app.post('/completeTask/:id', access, function(req, res) {
     var taskId = req.params.id;
     var dateText = req.body.dateText;
     async.parallel([
-      function updateTask(callback) {
+      function(callback) {
         updateTask(taskId, {checked: true}, function(err, task) {
           callback(err, task);
         });
@@ -190,10 +185,17 @@ module.exports = function(app, db) {
       function addTaskArchive(callback) {
         var TaskArchiveModel = models(db, 'TaskArchive');
         var doc = new TaskArchiveModel({
-          dateText: dateText,
+          user_id: req.user._id,
+          date_text: dateText,
           task: taskId
         });
         doc.save(function(err) {
+          callback(err);
+        });
+      },
+
+      function(callback) {
+        removeCurrentTask(taskId, function(err) {
           callback(err);
         });
       }
