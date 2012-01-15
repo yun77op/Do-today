@@ -62,7 +62,7 @@ define(function(require, exports, module) {
 
       var taskContentEl = $('.task-content', elJ).hotedit({
         callback: function(text) {
-          connect.taskAttrChange(self.model.get('_id'), 'content', text, function() {
+          connect.updateTask(self.model.get('_id'), 'content', text, function() {
             taskContentEl.text(text);
           });
         }
@@ -83,7 +83,7 @@ define(function(require, exports, module) {
     hideTask: function() {
       var self = this;
       var model = this.model;
-      connect.taskAttrChange(model.get('_id'), 'hidden', true, function() {
+      connect.updateTask(model.get('_id'), 'hidden', true, function() {
         var input = $('#task-today-current input');
         var source = _.clone(input.data('autocomplete').options.source);
         if (!source) { source = []; }
@@ -100,7 +100,7 @@ define(function(require, exports, module) {
     changePriority: function(priority) {
       var self = this;
       var prevPriority = this.model.get('priority');
-      connect.taskAttrChange(this.model.get('_id'), 'priority', priority, function() {
+      connect.updateTask(this.model.get('_id'), 'priority', priority, function() {
         var prefix = 'task-priority-';
         self.model.set({priority: priority});
         $(self.el).removeClass(prefix + prevPriority)
@@ -125,10 +125,10 @@ define(function(require, exports, module) {
 
     check: function(e) {
       var id = this.model.get('_id');
-      if(e.target != e.currentTarget) { return; }
-
       this.remove();
-      connect.progressChange(id, this.model.get('progress'), 100);
+      connect.completeTask(id, function() {
+        
+      });
     }
   });
 
@@ -212,7 +212,7 @@ define(function(require, exports, module) {
   }
 
   function makeSessionList(id, date, fn) {
-    connect.getArchiveData(date, function (data) {
+    connect.getArchiveTasks(date, function (data) {
       var container = $('#' + id);
       var list = container.find('ul').empty();
       container.removeClass('task-list-empty');
@@ -303,7 +303,7 @@ define(function(require, exports, module) {
         };
         if (hiddenId) {
           taskData.hidden = false;
-          connect.taskAttrChange(hiddenId, taskData, function(task) {
+          connect.updateTask(hiddenId, taskData, function(task) {
             acRemove(hiddenId);
             input.removeData('hiddenId');
             addToCurrent(task);

@@ -43,20 +43,18 @@ module.exports = function(db, modelName) {
   });
 
   /**
-    * Model: TasksArchive
+    * Model: TaskArchive
     */
-  var TasksArchive = new Schema({
+  var TaskArchive = new Schema({
     'dateText': String,
-    'user_id': String,
-    'sessions': [{
-      'task_id': ObjectId,
-      'start': Number,
-      'end': Number,
-      'created_at': {
-        'type': Date,
-        'default': Date.now
-      }
-    }]
+    'task': {
+      'type': ObjectId,
+      'ref': 'Task'
+    },
+    'created_at': {
+      'type': Date,
+      'default': Date.now
+    }
   });
 
   /**
@@ -89,7 +87,7 @@ module.exports = function(db, modelName) {
   });
 
   db.model('Task', Task);
-  db.model('TasksArchive', TasksArchive);
+  db.model('TaskArchive', TaskArchive);
   db.model('TasksCurrent', TasksCurrent);
   db.model('User', User);
 

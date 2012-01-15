@@ -58,12 +58,12 @@ module.exports = function(app, db) {
       }
     );
   });
-  
+
   app.put('/task/note', access, function(req, res) {
     var body = req.body;
     var TaskModel = models(db, 'Task');
     TaskModel.findOne({ _id: body.taskId, user_id: req.user._id },
-      function (err, doc) {
+      function(err, doc) {
         var data;
         doc.notes.forEach(function(el, index) {
           if (el._id == body.noteId) {
@@ -95,18 +95,39 @@ module.exports = function(app, db) {
     );
   });
 
-  app.put('/task/:id', access, function(req, res) {
-    var body = req.body;
+  function updateTask(id, attrs, fn) {
     var TaskModel = models(db, 'Task');
-    TaskModel.findOne({ _id: req.params.id, user_id: req.user._id },
+    TaskModel.findById(id,
       function (err, doc) {
-        util.extend(doc, body);
-        doc.save(function() {
-          res.send(doc.toObject());
+        if (err) { fn(err); }
+        util.extend(doc, attrs);
+        doc.save(function(err) {
+          fn(err, doc.toObject());
         });
       }
     );
+  }
+
+  app.put('/task/:id', access, function(req, res) {
+    updateTask(req.params.id, req.body, function(err, task) {
+      res.send(err ? err : task);
+    });
   });
+
+  function removeTaskCurrent(taskId, fn) {
+    models(db, 'TasksCurrent').findOne({ task: taskId },
+      function(err, doc) {
+        if (err) { return fn(err); }
+        if (!doc) {
+          err = new Error('Not found');
+          return fn(err);
+        }
+        doc.remove(function(err) {
+          fn(err);
+        });
+      }
+    );
+  }
 
   app.del('/task/:id', access, function(req, res) {
     var taskId = req.params.id;
@@ -125,30 +146,22 @@ module.exports = function(app, db) {
         );
       },
       removeTaskCurrent: function(callback) {
-        models(db, 'TasksCurrent').findOne({ task: taskId, user_id: userId },
-          function(err, doc) {
-            if (err) {
-              return callback(err);
-            }
-            doc.remove(function(err) {
-              callback(err);
-            });
-          }
-        );
+        removeTaskCurrent(taskId, function(err) {
+          callback(err);
+        });
       }
     }, function(err) {
       var result = err ? err : 'ok';
       res.send(result);
     });
-
   });
 
 
   app.get('/tasks/:dateText', access, function(req, res) {
-    var TasksArchiveModel = models(db, 'TasksArchive');
+    var TaskArchiveModel = models(db, 'TaskArchive');
     var dateText = req.params.dateText;
-    TasksArchiveModel.findOne({ dateText: dateText, user_id: req.user._id },
-      function (err, doc) {
+    TaskArchiveModel.findOne({ dateText: dateText, user_id: req.user._id },
+      function(err, doc) {
         var data = doc ? doc.toObject().sessions : [];
         res.send(data);
       }
@@ -156,51 +169,61 @@ module.exports = function(app, db) {
   });
 
   app.post('/tasks/:dateText', access, function(req, res) {
-    var TasksArchiveModel = models(db, 'TasksArchive');
-    var doc = TasksArchiveModel(req.body);
+    var TaskArchiveModel = models(db, 'TaskArchive');
+    var doc = TaskArchiveModel(req.body);
     doc.dateText = req.params.dateText;
     doc.save(function () {
       res.send(doc.toObject().sessions);
     });
   });
 
-
-  //Feed init data
-  app.get('/init/:dateText', access, function(req, res) {
-    var dateText = req.params.dateText;
-    var ueserId = req.user._id;
-    async.parallel({
-      today: function getTaskArchive(callback) {
-        models(db, 'TasksArchive').findOne({ dateText: dateText, user_id: ueserId },
-          function (err, doc) {
-            var data = doc ? doc.toObject().sessions : [];
-            callback(err, data);
-          }
-        );
+  app.post('/completeTask/:id', access, function(req, res) {
+    var taskId = req.params.id;
+    var dateText = req.body.dateText;
+    async.parallel([
+      function updateTask(callback) {
+        updateTask(taskId, {checked: true}, function(err, task) {
+          callback(err, task);
+        });
       },
 
-      current: function getCurrentTasks(callback) {
-        models(db, 'TasksCurrent')
-        .find({user_id: ueserId})
-        .populate('task')
-        .run(function(err, docs) {
-          var tasks = {};
-          docs.forEach(function(doc) {
-            var task = doc.toObject().task;
-            task.notes.forEach(function(el, index) {
-              el.created_at = dateformat(new Date(el.created_at), '%w/%m/%Y');
-            });
-            tasks[task._id] = task;
-          });
-          callback(err, tasks);
+      function addTaskArchive(callback) {
+        var TaskArchiveModel = models(db, 'TaskArchive');
+        var doc = new TaskArchiveModel({
+          dateText: dateText,
+          task: taskId
+        });
+        doc.save(function(err) {
+          callback(err);
         });
       }
-    }, function(err, results) {
-      if (err) {
-        return res.send(err);
-      }
-      res.send(results);
+    ], function(err, results) {
+      var task = results[0];
+      res.send(err ? err : task);
     });
 
   });
+  
+
+  //Feed current tasks
+  app.get('/currentTasks/:dateText', access, function(req, res) {
+    var dateText = req.params.dateText;
+    var ueserId = req.user._id;
+    models(db, 'TasksCurrent')
+      .find({user_id: ueserId})
+      .populate('task')
+      .run(function(err, docs) {
+        if (err) { return res.send(err); }
+        var tasks = {};
+        docs.forEach(function(doc) {
+          var task = doc.toObject().task;
+          task.notes.forEach(function(el, index) {
+            el.created_at = dateformat(new Date(el.created_at), '%w/%m/%Y');
+          });
+          tasks[task._id] = task;
+        });
+        res.send(tasks);
+      });
+  });
+
 };

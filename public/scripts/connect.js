@@ -11,7 +11,7 @@ define(function(require, exports, module) {
   }
 
   function Connect() {
-    this.archiveData = {};
+    this.archiveTasks = {};
   }
 
   Connect.prototype = {
@@ -19,11 +19,10 @@ define(function(require, exports, module) {
       //TODO 零点情况，请求的还是当天的数据，返回数据时却是明天了
       var dateText = getDateHandle();
       var self = this;
-      $.ajax('/init/' + dateText, {
-        contentType: 'json',
+      $.ajax('/currentTasks/' + dateText, {
+        dataType: 'json',
         success: function(data) {
-          self.currentTasks = data.current;
-          self.archiveData[dateText] = data.today;
+          self.currentTasks = data;
           self.renderUI();
         }
       });
@@ -54,15 +53,14 @@ define(function(require, exports, module) {
       this.host.initAutocomplete(source);
     },
 
-    getArchiveData: function(date, fn) {
+    getArchiveTasks: function(date, fn) {
       var dateText = getDateHandle(date);
-      var data = this.archiveData[dateText];
+      var data = this.archiveTasks[dateText];
       var self = this;
       if (!data) {
         $.ajax('/tasks/' + dateText, {
-          contentType: 'json',
           success: function(data) {
-            self.archiveData[dateText] = data;
+            self.archiveTasks[dateText] = data;
             fn(data);
           }
         });
@@ -94,7 +92,7 @@ define(function(require, exports, module) {
       });
     },
 
-    taskAttrChange: function(taskId, key, value, fn) {
+    updateTask: function(taskId, key, value, fn) {
       var self = this;
       var data = {};
       if (arguments.length == 3) {
@@ -111,6 +109,21 @@ define(function(require, exports, module) {
         processData: false,
         success: function(data) {
           self.currentTasks[taskId] = data;
+          fn(data);
+        }
+      });
+    },
+
+    completeTask: function(taskId, fn) {
+      var self = this;
+      var data = {
+        dateText: getDateHandle()
+      };
+      $.ajax('/completeTask/' + taskId, {
+        type: 'post',
+        data: data,
+        success: function(data) {
+          delete self.currentTasks[taskId];
           fn(data);
         }
       });
