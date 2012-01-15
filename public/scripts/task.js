@@ -364,11 +364,13 @@ define(function(require, exports, module) {
 
     var taskOverlay = $('#ui-overlay-task'), taskView;
 
-    $('.del', taskOverlay).click(function() {
+    $('.del', taskOverlay).click(function(e) {
+      e.preventDefault();
       taskView.removeTask();
     });
 
-    $('.hide', taskOverlay).click(function() {
+    $('.hide', taskOverlay).click(function(e) {
+      e.preventDefault();
       taskView.hideTask();
     });
 

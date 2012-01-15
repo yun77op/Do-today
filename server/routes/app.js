@@ -1,3 +1,4 @@
+var async = require('async');
 var models = require('../models');
 var util = require('../lib/util');
 var dateformat = require('../lib/dateformat').strftime;
@@ -16,27 +17,29 @@ module.exports = function(app, db) {
   });
 
   app.post('/task', access, function (req, res) {
-    var TaskModel = models(db, 'Task');
-    var doc = new TaskModel(req.body);
-    doc.user_id = req.user._id;
-    doc.save(function() {
-      var data = doc.toObject();
-      addCurrentTask({
-        task: data._id,
-        user_id: req.user._id
-      }, function() {
-        res.send(data);
-      });
+    async.waterfall([
+      function addTask(callback) {
+        var TaskModel = models(db, 'Task');
+        var doc = new TaskModel(req.body);
+        doc.user_id = req.user._id;
+        doc.save(function(err) {
+          var data = doc.toObject();
+          callback(err, data);
+        });
+      },
+      function addCurrentTask(data, callback) {
+        var TasksCurrentModel = models(db, 'TasksCurrent');
+        var doc = new TasksCurrentModel({
+          task: data._id,
+          user_id: req.user._id
+        });
+        doc.save(function(err) {
+          callback(err, data);
+        });
+      }
+    ], function(err, data) {
+      res.send(err ? err : data);
     });
-
-    function addCurrentTask(taskData, fn) {
-      var TasksCurrentModel = models(db, 'TasksCurrent');
-      var doc = new TasksCurrentModel(taskData);
-      doc.save(function() {
-        fn();
-      });
-    }
-
   });
 
   app.post('/task/note', access, function(req, res) {
@@ -75,7 +78,7 @@ module.exports = function(app, db) {
     );
   });
 
-  app.delete('/task/note', access, function(req, res) {
+  app.del('/task/note', access, function(req, res) {
     var body = req.body;
     var TaskModel = models(db, 'Task');
     TaskModel.findOne({ _id: body.taskId, user_id: req.user._id },
@@ -106,14 +109,38 @@ module.exports = function(app, db) {
   });
 
   app.del('/task/:id', access, function(req, res) {
-    var TaskModel = models(db, 'Task');
-    TaskModel.findOne({ _id: req.params.id, user_id: req.user._id },
-      function (err, doc) {
-        doc.remove(function() {
-          res.send('ok');
-        });
+    var taskId = req.params.id;
+    var userId = req.user._id;
+    async.parallel({
+      removeTask: function(callback) {
+        models(db, 'Task').findOne({ _id: taskId, user_id: userId },
+          function (err, doc) {
+            if (err) {
+              return callback(err);
+            }
+            doc.remove(function(err) {
+              callback(err);
+            });
+          }
+        );
+      },
+      removeTaskCurrent: function(callback) {
+        models(db, 'TasksCurrent').findOne({ task: taskId, user_id: userId },
+          function(err, doc) {
+            if (err) {
+              return callback(err);
+            }
+            doc.remove(function(err) {
+              callback(err);
+            });
+          }
+        );
       }
-    );
+    }, function(err) {
+      var result = err ? err : 'ok';
+      res.send(result);
+    });
+
   });
 
 
@@ -140,22 +167,20 @@ module.exports = function(app, db) {
 
   //Feed init data
   app.get('/init/:dateText', access, function(req, res) {
-    var TasksArchiveModel = models(db, 'TasksArchive');
-    var result = {};
     var dateText = req.params.dateText;
     var ueserId = req.user._id;
-    TasksArchiveModel.findOne({ dateText: dateText, user_id: ueserId },
-      function (err, doc) {
-        result.today = doc ? doc.toObject().sessions : [];
-        getCurrentTasks(ueserId, function(tasks) {
-          result.current = tasks;
-          res.send(result);
-        });
-      }
-    );
+    async.parallel({
+      today: function getTaskArchive(callback) {
+        models(db, 'TasksArchive').findOne({ dateText: dateText, user_id: ueserId },
+          function (err, doc) {
+            var data = doc ? doc.toObject().sessions : [];
+            callback(err, data);
+          }
+        );
+      },
 
-    function getCurrentTasks(ueserId, fn) {
-      models(db, 'TasksCurrent')
+      current: function getCurrentTasks(callback) {
+        models(db, 'TasksCurrent')
         .find({user_id: ueserId})
         .populate('task')
         .run(function(err, docs) {
@@ -167,9 +192,15 @@ module.exports = function(app, db) {
             });
             tasks[task._id] = task;
           });
-          fn(tasks);
+          callback(err, tasks);
         });
-    }
+      }
+    }, function(err, results) {
+      if (err) {
+        return res.send(err);
+      }
+      res.send(results);
+    });
 
   });
 };

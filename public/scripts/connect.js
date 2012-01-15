@@ -83,12 +83,13 @@ define(function(require, exports, module) {
       });
     },
 
-    removeTask: function(id) {
+    removeTask: function(id, fn) {
       var self = this;
       $.ajax('/task/' + id, {
         type: 'delete',
         success: function() {
           delete self.currentTasks[id];
+          fn();
         }
       });
     },
