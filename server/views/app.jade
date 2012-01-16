@@ -17,23 +17,24 @@ block body
         li: a(href="#task-today") 今日任务
         li: a(href="#task-archives") 往日记录
       #task-today
-        #task-today-current.task-list-container.task-list-empty
+        #task-today-current.task-list-container.empty-state
           .task-add
             input(placeholder="添加任务")
             a.task-add-button.button.fn-tipsy(title="查看全部隐藏任务")
           ul
-            li.task-empty 没有记录哦!
+            li.empty-task 没有记录哦!
           .actionArea
             button.button-reorder.button-dt 重排
-        #task-today-archive.task-list-container
-          ul.task-session
+        #task-today-archive.task-list-container.hidden-state
+          ul.task-archives-list
           .actionArea
-            a.listToday(href="#") 查看今日任务明细
-            //img.throbber(src="images/throbber.gif")
+            a.toggle(href="#") 查看今日任务明细
+            img.throbber.hidden(src="images/throbber.png")
+            a.refresh.right(href="#") 刷新
       #task-archives.task-list-container
         p: input#task-datepicker
         .content
-          ul.task-session
+          ul.task-archives-list
     //
       #mask
         .mask-message
@@ -52,6 +53,7 @@ block body
         .script('lib/sea.js')
         .script('lib/underscore.js').wait()
         .script('lib/backbone.js')
+        .script('lib/dateformat.js')
         .script('lib/jquery-ui.min.js').wait()
         .script('jquery.overlay.js')
         .script('jquery.hotedit.js')

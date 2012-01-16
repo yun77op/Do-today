@@ -114,23 +114,6 @@
   #task
     background: transparent
     font-size: 1em
-    .task-list-container
-      position: relative
-      > .actionArea .button-dt
-        &.active
-          background: $notice-color
-          +border-radius(4px)
-          color: $link-color
-    .task-empty
-      display: none
-    .task-list-empty
-      ul
-        list-style: none
-      .task-empty
-        display: list-item
-      .button-reorder
-        display: none
-
     .task-add
       position: relative
       margin-bottom: 1.5em
@@ -159,73 +142,85 @@
         height: 14px
         line-height: 14px
         padding: 0 2px
-    ul
-      list-style: none
-      margin: 0 1em 1em
-      .task
-        border-bottom: 1px dotted #000
-        padding: .5em
-        position: relative
-        .task
-          border: none
-          border-top: 1px dotted #000
-        &:hover
-          .actionArea
-            visibility: visible
-        .actionArea
-          visibility: hidden
-          +float-right()
-          *margin-top: -25px
-          .button
-            margin-top: 6px
-            width: 13px
-            height: 13px
-            +hide-text
-            background-image: url(../images/sprites.png)
-          .task-action-trigger
-            background-position: -129px -173px
-          .task-action-notes
-            background-position: -171px -173px
-        span
-          margin: 0 .5em 0 0
 
-        .ui-icon-arrowthick-2-n-s
-          position: absolute
-          right: 0
-          top: 50%
-          margin-top: -8px
-          visibility: hidden
-        .task-check
-          cursor: pointer
-          width: 17px
-          height: 17px
-          margin: 0 1em 0 0
-          border: 1px solid $background-color
-          border: 1px solid rgba($background-color, 0.7)
-          +border-radius(5px)
-          color: $dark-color
+    .task-list-container
+      position: relative
+      > .actionArea .button-dt
+        &.active
+          background: $notice-color
+          +border-radius(4px)
+          color: $link-color
+    
+    #task-today-current
+      ul
+        list-style: none
+        margin: 0 1em 1em
+        &.empty-state
+          .empty-task
+            display: list-item
+          .button-reorder
+            display: none
+        &.sortable-state
+          cursor: move
+          .task
+            .ui-icon-arrowthick-2-n-s
+              visibility: visible !important
+            .actionArea
+              visibility: hidden !important
+        .empty-task
+          display: none
+        .task
+          border-bottom: 1px dotted #000
+          padding: .5em
           &:hover
-            +box-shadow()
-            background: url(../images/sprites.png) -149px -173px
-      .task-priority-0
-        color: #202020
-      .task-priority-1
-        color: red
-      .task-priority-2
-        color: #007700
-      .task-priority-3
-        color: #006699
-    .task-session
-      list-style: upper-roman outside
-    .task-notes
-      list-style: disc inside
-    .sortable
-      cursor: move
-      .task
-        .ui-icon-arrowthick-2-n-s
-          visibility: visible !important
-        .actions
-          visibility: hidden !important
+            .actionArea
+              visibility: visible
+          .actionArea
+            visibility: hidden
+            +float-right()
+            .button
+              margin-top: 6px
+              width: 13px
+              height: 13px
+              +hide-text
+              background-image: url(../images/sprites.png)
+            .task-action-trigger
+              background-position: -129px -173px
+            .task-action-notes
+              background-position: -171px -173px
+          .ui-icon-arrowthick-2-n-s
+            position: absolute
+            right: 0
+            top: 50%
+            margin-top: -8px
+            visibility: hidden
+          .task-check
+            cursor: pointer
+            width: 17px
+            height: 17px
+            margin: 0 1em 0 0
+            border: 1px solid $background-color
+            border: 1px solid rgba($background-color, 0.7)
+            +border-radius(5px)
+            color: $dark-color
+            &:hover
+              +box-shadow()
+              background: url(../images/sprites.png) -149px -173px
+        .task-priority-0
+          color: #202020
+        .task-priority-1
+          color: red
+        .task-priority-2
+          color: #007700
+        .task-priority-3
+          color: #006699
+    
+    #task-today-archive
+      &.hidden-state
+        .actionArea .refresh
+          visibility: hidden
+    .task-archives-list
+      list-style: upper-roman inside
 
   #message-main
     top: 72px

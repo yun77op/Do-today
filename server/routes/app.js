@@ -219,9 +219,6 @@ module.exports = function(app, db) {
         var tasks = {};
         docs.forEach(function(doc) {
           var task = doc.toObject().task;
-          task.notes.forEach(function(el, index) {
-            el.created_at = dateformat(new Date(el.created_at), '%w/%m/%Y');
-          });
           tasks[task._id] = task;
         });
         res.send(tasks);

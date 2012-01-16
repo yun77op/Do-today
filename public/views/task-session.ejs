@@ -1,16 +1,15 @@
 <li class="task">
-  <strong class="task-content">[%= task.content %]</strong>
-    [% if (start != 0  end != 100) { %]
-    <em class="right">完成从[%= start %]%到[%= end %]%</em>
-  [% } %]
-  [% if (typeof task.notes != 'undefined') { %]
+  <div class="task-line">
+    <strong class="task-content"><%= task.content %></strong>
+    <em class="task-time right"><%= strftime(new Date(task.created_at), '%p %l:%M') %></em>
+  </div>
+  <% if (task.notes.length > 0) { %>
     <ul class="task-notes">
-      [% _.each(task.notes, function(note) { %]
+      <% task.notes.forEach(function(note) { %>
         <li>
-          [%= note.content %]
-          <em class="time right">[%= new Date(note.time).toLocaleString() %]</em>
+          <%= note.content %>
         </li>
-      [% }); %]
+      <% }); %>
     </ul>
-  [% } %]
+  <% } %>
 </li>

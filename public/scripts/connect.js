@@ -20,7 +20,6 @@ define(function(require, exports, module) {
       var dateText = getDateHandle();
       var self = this;
       $.ajax('/currentTasks/' + dateText, {
-        dataType: 'json',
         success: function(data) {
           self.currentTasks = data;
           self.renderUI();
@@ -55,18 +54,11 @@ define(function(require, exports, module) {
 
     getArchiveTasks: function(date, fn) {
       var dateText = getDateHandle(date);
-      var data = this.archiveTasks[dateText];
-      var self = this;
-      if (!data) {
-        $.ajax('/tasks/' + dateText, {
-          success: function(data) {
-            self.archiveTasks[dateText] = data;
-            fn(data);
-          }
-        });
-      } else {
-        fn(data);
-      }
+      $.ajax('/tasks/' + dateText, {
+        success: function(data) {
+          fn(data);
+        }
+      });
     },
 
     addTask: function(task, fn) {

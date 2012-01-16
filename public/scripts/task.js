@@ -125,9 +125,9 @@ define(function(require, exports, module) {
 
     check: function(e) {
       var id = this.model.get('_id');
-      this.remove();
+      var self = this;
       connect.completeTask(id, function() {
-        
+        self.remove();
       });
     }
   });
@@ -197,9 +197,6 @@ define(function(require, exports, module) {
 
   })();
 
-
-  var templateTaskSession = new EJS({url: 'views/task-session.ejs'});
-
   function addToCurrent(taskData) {
     var task = new TaskView({
       model: new Backbone.Model(taskData)
@@ -211,24 +208,28 @@ define(function(require, exports, module) {
     list.append(task.render().el);
   }
 
-  function makeSessionList(id, date, fn) {
-    connect.getArchiveTasks(date, function (data) {
+  var taskSessionTemplate = new EJS({url: 'views/task-session.ejs'});
+
+  function listArchives(id, date, fn) {
+    connect.getArchiveTasks(date, function(data) {
       var container = $('#' + id);
       var list = container.find('ul').empty();
-      container.removeClass('task-list-empty');
-
+      container.removeClass('empty-state');
       if (!data || data.length === 0) {
-        container.addClass('task-list-empty');
-        list.append('<li class="task-empty">没有记录哦!</li>');
+        container.addClass('empty-state');
+        list.append('<li>没有记录哦!</li>');
       } else {
-        _.each(data, function(item) {
-          var el = templateTaskSession.render(item);
-          list.append(el);
+        var docFragment = document.createDocumentFragment();
+        data.forEach(function(item) {
+          var el = taskSessionTemplate.render(item);
+          docFragment.appendChild($(el).get(0));
         });
+        list.get(0).appendChild(docFragment);
       }
       fn && fn();
     });
   }
+
 
   var input = $('#task-today-current input');
   
@@ -266,7 +267,7 @@ define(function(require, exports, module) {
       }
     });
 
-    input.data( 'autocomplete' )._renderItem = function( ul, item ) {
+    input.data('autocomplete')._renderItem = function(ul, item) {
       var a = $('<a>' + item.label + '</a>');
       var span = $('<span class="del" title="删除">x</span>');
         
@@ -324,25 +325,41 @@ define(function(require, exports, module) {
         .text((sortable ? '完成': '') + '重排');
       sortable = !sortable;
       $('#task-today-current ul').sortable({ disabled: sortable })
-        .toggleClass('sortable');
+        .toggleClass('sortable-state');
     });
 
     var isTodayListShow = false;
-    el.delegate('.actionArea .listToday', 'click', function(e) {
+    var todayArchives = $('#task-today-archive');
+    el.delegate('.actionArea .toggle', 'click', function(e) {
       e.preventDefault();
+      var toggleButton = $(this);
       var text;
-      var button = $(this);
       if (isTodayListShow) {
+        $('ul', todayArchives).empty();
         text = '查看今日任务明细';
-        $('#task-today-archive ul').empty();
+        callback();
       } else {
-        var throbber = button.next();
-        throbber.show();
         text = '隐藏';
-        makeSessionList('task-today-archive', Date.now());
+        var throbber = toggleButton.next();
+        throbber.show();
+        listArchives('task-today-archive', Date.now(), function() {
+          throbber.hide();
+          callback();
+        });
       }
-      button.text(text);
-      isTodayListShow = !isTodayListShow;
+
+      function callback() {
+        todayArchives.toggleClass('hidden-state');
+        toggleButton.text(text);
+        isTodayListShow = !isTodayListShow;
+      }
+    });
+
+    el.delegate('.actionArea .refresh', 'click', function(e) {
+      e.preventDefault();
+      listArchives('task-today-archive', Date.now(), function() {
+        
+      });
     });
 
 
@@ -356,14 +373,14 @@ define(function(require, exports, module) {
         if (ui.index == 1) {
           var yesterday = new Date().valueOf() -  24 * 60 * 60 * 1000;
           $('#task-datepicker').val($.datepicker.formatDate('mm/dd/yy', new Date(yesterday)));
-          makeSessionList('task-archives', yesterday);
+          listArchives('task-archives', yesterday);
         }
       }
     });
 
     $('#task-datepicker', el).datepicker({
       onClose: function(dateText, inst) {
-        makeSessionList('task-archives', dateText);
+        listArchives('task-archives', dateText);
       }
     });
     
