@@ -1,13 +1,14 @@
 <li class="task">
   <div class="task-line">
-    <strong class="task-content"><%= task.content %></strong>
+    <span class="task-content"><%= task.content %></span>
     <em class="task-time right"><%= strftime(new Date(task.created_at), '%p %l:%M') %></em>
   </div>
   <% if (task.notes.length > 0) { %>
     <ul class="task-notes">
       <% task.notes.forEach(function(note) { %>
-        <li>
-          <%= note.content %>
+        <li class="task-line">
+          <span><%= note.content %></span>
+          <em class="task-time right"><%= strftime(new Date(note.created_at), '%p %l:%M') %></em>
         </li>
       <% }); %>
     </ul>

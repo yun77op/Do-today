@@ -114,6 +114,8 @@
   #task
     background: transparent
     font-size: 1em
+    .ui-tabs-nav a
+      color: #FFF
     .task-add
       position: relative
       margin-bottom: 1.5em
@@ -145,11 +147,9 @@
 
     .task-list-container
       position: relative
-      > .actionArea .button-dt
-        &.active
-          background: $notice-color
-          +border-radius(4px)
-          color: $link-color
+      color: $dark-color
+      .actionArea
+        margin: 1.5em 0
     
     #task-today-current
       ul
@@ -170,7 +170,7 @@
         .empty-task
           display: none
         .task
-          border-bottom: 1px dotted #000
+          border-bottom: 1px dotted $dark-color
           padding: .5em
           &:hover
             .actionArea
@@ -214,13 +214,24 @@
           color: #007700
         .task-priority-3
           color: #006699
-    
+
+      .actionArea
+        .button-dt.active-state
+          background: $notice-color
+          +border-radius(4px)
+          color: $link-color
+
     #task-today-archive
       &.hidden-state
         .actionArea .refresh
           visibility: hidden
     .task-archives-list
-      list-style: upper-roman inside
+      list-style: upper-roman
+      .task-line
+        padding: .5em 0
+        border-bottom: 1px solid $dark-color
+      li li.task-line
+        border-style: dotted
 
   #message-main
     top: 72px

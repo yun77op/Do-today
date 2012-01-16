@@ -321,7 +321,7 @@ define(function(require, exports, module) {
     var sortable = true;
     el.delegate('.actionArea .button-reorder', 'click', function(e) {
       $(this)
-        .toggleClass('active')
+        .toggleClass('active-state')
         .text((sortable ? '完成': '') + '重排');
       sortable = !sortable;
       $('#task-today-current ul').sortable({ disabled: sortable })
