@@ -1,5 +1,3 @@
-// This import applies a global reset to any page that imports this stylesheet.
-@import blueprint/reset
 
 // To configure blueprint, edit the partials/base.sass file.
 @import partials/base
@@ -11,22 +9,20 @@
 @import compass/css3
 @import compass/typography
 
+@import partials/mixins
 
-// Combine the partials into a single screen stylesheet.
-
-@import partials/typography
-@import partials/form
-@import partials/layout
-@import partials/utilities
-@import typography
-
-+typography
-
-//Ext
-.message
-  font-size: 14px
-  position: absolute
-  padding: .2em .6em
+//Various classes
+.button-dt
+  +border-radius(2px)
+  padding: 0.2em 0.5em
+  font-size: 12px
+  color: $link-color
+  font-size: .9em
+  background: $background-color
+  background: rgba($background-color, 0.7)
+  +linear-gradient(color-stops(rgba($background-color, 0.7), rgba($background-color, 0.5)), top)
+  &:hover
+    +box-shadow()
 
 //Common
 #header
@@ -55,7 +51,7 @@
   position: relative
 
 
-//Page style
+//Page
 .page-app
   margin: 0 auto
   width: 550px
@@ -150,13 +146,14 @@
       color: $dark-color
       .actionArea
         margin: 1.5em 0
-    
-    #task-today-current
+    .empty-state
       ul
         list-style: none
-        margin: 0 1em 1em
+        margin-left: 1em
+    #task-today-current
+      ul
         &.empty-state
-          .empty-task
+          .empty
             display: list-item
           .button-reorder
             display: none
@@ -167,7 +164,7 @@
               visibility: visible !important
             .actionArea
               visibility: hidden !important
-        .empty-task
+        .empty
           display: none
         .task
           border-bottom: 1px dotted $dark-color
@@ -176,6 +173,7 @@
             .actionArea
               visibility: visible
           .actionArea
+            margin: 0
             visibility: hidden
             +float-right()
             .button
@@ -225,6 +223,10 @@
       &.hidden-state
         .actionArea .refresh
           visibility: hidden
+      .actionArea
+        a, a:hover
+          color: $font-color
+
     .task-archives-list
       list-style: upper-roman
       .task-line
@@ -256,7 +258,8 @@
 
   .task-priority
     border-bottom: none !important
-    ul 
+    ul
+      margin: 0
       li
         +horizontal-list-item(2px)
         cursor: pointer
@@ -264,14 +267,6 @@
         line-height: 1.1
         margin-right: .2em
         color: darken(#FFF, 20%)
-
-.ui-overlay-menu
-  float: left
-  .ui-overlay-content
-    +float-left
-    .ui-menu-item > a:hover
-      background: #999
-          
 
 #ui-dialog-notes
   textarea
@@ -300,6 +295,3 @@
       background: $background-color
       +border-radius(3px)
       margin-top: .5em
-
-.ui-overlay-content
-  padding: 1em 0.5em

@@ -217,7 +217,7 @@ define(function(require, exports, module) {
       container.removeClass('empty-state');
       if (!data || data.length === 0) {
         container.addClass('empty-state');
-        list.append('<li>没有记录哦!</li>');
+        list.append('<li class="empty">没有记录哦!</li>');
       } else {
         var docFragment = document.createDocumentFragment();
         data.forEach(function(item) {
@@ -339,7 +339,7 @@ define(function(require, exports, module) {
         text = '查看今日任务明细';
         callback();
       } else {
-        text = '隐藏';
+        text = '隐藏今日任务明细';
         var throbber = toggleButton.next();
         throbber.show();
         listArchives('task-today-archive', Date.now(), function() {
@@ -357,9 +357,7 @@ define(function(require, exports, module) {
 
     el.delegate('.actionArea .refresh', 'click', function(e) {
       e.preventDefault();
-      listArchives('task-today-archive', Date.now(), function() {
-        
-      });
+      listArchives('task-today-archive', Date.now());
     });
 
 
