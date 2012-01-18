@@ -110,6 +110,7 @@
   #task
     background: transparent
     font-size: 1em
+    min-height: 300px
     .ui-tabs-nav a
       color: #FFF
     .task-add
@@ -161,9 +162,9 @@
           cursor: move
           .task
             .ui-icon-arrowthick-2-n-s
-              visibility: visible !important
+              display: block !important
             .actionArea
-              visibility: hidden !important
+              display: none !important
         .empty
           display: none
         .task
@@ -175,9 +176,7 @@
           .actionArea
             margin: 0
             visibility: hidden
-            +float-right()
             .button
-              margin-top: 6px
               width: 13px
               height: 13px
               +hide-text
@@ -187,16 +186,11 @@
             .task-action-notes
               background-position: -171px -173px
           .ui-icon-arrowthick-2-n-s
-            position: absolute
-            right: 0
-            top: 50%
-            margin-top: -8px
-            visibility: hidden
+            display: none
           .task-check
             cursor: pointer
             width: 17px
             height: 17px
-            margin: 0 1em 0 0
             border: 1px solid $background-color
             border: 1px solid rgba($background-color, 0.7)
             +border-radius(5px)
@@ -270,8 +264,13 @@
 
 #ui-dialog-notes
   textarea
-    width: 264px
-    margin-bottom: 10px
+    width: 364px
+    height: 40px
+  .actionArea
+    margin: .5em 0 1em
+    text-align: right
+  .spacer
+    margin: 0 .5em
 
 #loginArea
   text-align: center

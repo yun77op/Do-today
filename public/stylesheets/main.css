@@ -25,7 +25,7 @@
 .page-app #timer .timer-start.stopped { width: 0; height: 0; border-style: solid; border-width: 10px; border-left-width: 0; border-color: transparent white; }
 .page-app #settings { position: absolute; right: 10px; top: 20px; }
 .page-app #settings a { width: 16px; height: 15px; background: url(../images/sprites.png) -77px -173px; text-indent: -119988px; overflow: hidden; text-align: left; }
-.page-app #task { background: transparent; font-size: 1em; }
+.page-app #task { background: transparent; font-size: 1em; min-height: 300px; }
 .page-app #task .ui-tabs-nav a { color: white; }
 .page-app #task .task-add { position: relative; margin-bottom: 1.5em; }
 .page-app #task .task-add input { font-size: 12px; padding: 4px; width: 498px; -webkit-border-radius: 4px 4px; -moz-border-radius: 4px / 4px; -o-border-radius: 4px / 4px; -ms-border-radius: 4px / 4px; -khtml-border-radius: 4px / 4px; border-radius: 4px / 4px; border: 2px inset threedface; }
@@ -38,17 +38,17 @@
 .page-app #task #task-today-current ul.empty-state .empty { display: list-item; }
 .page-app #task #task-today-current ul.empty-state .button-reorder { display: none; }
 .page-app #task #task-today-current ul.sortable-state { cursor: move; }
-.page-app #task #task-today-current ul.sortable-state .task .ui-icon-arrowthick-2-n-s { visibility: visible !important; }
-.page-app #task #task-today-current ul.sortable-state .task .actionArea { visibility: hidden !important; }
+.page-app #task #task-today-current ul.sortable-state .task .ui-icon-arrowthick-2-n-s { display: block !important; }
+.page-app #task #task-today-current ul.sortable-state .task .actionArea { display: none !important; }
 .page-app #task #task-today-current ul .empty { display: none; }
 .page-app #task #task-today-current ul .task { border-bottom: 1px dotted #202020; padding: 0.5em; }
 .page-app #task #task-today-current ul .task:hover .actionArea { visibility: visible; }
-.page-app #task #task-today-current ul .task .actionArea { margin: 0; visibility: hidden; display: inline; float: right; }
-.page-app #task #task-today-current ul .task .actionArea .button { margin-top: 6px; width: 13px; height: 13px; text-indent: -119988px; overflow: hidden; text-align: left; background-image: url(../images/sprites.png); }
+.page-app #task #task-today-current ul .task .actionArea { margin: 0; visibility: hidden; }
+.page-app #task #task-today-current ul .task .actionArea .button { width: 13px; height: 13px; text-indent: -119988px; overflow: hidden; text-align: left; background-image: url(../images/sprites.png); }
 .page-app #task #task-today-current ul .task .actionArea .task-action-trigger { background-position: -129px -173px; }
 .page-app #task #task-today-current ul .task .actionArea .task-action-notes { background-position: -171px -173px; }
-.page-app #task #task-today-current ul .task .ui-icon-arrowthick-2-n-s { position: absolute; right: 0; top: 50%; margin-top: -8px; visibility: hidden; }
-.page-app #task #task-today-current ul .task .task-check { cursor: pointer; width: 17px; height: 17px; margin: 0 1em 0 0; border: 1px solid #302716; border: 1px solid rgba(48, 39, 22, 0.7); -moz-border-radius: 5px; -webkit-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; -khtml-border-radius: 5px; border-radius: 5px; color: #202020; }
+.page-app #task #task-today-current ul .task .ui-icon-arrowthick-2-n-s { display: none; }
+.page-app #task #task-today-current ul .task .task-check { cursor: pointer; width: 17px; height: 17px; border: 1px solid #302716; border: 1px solid rgba(48, 39, 22, 0.7); -moz-border-radius: 5px; -webkit-border-radius: 5px; -o-border-radius: 5px; -ms-border-radius: 5px; -khtml-border-radius: 5px; border-radius: 5px; color: #202020; }
 .page-app #task #task-today-current ul .task .task-check:hover { -moz-box-shadow: 0px 0px 5px #333333; -webkit-box-shadow: 0px 0px 5px #333333; -o-box-shadow: 0px 0px 5px #333333; box-shadow: 0px 0px 5px #333333; background: url(../images/sprites.png) -149px -173px; }
 .page-app #task #task-today-current ul .task-priority-0 { color: #202020; }
 .page-app #task #task-today-current ul .task-priority-1 { color: red; }
@@ -71,7 +71,9 @@
 .page-app .task-priority ul li:last-child { padding-right: 0; }
 .page-app .task-priority ul li.last { padding-right: 0; }
 
-#ui-dialog-notes textarea { width: 264px; margin-bottom: 10px; }
+#ui-dialog-notes textarea { width: 364px; height: 40px; }
+#ui-dialog-notes .actionArea { margin: 0.5em 0 1em; text-align: right; }
+#ui-dialog-notes .spacer { margin: 0 0.5em; }
 
 #loginArea { text-align: center; padding: 40px 2em; }
 

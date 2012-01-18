@@ -5,16 +5,18 @@
   table.table-notes
     thead
       tr
-        th(width="120") 创建时间
+        th(width="80") 创建时间
         th 备注
         th(width="80") 操作
     tbody
-  table#template-note.hidden
-    tbody
-      tr
-        td [%= created_at %]
-        td
-          span.text [%= content %]
-        td
-          a.del(href="#") 删除
-          a.edit(href="#") 修改
+
+table#template-note.hidden
+  tbody
+    tr
+      td [%= strftime(new Date(created_at), '%p %l:%M') %]
+      td
+        span.text [%= content %]
+      td
+        a.del(href="#") 删除
+        span.spacer |
+        a.edit(href="#") 修改

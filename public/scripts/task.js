@@ -16,31 +16,36 @@ define(function(require, exports, module) {
     },
 
     edit: function(e) {
-      note.dialog.find('textarea').text(this.model.attributes.content);
+      e.preventDefault();
+      note.dialog.find('textarea').val(this.model.attributes.content);
       note.dialog.undelegate('.button-ok', 'click')
-        .delegate('.button-ok', 'click', this.notesButtonCallback.bind(this));
+        .delegate('.button-ok', 'click', this.noteButtonCallback.bind(this));
     },
 
     del: function(e) {
+      e.preventDefault();
       var data = this.model.attributes;
       this.remove();
       connect.removeNote(data.task._id, data._id);
     },
 
-    notesButtonCallback: function() {
+    noteButtonCallback: function() {
       var data = this.model.attributes;
       var textarea = note.dialog.find('textarea');
       var text = textarea.val().trim();
+      var self = this;
       connect.updateNote(data.task._id, data._id, text, function onSuccess(data) {
         $('#note' + data._id).find('.text').text(text);
         textarea.val('');
-        note.dialog.delegate('.button-ok', 'click', note.buttonCallback);
+        self.model.set({content: text});
+        note.dialog.undelegate('.button-ok', 'click')
+          .delegate('.button-ok', 'click', note.buttonCallback);
       });
     }
   });
 
   var TaskView = Backbone.View.extend({
-    tagName: 'li',
+    tagName: 'tr',
     className: 'task',
     template: new EJS({url: 'views/task-current.ejs'}),
     initialize: function() {
@@ -138,7 +143,8 @@ define(function(require, exports, module) {
     function start() {
       dialog = $('#ui-dialog-notes').dialog({
         autoOpen: false,
-        title: '任务备注'
+        title: '任务备注',
+        width: 400
       });
       dialog.delegate('.button-ok', 'click', buttonCallback);
 
@@ -158,11 +164,11 @@ define(function(require, exports, module) {
 
     function listNotes() {
       var notes = note.data.notes;
-      var notesEl = dialog.find('.table-notes');
+      var table = dialog.find('.table-notes');
       var self = this;
-      notesEl.hide();
+      table.hide();
       if (notes.length > 0) {
-        notesEl.find('tbody').empty();
+        table.find('tbody').empty();
         notes.forEach(function(note, index) {
           addNote_(note);
         });
@@ -182,9 +188,9 @@ define(function(require, exports, module) {
         model: new Backbone.Model(data)
       });
       taskNote.host = this;
-      var notesEl = dialog.find('.table-notes');
-      notesEl.find('tbody').append(taskNote.render().el);
-      notesEl.show();
+      var table = dialog.find('.table-notes');
+      table.find('tbody').append(taskNote.render().el);
+      table.show();
     }
 
     return {
