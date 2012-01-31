@@ -15,41 +15,15 @@ define(function(require, exports, module) {
   }
 
   Connect.prototype = {
-    start: function() {
+    getCurrentTasks: function(fn) {
       //TODO 零点情况，请求的还是当天的数据，返回数据时却是明天了
       var dateText = getDateHandle();
       var self = this;
       $.ajax('/currentTasks/' + dateText, {
         success: function(data) {
-          self.currentTasks = data;
-          self.renderUI();
+          fn(data);
         }
       });
-    },
-
-    renderUI: function() {
-      var task, currentTasks = this.currentTasks;
-      var hiddenTasks = [];
-      var id;
-      for (id in currentTasks) {
-        task = currentTasks[id];
-        if (task.hidden) {
-          hiddenTasks.push(task);
-        } else {
-          this.host.addToCurrent(task);
-        }
-      }
-      var source = [];
-      if (hiddenTasks.length > 0) {
-        for (var i = 0, l = hiddenTasks.length; i < l; ++i) {
-          task = hiddenTasks[i];
-          source.push({
-            id: task._id,
-            value: task.content
-          });
-        }
-      }
-      this.host.initAutocomplete(source);
     },
 
     getArchiveTasks: function(date, fn) {
