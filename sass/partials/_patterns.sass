@@ -4,12 +4,17 @@
   padding: .2em .6em
 
 
-.ui-overlay-content
-  padding: 1em 0.5em
+.ui-overlay
+  position: absolute
+  .ui-overlay-content
+    padding: 1em 0.5em
 
 .ui-overlay-menu
   float: left
   .ui-overlay-content
     +float-left
-    .ui-menu-item > a:hover
-      background: #999
+    .ui-menu-item > a
+      color: $grayDark
+      &:hover
+        color: $white
+        background: $grayDark

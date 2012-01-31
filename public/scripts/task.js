@@ -45,7 +45,7 @@ define(function(require, exports, module) {
   });
 
   var TaskView = Backbone.View.extend({
-    tagName: 'tr',
+    tagName: 'li',
     className: 'task',
     template: new EJS({url: 'views/task-current.ejs'}),
     initialize: function() {
@@ -78,10 +78,11 @@ define(function(require, exports, module) {
       return this;
     },
 
-    removeTask: function() {
+    removeTask: function(fn) {
       var self = this;
       connect.removeTask(this.model.get('_id'), function() {
         self.remove();
+        fn();
       });
     },
 
@@ -207,11 +208,18 @@ define(function(require, exports, module) {
     var task = new TaskView({
       model: new Backbone.Model(taskData)
     });
-
-    var container = $('#task-today-current');
-    var list = container.find('ul');
-    container.removeClass('task-list-empty');
+    var list = $('#task-today-current ul');
     list.append(task.render().el);
+
+    checkTaskCurrentListStatus();
+  }
+
+  function checkTaskCurrentListStatus() {
+    setTimeout(function() {
+      var list = $('#task-today-current ul');
+      var isEmptyState = list.find('li:visible').length === 0;
+      list[(isEmptyState ? 'add' : 'remove') + 'Class']('empty-state');
+    }, 0);
   }
 
   var taskSessionTemplate = new EJS({url: 'views/task-session.ejs'});
@@ -257,13 +265,6 @@ define(function(require, exports, module) {
     initAcSource(source);
   }
 
-  function checkTaskListStatus() {
-    var container = $('#task-today-current');
-    if (container.find('li:visible').length === 0) {
-      container.addClass('task-list-empty');
-    }
-  }
-  
   function initAutocomplete(source) {
     input.autocomplete({
       source: source,
@@ -393,8 +394,10 @@ define(function(require, exports, module) {
 
     $('.del', taskOverlay).click(function(e) {
       e.preventDefault();
-      taskView.removeTask();
       taskOverlay.hide();
+      taskView.removeTask(function() {
+        checkTaskCurrentListStatus();
+      });
     });
 
     $('.hide', taskOverlay).click(function(e) {

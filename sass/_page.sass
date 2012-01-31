@@ -1,17 +1,4 @@
-
-// To configure blueprint, edit the partials/base.sass file.
-@import partials/base
-
-// Import all the default blueprint modules so that we can access their mixins.
-@import blueprint
-
-
-@import compass/css3
-@import compass/typography
-
-@import partials/mixins
-
-//Various classes
+/* Various classes */
 .button-dt
   +border-radius(2px)
   padding: 0.2em 0.5em
@@ -24,7 +11,7 @@
   &:hover
     +box-shadow()
 
-//Common
+/* Common */
 #header
   +clearfix
   background: $background-light-color url(../images/header.png) repeat-x
@@ -45,13 +32,16 @@
   ul
     +horizontal-list
 
-#main
+.container
   background: #443C2B
-  padding: 10px
-  position: relative
+  padding: 10px 10px 5px
+  #main
+    position: relative
+  #footer
+    text-align: center
+    color: $grayLight
 
-
-//Page
+/* Page */
 .page-app
   margin: 0 auto
   width: 550px
@@ -137,22 +127,20 @@
         magrin: 2px 2px 0 0
         display: block
         cursor: pointer
-        border: 1px solid $dark-color
+        border: 1px solid lighten($black, 5%)
         height: 14px
         line-height: 14px
         padding: 0 2px
 
     .task-list-container
       position: relative
-      color: $dark-color
+      color: lighten($black, 5%)
       .actionArea
         margin: 1.5em 0
-    .empty-state
-      ul
-        list-style: none
-        margin-left: 1em
     #task-today-current
       ul
+        +reset-box-model
+        list-style-type: none
         &.empty-state
           .empty
             display: list-item
@@ -165,47 +153,47 @@
               display: block !important
             .actionArea
               display: none !important
-        .empty
-          display: none
-        .task
-          border-bottom: 1px dotted $dark-color
-          padding: .5em
-          &:hover
-            .actionArea
-              visibility: visible
+      .empty
+        display: none
+      .task
+        border-bottom: 1px dotted lighten($black, 5%)
+        padding: .5em
+        &:hover
           .actionArea
-            margin: 0
-            visibility: hidden
-            .button
-              width: 13px
-              height: 13px
-              +hide-text
-              background-image: url(../images/sprites.png)
-            .task-action-trigger
-              background-position: -129px -173px
-            .task-action-notes
-              background-position: -171px -173px
-          .ui-icon-arrowthick-2-n-s
-            display: none
-          .task-check
-            cursor: pointer
-            width: 17px
-            height: 17px
-            border: 1px solid $background-color
-            border: 1px solid rgba($background-color, 0.7)
-            +border-radius(5px)
-            color: $dark-color
-            &:hover
-              +box-shadow()
-              background: url(../images/sprites.png) -149px -173px
-        .task-priority-0
-          color: #202020
-        .task-priority-1
-          color: red
-        .task-priority-2
-          color: #007700
-        .task-priority-3
-          color: #006699
+            visibility: visible
+        .actionArea
+          margin: 0
+          visibility: hidden
+          .button
+            width: 13px
+            height: 13px
+            +hide-text
+            background-image: url(../images/sprites.png)
+          .task-action-trigger
+            background-position: -129px -173px
+          .task-action-notes
+            background-position: -171px -173px
+        .ui-icon-arrowthick-2-n-s
+          display: none
+        .task-check
+          cursor: pointer
+          width: 17px
+          height: 17px
+          border: 1px solid $background-color
+          border: 1px solid rgba($background-color, 0.7)
+          +border-radius(5px)
+          color: lighten($black, 5%)
+          &:hover
+            +box-shadow()
+            background: url(../images/sprites.png) -149px -173px
+      .task-priority-0
+        color: lighten($black, 5%)
+      .task-priority-1
+        color: red
+      .task-priority-2
+        color: $green
+      .task-priority-3
+        color: $blue
 
       .actionArea
         .button-dt.active-state
@@ -225,10 +213,9 @@
       list-style: upper-roman
       .task-line
         padding: .5em 0
-        border-bottom: 1px solid $dark-color
+        border-bottom: 1px solid lighten($black, 5%)
       li li.task-line
         border-style: dotted
-
   #message-main
     top: 72px
     left: 50%
@@ -253,7 +240,7 @@
   .task-priority
     border-bottom: none !important
     ul
-      margin: 0
+      +reset-box-model
       li
         +horizontal-list-item(2px)
         cursor: pointer

@@ -1,7 +1,7 @@
 // Here is where you can define your constants for your application and to configure the blueprint framework.
 // Feel free to delete these if you want keep the defaults:
 
-@import "colors"
+@import "variables"
 
 $grid-columns   : 24
 $container-size : 700px
@@ -12,11 +12,13 @@ $grid-margin    : 10px
 $grid-width: ($container-size + $grid-margin) / $grid-columns - $grid-margin
 
 $line-height              : 1.5
-$font-color               : #FFF
-$link-color               : #FFF
+$font-color               : $white
+$link-color               : $white
 $link-hover-color         : darken($link-color, 30%)
+$link-focus-color         : $link-hover-color
+$link-active-color        : lighten(adjust-hue($link-color, 75deg), 10%)
+$link-visited-color       : darken($link-color, 10%)
 $background-color         : rgb(48, 39, 22)
-$dark-color               : #202020
 $notice-color             : #EC5800
 $notice-bg-color          : #AFCF51
 $background-light-color   : #443C2B

@@ -1,8 +1,5 @@
 extends layout
 
-block styles
-  link(href='stylesheets/Aristo/jquery-ui-1.8.7.custom.css', media='screen, projection', rel='stylesheet')
-
 block body
   .page-app
     #timer
@@ -16,11 +13,11 @@ block body
         li: a(href="#task-today") 今日任务
         li: a(href="#task-archives") 往日记录
       #task-today
-        #task-today-current.task-list-container.empty-state
+        #task-today-current.task-list-container
           .task-add
             input(placeholder="添加任务")
             a.task-add-button.button.fn-tipsy(title="查看全部隐藏任务")
-          ul
+          ul.empty-state
             li.empty 没有记录哦!
           .actionArea
             button.button-reorder.button-dt 重排
@@ -34,7 +31,7 @@ block body
         p: input#task-datepicker
         .content
           ul.task-archives-list
-    
+
     #mask
       .mask-message
         strong.mask-text 载入中...

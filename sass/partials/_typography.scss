@@ -1,5 +1,4 @@
 @import "compass/typography/links/link-colors";
-@import "font";
 
 
 @mixin typography() {
@@ -70,9 +69,12 @@
   hr { display:block; height:0; border-top: 1px solid #CCC; clear: both;
     margin:1em 0; padding:0; }
 
-  ul, ol { margin-left: 1.8em; }
   ol { list-style-type: decimal; }
-  ul { list-style: none; }
+  ul { list-style-type: disc; }
+  ul, ol {
+    margin: 0 1.5em 1.5em 0;
+    padding-left: 1.5em;
+  }
   dl {
     margin: 0 0 1.5em 0;
     dt {
@@ -97,5 +99,17 @@
     font-size: 1.2em;
   }
 
+
+  body {
+    font-family: $font-family
+  }
+
+  select, input, textarea, button {
+    font: 99% sans-serif
+  }
+
+  pre, code, kbd, samp {
+    font-family: $fixed-font-family
+  }
 }
 
