@@ -1,18 +1,16 @@
 var express = require('express');
 var app = express.createServer();
-
-var config = require('./config');
-var models = require('./models');
+var config = require('./config.json');
 
 process.env.NODE_ENV = 'development';
-var env  = process.env.NODE_ENV;
-var port = process.env.PORT || 8888;
-var envConfig = config.environment[env];
 
+var models = require('./models');
+var env  = process.env.NODE_ENV;
+var envConfig = config.environment[env];
+var port = envConfig.port;
 var db = require('mongoose').connect(
-  envConfig.db.host,
-  envConfig.db.database,
-  envConfig.db.port
+  'mongodb://' + envConfig.db.user + ':' + envConfig.db.pass + '@' +
+  envConfig.db.host + ':' + envConfig.db.port + '/' + envConfig.db.database
 );
 
 var boot = require('./boot');

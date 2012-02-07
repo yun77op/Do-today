@@ -4,18 +4,14 @@
 // Copyright (c) 2008, Philip S Tellis <philip@bluesmoon.info>
 // Copyright (c) 2010, James Smith <james@loopj.com>
 //
-
 function xPad(x, pad, r) {
   if(typeof(r) == 'undefined') {
     r=10;
   }
-
   for( ; parseInt(x, 10)<r && r>1; r/=10) 
     x = pad.toString() + x;
-
   return x.toString();
-};
-
+}
 // Localised strings for English
 var locales = {};
 locales.en = {
@@ -29,19 +25,15 @@ locales.en = {
   x: '%d/%m/%y',
   X: '%T'
 };
-
 // Localised strings for US English
 locales['en-US'] = locales.en;
 locales['en-US'].c = '%a %d %b %Y %r %Z';
 locales['en-US'].x = '%D';
 locales['en-US'].X = '%r';
-
 // Localised strings for British English
 locales['en-GB'] = locales.en;
-
 // Localised strings for Australian English
 locales['en-AU'] = locales['en-GB'];
-
 // List of supported format specifiers.
 var formats = {
   a: function(d) { return locales[d.locale].a[d.getDay()]; },
@@ -57,13 +49,11 @@ var formats = {
       var y = d.getFullYear();
       var V = parseInt(formats.V(d), 10);
       var W = parseInt(formats.W(d), 10);
-
       if(W > V) {
         y++;
       } else if(W===0 && V>=52) {
         y--;
       }
-
       return y;
     },
   H: ['getHours', '0'],
@@ -99,7 +89,6 @@ var formats = {
       {
         idow = formats.V(new Date('' + (d.getFullYear()-1) + '/12/31'));
       }
-
       return xPad(idow, 0);
     },
   w: 'getDay',
@@ -120,7 +109,6 @@ var formats = {
   Z: function(d) { return d.toString().replace(/^.*\(([^)]+)\)$/, '$1'); },
   '%': function(d) { return '%'; }
 };
-
 // List of aggregate format specifiers.
 var aggregates = {
   c: 'locale',
@@ -134,11 +122,9 @@ var aggregates = {
   x: 'locale',
   X: 'locale'
 };
-
 // Formats the date according to the specified format
 exports.strftime = function (d, fmt, locale) {
   d.locale = locale = locales[locale] ? locale : "en-US";
-
   // First replace aggregates
   while(fmt.match(/%[cDhnrRtTxXzZ]/)) {
     fmt = fmt.replace(/%([cDhnrRtTxXzZ])/g, function(m0, m1) {
@@ -146,7 +132,6 @@ exports.strftime = function (d, fmt, locale) {
       return (f == 'locale' ? locales[locale][m1] : f);
     });
   }
-
   // Now replace formats - we need a closure so that the date object gets passed through
   var str = fmt.replace(/%([aAbBCdegGHIjlmMpPSuUVwWyY%])/g, function(m0, m1) {
     var f = formats[m1];
@@ -160,6 +145,5 @@ exports.strftime = function (d, fmt, locale) {
       return m1;
     }
   });
-
   return str;
 };

@@ -416,21 +416,37 @@ define(function(require, exports, module) {
     });
 
     note.start();
-    connect.start();
+
+    connect.getCurrentTasks(function(currentTasks) {
+      var task;
+      var hiddenTasks = [];
+      var id;
+      for (id in currentTasks) {
+        task = currentTasks[id];
+        if (task.hidden) {
+          hiddenTasks.push(task);
+        } else {
+          addToCurrent(task);
+        }
+      }
+      var source = [];
+      if (hiddenTasks.length > 0) {
+        for (var i = 0, l = hiddenTasks.length; i < l; ++i) {
+          task = hiddenTasks[i];
+          source.push({
+            id: task._id,
+            value: task.content
+          });
+        }
+      }
+      initAutocomplete(source);
+    });
+
   }
 
-  var expt = {
-    initAutocomplete: initAutocomplete,
-    addToCurrent: addToCurrent,
-
+  return {
     focusInput: focusInput,
-    start: start,
-
-    note: note
+    start: start
   };
-
-  connect.host = expt;
-
-  return expt;
 
 });

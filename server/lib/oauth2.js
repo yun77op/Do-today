@@ -1,7 +1,6 @@
 var https = require('https'),
     url = require('url'),
     util = require('./util');
-
 function OAuth2(id_, secret_, baseURI, redirectURI, authorizePath, accessPath) {
   this.id_ = id_;
   this.secret_ = secret_;
@@ -10,9 +9,7 @@ function OAuth2(id_, secret_, baseURI, redirectURI, authorizePath, accessPath) {
   this.authorizePath_ = authorizePath || '/oauth/authorize';
   this.accessPath_ = accessPath || '/oauth/access_token';
 }
-
 var p = OAuth2.prototype;
-
 p.getAuthorizeURL = function () {
   var authorizeURI = this.baseURI_ + this.authorizePath_;
   return util.addURLParam(authorizeURI, {
@@ -21,13 +18,11 @@ p.getAuthorizeURL = function () {
     redirect_uri: this.redirectURI_
   });
 };
-
 p.getAccessToken = function (code, callback) {
   var options = {
     path: this.accessPath_,
     method: 'POST'
   };
-
   var params = {
     client_id: this.id_,
     client_secret: this.secret_,
@@ -35,12 +30,10 @@ p.getAccessToken = function (code, callback) {
     redirect_uri: this.redirectURI_,
     code: code
   };
-
   this.request(options, params, function (err, data) {
     callback(err, data);
   });
 };
-
 /**
  * 不同的参数组合
  * 1 options, params, callback
@@ -79,7 +72,6 @@ p.request = function (options, params, accessToken, callback) {
     }
     options.path = util.addURLParam(options.path, params);
   }
-
   var req = https.request(options, function (res) {
     var result = '';
     res.setEncoding('utf8');
@@ -95,16 +87,12 @@ p.request = function (options, params, accessToken, callback) {
       }
     });
   });
-
   req.on('error', function(e) {
     callback(e);
   });
-
   if (hasPostBody) {
     req.write(postBody);
   }
-
   req.end();
 };
-
 exports.OAuth2 = OAuth2;

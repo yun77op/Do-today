@@ -6,24 +6,27 @@
   },
   "server": {
     "cookie_maxAge": 86400000,
-    "base_uri": "http://dev.com:8888"
+    "base_uri": "http://dotoday.cnodejs.net"
   },
-
   "environment": {
     "development": {
-      "port": 8888,
+      "port": 80,
       "db": {
-        "host": "localhost",
-        "database": "dotoday_development",
-        "port": 27017
+        "user": "w86lSnV08vtB",
+        "pass": "AIaExpPBgT",
+        "host": "127.0.0.1",
+        "database": "66prEBTWVkD4",
+        "port": 20088
       }
     },
     "production": {
       "port": 80,
       "db": {
-        "host": "localhost",
-        "database": "dotoday_production",
-        "port": 27017
+        "user": "w86lSnV08vtB",
+        "pass": "AIaExpPBgT",
+        "host": "127.0.0.1",
+        "database": "66prEBTWVkD4",
+        "port": 20088
       }
     }
   }
