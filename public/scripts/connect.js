@@ -158,4 +158,5 @@ define(function(require, exports, module) {
   return {
     connect: connect
   };
+
 });
