@@ -1,5 +1,0 @@
-h3. Do today
-
-基于番茄工作法的web实现，除了计时，还和任务管理结合。
-
-"http://dotoday.sinaapp.com/":http://dotoday.sinaapp.com/
