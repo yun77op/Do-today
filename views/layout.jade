@@ -27,19 +27,23 @@ html(class='no-js', lang='en')
       a(href='http://enable-javascript.com/', target="_blank") enable JavaScript
       |  to view this website.
     #header
-      .logo
-        a(href="/") Dotoday
-      #global-nav
-        ul
-          - if (isLoggedIn)
-              li #{user.name}
-              li: a(href='/logout') 退出
-    .container
-      div#main(role='main')
+      .cnt
+        .logo
+          a(href="/") Dotoday
+        #global-nav
+          ul
+            - if (isLoggedIn)
+                li #{user.name}
+                li: a(href='/logout') 退出
+            - else
+                li: a(href='/login') 登陆
+            li: a(href='/help') 帮助
 
-        //- Dynamically load the body content with support for { layout: false }
-        //-  (e.g. index's route and view this through use of extends/inheritance)
-        block body
-          !=body
-      footer#footer
-        &copy; 2012 Dotoday
+    #main(role='main')
+      //- Dynamically load the body content with support for { layout: false }
+      //-  (e.g. index's route and view this through use of extends/inheritance)
+      block body
+        !=body
+
+    footer#footer
+      &copy; 2012 Dotoday

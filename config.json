@@ -1,9 +1,4 @@
 {
-  "oauth": {
-    "client_id": "2316304576",
-    "client_secret": "27632f40604729efb03599200bfe28b6",
-    "base_uri": "https://api.weibo.com"
-  },
   "server": {
     "cookie_maxAge": 86400000,
     "base_uri": "http://dotoday.cnodejs.net"
