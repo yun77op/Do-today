@@ -10,13 +10,10 @@
   },
   "environment": {
     "development": {
-      "port": 80,
+      "port": 8000,
       "db": {
-        "user": "w86lSnV08vtB",
-        "pass": "AIaExpPBgT",
         "host": "127.0.0.1",
-        "database": "66prEBTWVkD4",
-        "port": 20088
+        "database": "dotoday_dev"
       }
     },
     "production": {

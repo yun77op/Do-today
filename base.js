@@ -2,6 +2,7 @@ var express  = require('express');
 var mongoStore = require('connect-mongodb');
 var gzippo = require('gzippo');
 var config = require('./config.json');
+
 // Return existing connection info
 // http://dailyjs.com/2010/12/06/node-tutorial-5/
 function mongoStoreConnectionArgs(db) {
@@ -13,11 +14,13 @@ function mongoStoreConnectionArgs(db) {
     password: db.connections[0].pass
   };
 }
+
 // Login middleware helper
 function loginHelper(req, res, next) {
   req.isLoggedIn = req.session.user ? true : false;
   next();
 }
+
 function access(req, res, next) {
   if (req.isLoggedIn) {
     req.user = req.session.user;
@@ -28,8 +31,9 @@ function access(req, res, next) {
     res.redirect('home');
   }
 }
+
 exports.bootApplication = function(app, db) {
-  var publicDir = __dirname + '/../public';
+  var publicDir = __dirname + '/public';
   var maxAge = config.server.cookie_maxAge;
   app.configure(function () {
     app.set('view engine', 'jade');
@@ -45,40 +49,71 @@ exports.bootApplication = function(app, db) {
     // app.use(express.csrf());
     app.use(loginHelper);
     app.use(app.router);
-    app.use(express.favicon(__dirname + '/../public/favicon.ico'));
+    app.use(express.favicon(publicDir + '/favicon.ico'));
   });
+
   app.configure('development', function() {
     // Colorful logger
     // app.use(express.logger({ format: '\x1b[1m:method\x1b[0m \x1b[33m:url\x1b[0m :response-time ms' }));
     app.use(express.static(publicDir, {maxAge: 0}));
     app.set('showStackError', true);
   });
+
   app.configure('production', function() {
     // Enable gzip compression is for production mode only
     app.use(gzippo.staticGzip(publicDir, {maxAge: maxAge}));
     app.enable('view cache');
     app.set('showStackError', false);
   });
+
   app.dynamicHelpers({
     isLoggedIn: function(req, res) {
       return !!req.user;
     },
+
     user: function(req, res) {
       return req.user;
     },
+
     dateformat: function(req, res) {
       return require('./lib/dateformat').strftime;
-    },
+    }//,
     
     // Generate token using Connect's csrf module
     //  and in your Jade view use the following:
     //  `input(type="hidden",name="_csrf", value=csrf)`
-    csrf: function(req, res) {
-      return req.session._csrf;
-    }
+    // csrf: function(req, res) {
+    //   return req.session._csrf;
+    // }
   });
+
   app.access = access;
 };
+
+// ## Boot DB
+exports.bootDB = function() {
+  var env  = process.env.NODE_ENV;
+  var dbConfig = config.environment[env].db;
+  var poolLink = 'mongodb://';
+
+  if (typeof dbConfig.user != 'undefined') {
+    if (typeof dbConfig.pass == 'undefined')
+      throw Error('== Config Error == mongodb pass required');
+    poolLink += dbConfig.user + ':' + dbConfig.pass + '@';
+  }
+
+  poolLink += dbConfig.host;
+
+  if (typeof dbConfig.port != 'undefined')
+    poolLink += ':' + dbConfig.port;
+
+  poolLink += '/' + dbConfig.database;
+
+  var db = require('mongoose').connect(poolLink);
+
+  return db;
+};
+
 // ## Load Routes
 exports.bootRoutes = function(app, db) {
   var walk = require('walk');
@@ -86,10 +121,12 @@ exports.bootRoutes = function(app, db) {
   var files = [];
   var dir = path.join(__dirname, 'routes');
   var walker  = walk.walk(dir, { followLinks: false });
+
   walker.on('file', function(root, stat, next) {
     files.push(root + '/' + stat.name);
     next();
   });
+
   walker.on('end', function() {
     files.forEach(function(file) {
       require(file)(app, db);
@@ -121,6 +158,7 @@ exports.bootExtras = function(app) {
     next();
   });
 };
+
 // ## Error Configuration
 exports.bootErrorConfig = function(app) {
   // Since this is the last non-error-handling middleware use()d,
@@ -134,6 +172,7 @@ exports.bootErrorConfig = function(app) {
       title: 'Page not found :('
     });
   });
+
   app.error(function(err, req, res, next) {
     res.render('500', {
       layout: false,
@@ -143,6 +182,7 @@ exports.bootErrorConfig = function(app) {
       title: 'Something went wrong, oops!'
     });
   });
+
   //     Error-handling middleware, take the same form as regular middleware,
   //     however they require an arity of 4, aka the signature (err, req, res, next)
   //     when connect has an error, it will invoke ONLY error-handling middleware.
