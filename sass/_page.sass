@@ -10,6 +10,14 @@
   &:hover
     +box-shadow()
 
+.form-field
+  margin: 1em 0
+  label
+    width: 7em
+    display: inline-block
+    text-align: right
+    padding-right: 1em
+
 /* Common */
 #header
   +clearfix
@@ -273,7 +281,15 @@
 
 #login-form
   margin-bottom: 1.5em
-  .filed-line
+  fieldset
     margin-bottom: 1em
     label
       display: block
+
+.action-area button,
+.action-area input,
+.action-area a
+  margin: 0 .5em
+
+form .action-area
+  padding-left: 8em

@@ -1,9 +1,9 @@
 h1 登陆
-form(method="POST", action="/users", id="login-form")
-  .filed-line
+form(method="POST", action="/session", id="login-form")
+  fieldset
     label(for="username_or_email") 用户名 或 邮箱
     input#username_or_email(type="text", name="username_or_email")
-  .filed-line
+  fieldset
     label(for="pass") 密码
     input#pass(type="password", name="pass")
   input(type="submit", value="登陆") 

@@ -235,6 +235,9 @@ pre, code, kbd, samp { font-family: monospace, sans-serif; }
 .button-dt { -moz-border-radius: 2px; -webkit-border-radius: 2px; -o-border-radius: 2px; -ms-border-radius: 2px; -khtml-border-radius: 2px; border-radius: 2px; padding: 0.2em 0.5em; font-size: 12px; color: #a2a0a1; font-size: 0.9em; background: rgba(162, 160, 161, 0.7); background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(162, 160, 161, 0.7)), color-stop(100%, rgba(162, 160, 161, 0.5))); background-image: -webkit-linear-gradient(top, rgba(162, 160, 161, 0.7), rgba(162, 160, 161, 0.5)); background-image: -moz-linear-gradient(top, rgba(162, 160, 161, 0.7), rgba(162, 160, 161, 0.5)); background-image: -o-linear-gradient(top, rgba(162, 160, 161, 0.7), rgba(162, 160, 161, 0.5)); background-image: -ms-linear-gradient(top, rgba(162, 160, 161, 0.7), rgba(162, 160, 161, 0.5)); background-image: linear-gradient(top, rgba(162, 160, 161, 0.7), rgba(162, 160, 161, 0.5)); }
 .button-dt:hover { -moz-box-shadow: 0px 0px 5px #333333; -webkit-box-shadow: 0px 0px 5px #333333; -o-box-shadow: 0px 0px 5px #333333; box-shadow: 0px 0px 5px #333333; }
 
+.form-field { margin: 1em 0; }
+.form-field label { width: 7em; display: inline-block; text-align: right; padding-right: 1em; }
+
 /* Common */
 #header { overflow: hidden; *zoom: 1; border-top: 20px #443c2b solid; }
 #header > .cnt { position: relative; }
@@ -318,5 +321,9 @@ pre, code, kbd, samp { font-family: monospace, sans-serif; }
 .thumb-list li.thumb .thumb-desc { display: block; text-align: center; background: #a2a0a1; color: white; -moz-border-radius: 3px; -webkit-border-radius: 3px; -o-border-radius: 3px; -ms-border-radius: 3px; -khtml-border-radius: 3px; border-radius: 3px; margin-top: 0.5em; }
 
 #login-form { margin-bottom: 1.5em; }
-#login-form .filed-line { margin-bottom: 1em; }
-#login-form .filed-line label { display: block; }
+#login-form fieldset { margin-bottom: 1em; }
+#login-form fieldset label { display: block; }
+
+.action-area button, .action-area input, .action-area a { margin: 0 0.5em; }
+
+form .action-area { padding-left: 8em; }
