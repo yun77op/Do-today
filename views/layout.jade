@@ -17,8 +17,8 @@ html(class='no-js', lang='en')
     - else
       title Dotoday
     meta(name='viewport', content='width=device-width,initial-scale=1')
-    link(href='stylesheets/Aristo/jquery-ui-1.8.7.custom.css', media='screen, projection', rel='stylesheet')
-    link(href='stylesheets/dt.css', media='screen, projection', rel='stylesheet')
+    link(href='/stylesheets/Aristo/jquery-ui-1.8.7.custom.css', media='screen, projection', rel='stylesheet')
+    link(href='/stylesheets/dt.css', media='screen, projection', rel='stylesheet')
 
     //script(src='/js/lib/modernizr-2.0.6.min.js')
   body
@@ -34,9 +34,9 @@ html(class='no-js', lang='en')
           ul
             - if (isLoggedIn)
                 li #{user.name}
-                li: a(href='/logout') 退出
+                li: a(href='/session') 退出
             - else
-                li: a(href='/login') 登陆
+                li: a(href='/session/new') 登陆
             li: a(href='/help') 帮助
 
     #main(role='main')
