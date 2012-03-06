@@ -10,9 +10,7 @@ module.exports = function(app, db) {
     var user = req.user;
     res.render('app', {
       layout: false,
-      locals: {
-        title: user.name
-      }
+      title: user.name
     });
   });
 
@@ -197,7 +195,6 @@ module.exports = function(app, db) {
       .find({user_id: userId})
       .populate('task')
       .run(function(err, docs) {
-        console.log('--Current tasks');
         if (err) { return res.send(err); }
         var tasks = {};
         docs.forEach(function(doc) {

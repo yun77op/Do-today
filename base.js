@@ -2,6 +2,7 @@ var express  = require('express');
 var mongoStore = require('connect-mongodb');
 var gzippo = require('gzippo');
 var config = require('./config.json');
+var FlashMessage = require('./lib/flash_message');
 
 // Return existing connection info
 // http://dailyjs.com/2010/12/06/node-tutorial-5/
@@ -15,9 +16,9 @@ function mongoStoreConnectionArgs(db) {
   };
 }
 
-// Login middleware helper
+// Login middleware
 function loginHelper(req, res, next) {
-  req.isLoggedIn = req.session.user ? true : false;
+  req.isLoggedIn = req.session.user_id ? true : false;
   next();
 }
 
@@ -32,6 +33,31 @@ function access(req, res, next) {
   }
 }
 
+// ## Boot DB
+exports.bootDB = function(app) {
+  var env  = app.settings.env;
+  var dbConfig = config.environment[env].db;
+  var poolLink = 'mongodb://';
+
+  if (typeof dbConfig.user != 'undefined') {
+    if (typeof dbConfig.pass == 'undefined')
+      throw Error('== Config Error == mongodb pass required');
+    poolLink += dbConfig.user + ':' + dbConfig.pass + '@';
+  }
+
+  poolLink += dbConfig.host;
+
+  if (typeof dbConfig.port != 'undefined')
+    poolLink += ':' + dbConfig.port;
+
+  poolLink += '/' + dbConfig.database;
+
+  var db = require('mongoose').connect(poolLink);
+
+  return db;
+};
+
+// ## Boot Application
 exports.bootApplication = function(app, db) {
   var publicDir = __dirname + '/public';
   var maxAge = config.server.cookie_maxAge;
@@ -71,13 +97,13 @@ exports.bootApplication = function(app, db) {
       return !!req.user;
     },
 
-    user: function(req, res) {
+    currentUser: function(req, res) {
       return req.user;
     },
 
     dateformat: function(req, res) {
       return require('./lib/dateformat').strftime;
-    }//,
+    },
     
     // Generate token using Connect's csrf module
     //  and in your Jade view use the following:
@@ -85,33 +111,20 @@ exports.bootApplication = function(app, db) {
     // csrf: function(req, res) {
     //   return req.session._csrf;
     // }
+
+    flashMessages: function(req, res) {
+      var html = '';
+      ['error', 'info'].forEach(function(type) {
+        var messages = req.flash(type);
+        if (messages.length > 0) {
+          html += new FlashMessage(type, messages).toHTML();
+        }
+      });
+      return html;
+    }
   });
 
   app.access = access;
-};
-
-// ## Boot DB
-exports.bootDB = function() {
-  var env  = process.env.NODE_ENV;
-  var dbConfig = config.environment[env].db;
-  var poolLink = 'mongodb://';
-
-  if (typeof dbConfig.user != 'undefined') {
-    if (typeof dbConfig.pass == 'undefined')
-      throw Error('== Config Error == mongodb pass required');
-    poolLink += dbConfig.user + ':' + dbConfig.pass + '@';
-  }
-
-  poolLink += dbConfig.host;
-
-  if (typeof dbConfig.port != 'undefined')
-    poolLink += ':' + dbConfig.port;
-
-  poolLink += '/' + dbConfig.database;
-
-  var db = require('mongoose').connect(poolLink);
-
-  return db;
 };
 
 // ## Load Routes

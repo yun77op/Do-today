@@ -2,16 +2,16 @@ h1 注册
 form(method="POST", action="/signup", id="signup-form")
   .form-field
     fieldset
-      label(for="username") 用户名
-      input#username(type="text", name="username", required)
+      label(for="name") 用户名
+      input#name(type="text", name="name", required, value=user.name || '')
   .form-field
     fieldset
       label(for="email") 邮箱
-      input#email(type="email", name="email", required)
+      input#email(type="email", name="email", required, value=user.email || '')
   .form-field
     fieldset
-      label(for="pass") 密码
-      input#pass(type="password", name="pass", required)
+      label(for="password") 密码
+      input#password(type="password", name="password", required)
   .action-area
     input(type="submit", value="注册")
     a(href="/") 取消

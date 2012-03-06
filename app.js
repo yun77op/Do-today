@@ -2,15 +2,14 @@ var express = require('express');
 var app = module.exports = express.createServer();
 var config = require('./config.json');
 
-process.env.NODE_ENV = 'development';
-
 var models = require('./models');
-var env  = process.env.NODE_ENV;
+var env  = app.settings.env;
+
 var envConfig = config.environment[env];
 var port = envConfig.port;
 
 var base = require('./base');
-var db = base.bootDB();
+var db = base.bootDB(app);
 base.bootApplication(app, db);
 base.bootRoutes(app, db);
 base.bootErrorConfig(app);

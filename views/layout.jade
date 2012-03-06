@@ -42,6 +42,7 @@ html(class='no-js', lang='en')
     #main(role='main')
       //- Dynamically load the body content with support for { layout: false }
       //-  (e.g. index's route and view this through use of extends/inheritance)
+      !{flashMessages}
       block body
         !=body
 
