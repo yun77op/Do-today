@@ -1,5 +1,7 @@
+include functions
+
 //- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/
-!!! 5
+doctype html
 //-  H5BP implementation inspired by <https://gist.github.com/888338/>.
 //if lt IE 7
   <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en">
@@ -32,19 +34,18 @@ html(class='no-js', lang='en')
           a(href="/") Dotoday
         #global-nav
           ul
-            - if (isLoggedIn)
-                li #{user.name}
-                li: a(href='/session') 退出
-            - else
-                li: a(href='/session/new') 登陆
-            li: a(href='/help') 帮助
+            if isLoggedIn
+              li #{currentUser.name}
+              li: a(href='/session/del') 退出
+            else
+              li: a(href='/session/new') 登陆
 
     #main(role='main')
       //- Dynamically load the body content with support for { layout: false }
       //-  (e.g. index's route and view this through use of extends/inheritance)
-      !{flashMessages}
-      block body
-        !=body
+      //!{flashMessages}
+      if messages
+        +messages(messages)
+      block content
 
-    footer#footer
-      &copy; 2012 Dotoday
+    footer#footer &copy; 2012 Dotoday

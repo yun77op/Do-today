@@ -1,0 +1,7 @@
+mixin messages(messageObjs)
+  each messages, type in messageObjs
+    .ui-widget.alert
+      div.ui-corner-all(class=type == "info" ? "ui-state-highlight" : "ui-state-#{type}")
+      p
+        span.ui-icon(class=type == "info" ? "ui-icon-info" : "ui-icon-alert")
+        = messages

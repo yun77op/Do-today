@@ -13,9 +13,11 @@ module.exports = function(app, db) {
     var user = new UserModel(req.body);
 
     function userSaveFailed(err) {
-      req.flash('error', err.toString());
       res.render('signup', {
-        user: user
+        user: user,
+        messages: {
+          error: err.toString()
+        }
       });
     }
 
@@ -23,7 +25,10 @@ module.exports = function(app, db) {
       if (err) return userSaveFailed(err);
 
       req.flash('info', 'Your account has been created');
-      req.session.user_id = user.id;
+      req.session.user = {
+        id: user._id,
+        name: user.get('name')
+      };
       res.redirect('/app');
     });
   });

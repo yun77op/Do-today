@@ -21,6 +21,7 @@ define(function(require, exports, module) {
       var self = this;
       $.ajax('/currentTasks/' + dateText, {
         success: function(data) {
+          self.currentTasks = data;
           fn(data);
         }
       });

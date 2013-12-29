@@ -1,6 +1,6 @@
-extends layout
+extends ../layout
 
-block body
+block content
   .page-app
     #timer
       .timer-time 25:00
@@ -37,11 +37,11 @@ block body
         strong.mask-text 载入中...
         p: img(src="images/loading.gif")
 
-    include partials/overlay-task
-    include partials/overlay-notes
+    include overlay-task
+    include overlay-notes
 
     script(src="scripts/lib/LAB.min.js")
-    script
+    script.
       $LAB.setGlobalDefaults({BasePath: '/scripts/'});
       $LAB
         .script('lib/jquery.min.js')

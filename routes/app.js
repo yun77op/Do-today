@@ -8,10 +8,16 @@ module.exports = function(app, db) {
 
   app.get('/app', access, function (req, res) {
     var user = req.user;
-    res.render('app', {
+    var options = {
       layout: false,
       title: user.name
-    });
+    };
+    if (req.flash('info').length > 0) {
+      options.messages = {
+        info: req.flash('info')
+      };
+    }
+    res.render('app/app', options);
   });
 
   app.post('/task', access, function (req, res) {
@@ -189,12 +195,13 @@ module.exports = function(app, db) {
   //Feed current tasks
   app.get('/currentTasks/:dateText', access, function(req, res) {
     var TasksCurrentModel = models(db, 'TasksCurrent');
+    var TaskModel = models(db, 'Task');
     var dateText = req.params.dateText;
     var userId = req.user._id;
     TasksCurrentModel
       .find({user_id: userId})
       .populate('task')
-      .run(function(err, docs) {
+      .exec(function(err, docs) {
         if (err) { return res.send(err); }
         var tasks = {};
         docs.forEach(function(doc) {
@@ -213,7 +220,7 @@ module.exports = function(app, db) {
     TaskArchiveModel
       .find({ date_text: dateText, user_id: userId })
       .populate('task')
-      .run(function(err, docs) {
+      .exec(function(err, docs) {
         if (err) { return res.send(err); }
         var results = docs.map(function(doc) {
           return doc.toObject();

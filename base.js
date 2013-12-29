@@ -1,24 +1,14 @@
 var express  = require('express');
-var mongoStore = require('connect-mongodb');
 var gzippo = require('gzippo');
 var config = require('./config.json');
 var FlashMessage = require('./lib/flash_message');
+var mongoose = require('mongoose');
+var flash = require('connect-flash');
 
-// Return existing connection info
-// http://dailyjs.com/2010/12/06/node-tutorial-5/
-function mongoStoreConnectionArgs(db) {
-  return {
-    db: db.connections[0].db.databaseName,
-    host: db.connections[0].db.serverConfig.host,
-    port: db.connections[0].db.serverConfig.port,
-    username: db.connections[0].user,
-    password: db.connections[0].pass
-  };
-}
 
 // Login middleware
 function loginHelper(req, res, next) {
-  req.isLoggedIn = req.session.user_id ? true : false;
+  req.isLoggedIn = !!req.session.user;
   next();
 }
 
@@ -35,26 +25,11 @@ function access(req, res, next) {
 
 // ## Boot DB
 exports.bootDB = function(app) {
-  var env  = app.settings.env;
-  var dbConfig = config.environment[env].db;
-  var poolLink = 'mongodb://';
+  var uri = process.env.MONGOLAB_URI ||
+                  process.env.MONGOHQ_URL ||
+                  'mongodb://localhost:27017/dotoday';
 
-  if (typeof dbConfig.user != 'undefined') {
-    if (typeof dbConfig.pass == 'undefined')
-      throw Error('== Config Error == mongodb pass required');
-    poolLink += dbConfig.user + ':' + dbConfig.pass + '@';
-  }
-
-  poolLink += dbConfig.host;
-
-  if (typeof dbConfig.port != 'undefined')
-    poolLink += ':' + dbConfig.port;
-
-  poolLink += '/' + dbConfig.database;
-
-  var db = require('mongoose').connect(poolLink);
-
-  return db;
+  return mongoose.connect(uri);
 };
 
 // ## Boot Application
@@ -62,19 +37,32 @@ exports.bootApplication = function(app, db) {
   var publicDir = __dirname + '/public';
   var maxAge = config.server.cookie_maxAge;
   app.configure(function () {
+    app.engine('jade', require('jade').__express);
     app.set('view engine', 'jade');
     app.set('views', __dirname + '/views');
     app.use(express.bodyParser());
     app.use(express.methodOverride());
     app.use(express.cookieParser());
-    app.use(express.session({
-      store: mongoStore(mongoStoreConnectionArgs(db)),
+    app.use(express.cookieSession({
       secret: 'topsecret',
       maxAge : maxAge
     }));
-    // app.use(express.csrf());
+    app.use(flash());
     app.use(loginHelper);
-    app.use(app.router);
+
+    app.use(function(req, res, next) {
+      app.locals({
+        isLoggedIn: !!req.isLoggedIn,
+        currentUser: req.session.user ? req.session.user : null
+      });
+
+      next();
+    });
+
+    app.locals({
+      dateformat: require('./lib/dateformat').strftime
+    });
+
     app.use(express.favicon(publicDir + '/favicon.ico'));
   });
 
@@ -92,19 +80,8 @@ exports.bootApplication = function(app, db) {
     app.set('showStackError', false);
   });
 
-  app.dynamicHelpers({
-    isLoggedIn: function(req, res) {
-      return !!req.user;
-    },
+  app.use(app.router);
 
-    currentUser: function(req, res) {
-      return req.user;
-    },
-
-    dateformat: function(req, res) {
-      return require('./lib/dateformat').strftime;
-    },
-    
     // Generate token using Connect's csrf module
     //  and in your Jade view use the following:
     //  `input(type="hidden",name="_csrf", value=csrf)`
@@ -112,17 +89,6 @@ exports.bootApplication = function(app, db) {
     //   return req.session._csrf;
     // }
 
-    flashMessages: function(req, res) {
-      var html = '';
-      ['error', 'info'].forEach(function(type) {
-        var messages = req.flash(type);
-        if (messages.length > 0) {
-          html += new FlashMessage(type, messages).toHTML();
-        }
-      });
-      return html;
-    }
-  });
 
   app.access = access;
 };
@@ -186,7 +152,7 @@ exports.bootErrorConfig = function(app) {
     });
   });
 
-  app.error(function(err, req, res, next) {
+  app.use(function(err, req, res, next) {
     res.render('500', {
       layout: false,
       status: err.status || 500,
