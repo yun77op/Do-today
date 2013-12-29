@@ -12,7 +12,7 @@
     "walk": ">=2.0.2",
     "async": ">=0.1.15"
   },
-  "engines": { "node": ">= 0.6.3" },
+  "engines": { "node": "0.8.x" },
   "repository": {
     "type": "git",
     "url": "git://github.com/yun77op/Do-today.git"
